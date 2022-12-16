@@ -1,4 +1,5 @@
 import { Message } from './class/Message';
+import { Subscribe } from './class/Subscibe';
 
 import { EventEmitter } from 'events';
 import { RefreshingAuthProvider } from '@twurple/auth';
@@ -61,6 +62,12 @@ export class TwitchClient extends EventEmitter {
             const message = new Message(this, channelName, content, msg);
             super.emit(Events.MessageCreate, message);
         });
+
+        /* subCreate */
+        this._chat.onSub((channelName, userName, subInfo, msg) => {
+            const sub = new Subscribe(this, channelName, subInfo, msg);
+            super.emit(Events.SubCreate, sub);
+        });
     }
 
     /**
@@ -111,9 +118,11 @@ export interface ClientOptions {
 const Events = {
     Ready: 'ready',
     MessageCreate: 'messageCreate',
+    SubCreate: 'subCreate',
 };
 
 export interface ClientEvents {
     ready: [];
     messageCreate: [message: Message];
+    subCreate: [subscibe: Subscribe];
 }
