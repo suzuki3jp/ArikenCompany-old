@@ -1,8 +1,8 @@
-import type { Client } from '../Client';
+import type { TwitchClient } from '../Client';
 import type { HelixChannel } from '@twurple/api';
 
 export class Channel {
-    public client: Client;
+    public client: TwitchClient;
 
     /**
      * The id of the channel.
@@ -14,7 +14,7 @@ export class Channel {
      */
     public name: string;
 
-    constructor(client: Client, channelName: string, channelId: string) {
+    constructor(client: TwitchClient, channelName: string, channelId: string) {
         this.client = client;
         this.name = channelName;
         this.id = channelId;

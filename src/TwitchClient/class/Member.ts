@@ -1,8 +1,8 @@
 import type { ChatUser } from '@twurple/chat';
-import type { Client } from '../Client';
+import type { TwitchClient } from '../Client';
 
 export class ChannelMember {
-    public client: Client;
+    public client: TwitchClient;
 
     /**
      * The name of the member.
@@ -60,7 +60,7 @@ export class ChannelMember {
      */
     public color: string | null;
 
-    constructor(client: Client, userInfo: ChatUser) {
+    constructor(client: TwitchClient, userInfo: ChatUser) {
         this.client = client;
         this.id = userInfo.userId;
         this.name = userInfo.userName;

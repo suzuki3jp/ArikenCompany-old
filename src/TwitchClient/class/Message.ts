@@ -1,10 +1,10 @@
 import { Channel } from './Channel';
 import { ChannelMember } from './Member';
 import type { PrivateMessage } from '@twurple/chat';
-import type { Client } from '../Client';
+import type { TwitchClient } from '../Client';
 
 export class Message {
-    public client: Client;
+    public client: TwitchClient;
 
     /**
      * The content of the message.
@@ -31,7 +31,7 @@ export class Message {
      */
     public author: ChannelMember;
 
-    constructor(client: Client, channelName: string, content: string, message: PrivateMessage) {
+    constructor(client: TwitchClient, channelName: string, content: string, message: PrivateMessage) {
         if (!message.channelId) throw new Error('MESSAGE_CHANNELID_IS_NOT_DEFINED');
         this.client = client;
         this.content = content;

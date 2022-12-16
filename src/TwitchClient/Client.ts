@@ -8,7 +8,7 @@ import type { UserIdResolvable, HelixPrivilegedUser, HelixUser } from '@twurple/
 import { ChatClient } from '@twurple/chat';
 import type { PrivateMessage } from '@twurple/chat';
 
-export class Client extends EventEmitter {
+export class TwitchClient extends EventEmitter {
     /**
      * RefreshingAuthProvider from @twurple/auth.
      * {@link https://twurple.js.org/reference/auth/classes/RefreshingAuthProvider.html AuthProvider docs}
