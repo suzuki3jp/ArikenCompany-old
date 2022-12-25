@@ -1,6 +1,7 @@
 import { Message } from './class/Message';
 import { SubGift, Subscribe } from './class/Subscibe';
 import { Ban } from './class/Ban';
+import { Raid } from './class/Raid';
 
 import { EventEmitter } from 'events';
 import { RefreshingAuthProvider } from '@twurple/auth';
@@ -81,6 +82,11 @@ export class TwitchClient extends EventEmitter {
             const ban = new Ban(this, userName, channelName, msg);
             super.emit(Events.BanCreate, ban);
         });
+
+        this._chat.onRaid((channelName, userName, raidInfo, msg) => {
+            const raid = new Raid(this, channelName, raidInfo, msg);
+            super.emit(Events.raidCreate, raid);
+        });
     }
 
     /**
@@ -143,4 +149,5 @@ export interface ClientEvents {
     subCreate: [subscibe: Subscribe];
     subGiftCreate: [gift: SubGift];
     banCreate: [ban: Ban];
+    raidCreate: [raid: Raid];
 }
