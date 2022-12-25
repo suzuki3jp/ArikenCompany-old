@@ -1,7 +1,29 @@
-import type { ChatUser } from '@twurple/chat';
+import type { ChatUser, ChatSubGiftInfo } from '@twurple/chat';
+import type { HelixUser } from '@twurple/api';
 import type { TwitchClient } from '../Client';
 
-export class ChannelMember {
+export class BaseUser {
+    public client: TwitchClient;
+
+    /**
+     * The id of the user.
+     */
+    public id: string;
+
+    constructor(client: TwitchClient, id: string) {
+        this.client = client;
+        this.id = id;
+    }
+
+    /**
+     * Get infomation of the user.
+     */
+    async getInfo(): Promise<HelixUser | null> {
+        return await this.client.getUser(this.id);
+    }
+}
+
+export class ChannelMember extends BaseUser {
     public client: TwitchClient;
 
     /**
@@ -61,6 +83,7 @@ export class ChannelMember {
     public color: string | null;
 
     constructor(client: TwitchClient, userInfo: ChatUser) {
+        super(client, userInfo.userId);
         this.client = client;
         this.id = userInfo.userId;
         this.name = userInfo.userName;
@@ -73,5 +96,38 @@ export class ChannelMember {
         this.badges = userInfo.badges;
         this.badgeInfo = userInfo.badgeInfo;
         this.color = userInfo.color ?? null;
+    }
+}
+
+export class ChannelGifter extends ChannelMember {
+    /**
+     * The number of subscriptions the gifting user has already gifted in total.
+     */
+    giftCount: number | null;
+
+    constructor(client: TwitchClient, userInfo: ChatUser, gifterInfo: ChatSubGiftInfo) {
+        super(client, userInfo);
+        this.giftCount = gifterInfo.gifterGiftCount ?? null;
+    }
+}
+
+export class GiftRecipient extends BaseUser {
+    public client;
+
+    /**
+     * The display name of the user.
+     */
+    public displayName: string;
+
+    /**
+     * The id of the user.
+     */
+    public id: string;
+
+    constructor(client: TwitchClient, displayName: string, id: string) {
+        super(client, id);
+        this.client = client;
+        this.displayName = displayName;
+        this.id = id;
     }
 }
