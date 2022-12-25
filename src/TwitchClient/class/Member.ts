@@ -23,6 +23,18 @@ export class BaseUser {
     }
 }
 
+export class User extends BaseUser {
+    /**
+     * The name of the user.
+     */
+    public name: string;
+
+    constructor(client: TwitchClient, userId: string, userName: string) {
+        super(client, userId);
+        this.name = userName;
+    }
+}
+
 export class ChannelMember extends BaseUser {
     public client: TwitchClient;
 
