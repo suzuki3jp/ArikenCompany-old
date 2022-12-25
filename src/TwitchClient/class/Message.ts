@@ -27,9 +27,9 @@ export class Message {
     public channel: Channel;
 
     /**
-     * The author that sent the message.
+     * The member that sent the message.
      */
-    public author: ChannelMember;
+    public member: ChannelMember;
 
     constructor(client: TwitchClient, channelName: string, content: string, message: PrivateMessage) {
         if (!message.channelId) throw new Error('MESSAGE_CHANNELID_IS_NOT_DEFINED');
@@ -38,7 +38,7 @@ export class Message {
         this.id = message.id;
         this.sentAt = message.date;
         this.channel = new Channel(this.client, channelName, message.channelId);
-        this.author = new ChannelMember(this.client, message.userInfo);
+        this.member = new ChannelMember(this.client, message.userInfo);
     }
 
     /**
