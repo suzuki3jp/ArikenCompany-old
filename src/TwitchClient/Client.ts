@@ -52,7 +52,6 @@ export class TwitchClient extends EventEmitter {
         this._auth = new RefreshingAuthProvider(refreshConfig, accessToken);
         this._chat = new ChatClient({ authProvider: this._auth, channels: options.channels });
         this._api = new ApiClient({ authProvider: this._auth });
-        this._chat.connect();
 
         /* ready */
         this._chat.onRegister(() => {
@@ -111,6 +110,13 @@ export class TwitchClient extends EventEmitter {
      */
     say(channelName: string, content: string, replyTo?: string | PrivateMessage) {
         this._chat.say(channelName, content, { replyTo });
+    }
+
+    /**
+     *
+     */
+    async login(): Promise<void> {
+        await this._chat.connect();
     }
 }
 
