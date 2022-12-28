@@ -4,7 +4,7 @@
     "module": "commonjs",
     "resolveJsonModule": true,
     "sourceMap": false,
-    "outDir": "./lib",
+    "outDir": "./dist",
     "noEmitOnError": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
