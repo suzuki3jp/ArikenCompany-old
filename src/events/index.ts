@@ -1,9 +1,9 @@
-import type { TwitchClient } from '../TwitchClient/index';
+import type { TwitchClient } from '@suzuki3jp/twitch.js';
 import type { Client } from 'discord.js';
 import type { Logger } from '@suzuki3jp/utils';
 
 import { discordReady } from './discord/index';
-import { twitchReady } from './twitch/index';
+import { twitchReady, twitchMessage } from './twitch/index';
 
 export const eventsIndex = (
     twitchClient: TwitchClient,
@@ -20,4 +20,6 @@ export const eventsIndex = (
 
     // twitch events
     twitchClient.on('ready', () => twitchReady(twitchClient, logger));
+
+    twitchClient.on('messageCreate', (message) => twitchMessage(twitchClient, logger, message));
 };
