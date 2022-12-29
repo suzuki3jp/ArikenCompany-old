@@ -21,7 +21,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "@suzuki3jp/utils": "^1.0.0",
+    "@suzuki3jp/utils": "^1.1.0",
     "@twurple/api": "^5.2.7",
     "@twurple/auth": "^5.2.7",
     "@twurple/chat": "^5.2.7",
