@@ -4,10 +4,6 @@ import { Agent } from 'https';
 import path from 'path';
 import { readFileSync } from 'fs';
 
-const commands: Record<string, string> = JSON.parse(
-    readFileSync(path.resolve(__dirname, '../data/Commands.json'), { encoding: 'utf-8' })
-);
-
 export class ValueParser {
     async parse(value: string, message: Message): Promise<ValueParseResult> {
         const startBracketLength = StringUtils.countBy(value, '{');
@@ -26,7 +22,7 @@ export class ValueParser {
                 if (value[index] === '$') {
                     const startIndex = index + 2;
                     const endIndex = value.indexOf('}', startIndex);
-                    index = index + endIndex - 5;
+                    index = index + endIndex;
                     const codeRaw = value.slice(startIndex, endIndex);
                     const parsedCode = await this.parseCode(codeRaw, message);
                     if (parsedCode.status === 200) {
@@ -112,7 +108,10 @@ export class ValueParser {
     }
 
     private parseAlias(codeRaw: string): string {
-        const targetCommand = codeRaw.slice(6);
+        const targetCommand = codeRaw.slice(6).toLowerCase();
+        const commands: Record<string, string> = JSON.parse(
+            readFileSync(path.resolve(__dirname, '../data/Commands.json'), { encoding: 'utf-8' })
+        );
         return commands[targetCommand];
     }
 

@@ -9,6 +9,7 @@ const managersData: { managers: string[] } = JSON.parse(
         encoding: 'utf-8',
     })
 );
+
 const MessageCounter = JSON.parse(
     readFileSync(path.resolve(__dirname, '../data/MessageCounter.json'), { encoding: 'utf-8' })
 );
@@ -111,5 +112,13 @@ export class TwitchCommand extends CommandManager {
     removeCom(): string {
         const targetCommand = this.command.commandsArg[0];
         return super.removeCom(targetCommand);
+    }
+
+    commandValue(): string | null {
+        const Commands: Record<string, string> = JSON.parse(
+            readFileSync(path.resolve(__dirname, '../data/Commands.json'), { encoding: 'utf-8' })
+        );
+        const result = Commands[this.command.commandName];
+        return result ?? null;
     }
 }

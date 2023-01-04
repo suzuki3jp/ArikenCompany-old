@@ -1,1 +1,8 @@
-{}
+{
+	"!test": "${mod fetch https://beta.decapi.me/twitch/uptime/arikendebu}",
+	"!random": "${mod random hoge huge haga}",
+	"!hoge": "{hoge}",
+	"!time": "${mod time} haga",
+	"!channel": "${channel}",
+	"!alias": "${alias !Channel}"
+}

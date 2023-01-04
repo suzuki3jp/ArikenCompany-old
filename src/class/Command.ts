@@ -4,7 +4,6 @@ import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 const commandsFilePath = resolve(__dirname, '../data/Commands.json');
-const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
 
 export class CommandManager {
     public valueParser: ValueParser;
@@ -13,6 +12,7 @@ export class CommandManager {
     }
 
     async addCom(commandName: string, value: string, message: Message): Promise<string> {
+        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
         const name = commandName.toLowerCase();
         if (commands[name]) return manageCommandError.existCommandName;
 
@@ -26,6 +26,7 @@ export class CommandManager {
     }
 
     async editCom(commandName: string, value: string, message: Message): Promise<string> {
+        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -39,6 +40,7 @@ export class CommandManager {
     }
 
     removeCom(commandName: string): string {
+        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];

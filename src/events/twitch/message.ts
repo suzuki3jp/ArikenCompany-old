@@ -2,6 +2,7 @@ import { TwitchClient, Message } from '@suzuki3jp/twitch.js';
 import type { Logger } from '@suzuki3jp/utils';
 
 import { TwitchCommand } from '../../class/TwitchCommand';
+import { ValueParser } from '../../class/ValueParser';
 import { twitch } from '../../data/settings.json';
 
 export const twitchMessage = async (client: TwitchClient, logger: Logger, message: Message) => {
@@ -25,5 +26,11 @@ export const twitchMessage = async (client: TwitchClient, logger: Logger, messag
             message.reply(twitchCommand.removeCom());
         }
     } else {
+        const commandValue = twitchCommand.commandValue();
+        if (!commandValue) return;
+        const valueParser = new ValueParser();
+        const valueParseResult = await valueParser.parse(commandValue, message);
+        if (valueParseResult.status !== 200) return;
+        message.channel.send(valueParseResult.content);
     }
 };
