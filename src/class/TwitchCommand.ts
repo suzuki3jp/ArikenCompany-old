@@ -1,18 +1,17 @@
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { TwitchClient, Message } from '@suzuki3jp/twitch.js';
+import { JSTDate } from '@suzuki3jp/utils';
 import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 
 import { CommandManager } from './Command';
-const managersData: { managers: string[] } = JSON.parse(
-    readFileSync(path.resolve(__dirname, '../data/Managers.json'), {
-        encoding: 'utf-8',
-    })
-);
 
-const MessageCounter = JSON.parse(
-    readFileSync(path.resolve(__dirname, '../data/MessageCounter.json'), { encoding: 'utf-8' })
-);
+// paths
+const managersPath = path.resolve(__dirname, '../data/Managers.json');
+const messageCounterPath = path.resolve(__dirname, '../data/MessageCounter.json');
+const commandsPath = path.resolve(__dirname, '../data/Commands.json');
+const cooltimePath = path.resolve(__dirname, '../data/Cooltime.json');
+const settingsPath = path.resolve(__dirname, '../data/settings.json');
 
 export class TwitchCommand extends CommandManager {
     public client: TwitchClient;
@@ -35,6 +34,11 @@ export class TwitchCommand extends CommandManager {
     }
 
     isManager(): boolean {
+        const managersData: { managers: string[] } = JSON.parse(
+            readFileSync(managersPath, {
+                encoding: 'utf-8',
+            })
+        );
         if (this.message.member.isMod) return true;
         if (this.message.member.isBroadCaster) return true;
         if (managersData.managers.includes(this.message.member.name)) return true;
@@ -42,21 +46,28 @@ export class TwitchCommand extends CommandManager {
     }
 
     isVip(): boolean {
+        const managersData: { managers: string[] } = JSON.parse(
+            readFileSync(managersPath, {
+                encoding: 'utf-8',
+            })
+        );
         if (this.message.member.isVip) return true;
         if (this.message.member.isBroadCaster) return true;
         if (this.message.member.isMod) return true;
+        if (managersData.managers.includes(this.message.member.name)) return true;
         return false;
     }
 
     countMessage(): void {
+        const MessageCounter = JSON.parse(readFileSync(messageCounterPath, { encoding: 'utf-8' }));
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
             const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(path.resolve(__dirname, '../data/MessageCounter.json'), newData, { encoding: 'utf-8' });
+            writeFileSync(messageCounterPath, newData, { encoding: 'utf-8' });
         } else {
             MessageCounter[this.message.member.name] = 1;
             const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(path.resolve(__dirname, '../data/MessageCounter.json'), newData, { encoding: 'utf-8' });
+            writeFileSync(messageCounterPath, newData, { encoding: 'utf-8' });
         }
     }
 
@@ -115,10 +126,32 @@ export class TwitchCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: Record<string, string> = JSON.parse(
-            readFileSync(path.resolve(__dirname, '../data/Commands.json'), { encoding: 'utf-8' })
-        );
+        const Commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, { encoding: 'utf-8' }));
         const result = Commands[this.command.commandName];
         return result ?? null;
+    }
+
+    isPassedCooltime(): boolean {
+        if (this.isVip()) return true;
+        const cooltimes: Record<string, number> = JSON.parse(readFileSync(cooltimePath, { encoding: 'utf-8' }));
+        if (!cooltimes[this.command.commandName]) return true;
+        const settings: { twitch: { cooltime: number } } = JSON.parse(
+            readFileSync(settingsPath, { encoding: 'utf-8' })
+        );
+        const currentCooltime = settings.twitch.cooltime;
+        const currentTime = JSTDate.getDate().getTime();
+        const diffTime = currentTime - cooltimes[this.command.commandName];
+        if (currentCooltime < diffTime) return true;
+        return false;
+    }
+
+    saveCooltime(): void {
+        if (this.isVip()) return;
+        const commandName = this.command.commandName;
+        const cooltimes = JSON.parse(readFileSync(cooltimePath, { encoding: 'utf-8' }));
+
+        cooltimes[commandName] = JSTDate.getDate().getTime();
+        const writeData = JSON.stringify(cooltimes, null, '\t');
+        writeFileSync(cooltimePath, writeData, { encoding: 'utf-8' });
     }
 }

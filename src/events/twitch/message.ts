@@ -26,6 +26,8 @@ export const twitchMessage = async (client: TwitchClient, logger: Logger, messag
             message.reply(twitchCommand.removeCom());
         }
     } else {
+        if (!twitchCommand.isPassedCooltime()) return;
+        twitchCommand.saveCooltime();
         const commandValue = twitchCommand.commandValue();
         if (!commandValue) return;
         const valueParser = new ValueParser();

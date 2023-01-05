@@ -13,6 +13,8 @@
             "!setct",
             "!allow",
             "!deny"
-        ]
+        ],
+        "command": true,
+        "cooltime": 120
     }
 }
