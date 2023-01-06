@@ -72,6 +72,8 @@ export class TwitchCommand extends CommandManager {
     }
 
     manageCommandName():
+        | '!oncom'
+        | '!offcom'
         | '!addcom'
         | '!editcom'
         | '!rmcom'
@@ -83,6 +85,10 @@ export class TwitchCommand extends CommandManager {
         const commandName = this.command.commandName.toLowerCase();
 
         switch (commandName) {
+            case '!oncom':
+                return '!oncom';
+            case '!offcom':
+                return '!offcom';
             case '!addcom':
                 return '!addcom';
             case '!editcom':
@@ -106,6 +112,18 @@ export class TwitchCommand extends CommandManager {
             default:
                 return 'none';
         }
+    }
+
+    isOnCom(): boolean {
+        return super.currentCommandStatus();
+    }
+
+    onCom(): string {
+        return super.on();
+    }
+
+    offCom(): string {
+        return super.off();
     }
 
     async addCom(): Promise<string> {

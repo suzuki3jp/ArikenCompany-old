@@ -12,7 +12,9 @@
             "!ct",
             "!setct",
             "!allow",
-            "!deny"
+            "!deny",
+            "!oncom",
+            "!offcom"
         ],
         "command": true,
         "cooltime": 120

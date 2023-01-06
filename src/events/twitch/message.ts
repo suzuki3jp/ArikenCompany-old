@@ -15,7 +15,11 @@ export const twitchMessage = async (client: TwitchClient, logger: Logger, messag
         if (!twitchCommand.isManager()) return;
         const manageCommandName = twitchCommand.manageCommandName();
 
-        if (manageCommandName === '!addcom') {
+        if (manageCommandName === '!oncom') {
+            reply(twitchCommand.onCom());
+        } else if (manageCommandName === '!offcom') {
+            reply(twitchCommand.offCom());
+        } else if (manageCommandName === '!addcom') {
             reply(await twitchCommand.addCom());
         } else if (manageCommandName === '!editcom') {
             reply(await twitchCommand.editCom());
@@ -31,6 +35,7 @@ export const twitchMessage = async (client: TwitchClient, logger: Logger, messag
             reply(twitchCommand.changeCoolTime());
         }
     } else {
+        if (!twitchCommand.isOnCom()) return;
         if (!twitchCommand.isPassedCooltime()) return;
         twitchCommand.saveCooltime();
         const commandValue = twitchCommand.commandValue();
