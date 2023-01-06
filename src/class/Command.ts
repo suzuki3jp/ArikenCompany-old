@@ -3,11 +3,14 @@ import { ValueParser } from './ValueParser';
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
+import { CommandManagersManager } from './CommandManagers';
+
 const commandsFilePath = resolve(__dirname, '../data/Commands.json');
 
-export class CommandManager {
+export class CommandManager extends CommandManagersManager {
     public valueParser: ValueParser;
     constructor() {
+        super();
         this.valueParser = new ValueParser();
     }
 

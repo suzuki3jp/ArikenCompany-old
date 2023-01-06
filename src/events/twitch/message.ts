@@ -6,6 +6,7 @@ import { ValueParser } from '../../class/ValueParser';
 import { twitch } from '../../data/settings.json';
 
 export const twitchMessage = async (client: TwitchClient, logger: Logger, message: Message) => {
+    const reply = message.reply;
     const twitchCommand = new TwitchCommand(client, message, twitch.manageCommands);
 
     twitchCommand.countMessage();
@@ -15,15 +16,19 @@ export const twitchMessage = async (client: TwitchClient, logger: Logger, messag
         const manageCommandName = twitchCommand.manageCommandName();
 
         if (manageCommandName === '!addcom') {
-            message.reply(await twitchCommand.addCom());
-        }
-
-        if (manageCommandName === '!editcom') {
-            message.reply(await twitchCommand.editCom());
-        }
-
-        if (manageCommandName === '!rmcom') {
-            message.reply(twitchCommand.removeCom());
+            reply(await twitchCommand.addCom());
+        } else if (manageCommandName === '!editcom') {
+            reply(await twitchCommand.editCom());
+        } else if (manageCommandName === '!rmcom') {
+            reply(twitchCommand.removeCom());
+        } else if (manageCommandName === '!allow') {
+            reply(twitchCommand.allow());
+        } else if (manageCommandName === '!deny') {
+            reply(twitchCommand.deny());
+        } else if (manageCommandName === '!cooltime') {
+            reply(twitchCommand.coolTime());
+        } else if (manageCommandName === '!setcooltime') {
+            reply(twitchCommand.changeCoolTime());
         }
     } else {
         if (!twitchCommand.isPassedCooltime()) return;

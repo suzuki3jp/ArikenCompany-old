@@ -131,27 +131,30 @@ export class TwitchCommand extends CommandManager {
         return result ?? null;
     }
 
+    coolTime(): string {
+        return String(super.currentCoolTime());
+    }
+
     isPassedCooltime(): boolean {
-        if (this.isVip()) return true;
-        const cooltimes: Record<string, number> = JSON.parse(readFileSync(cooltimePath, { encoding: 'utf-8' }));
-        if (!cooltimes[this.command.commandName]) return true;
-        const settings: { twitch: { cooltime: number } } = JSON.parse(
-            readFileSync(settingsPath, { encoding: 'utf-8' })
-        );
-        const currentCooltime = settings.twitch.cooltime;
-        const currentTime = JSTDate.getDate().getTime();
-        const diffTime = currentTime - cooltimes[this.command.commandName];
-        if (currentCooltime < diffTime) return true;
-        return false;
+        return super.isPassedCoolTime(this);
     }
 
     saveCooltime(): void {
-        if (this.isVip()) return;
-        const commandName = this.command.commandName;
-        const cooltimes = JSON.parse(readFileSync(cooltimePath, { encoding: 'utf-8' }));
+        super.save(this);
+    }
 
-        cooltimes[commandName] = JSTDate.getDate().getTime();
-        const writeData = JSON.stringify(cooltimes, null, '\t');
-        writeFileSync(cooltimePath, writeData, { encoding: 'utf-8' });
+    changeCoolTime(): string {
+        const newCoolTime = this.command.commandsArg[0];
+        return super.changeCoolTime(newCoolTime);
+    }
+
+    allow(): string {
+        const allowManager = this.command.commandsArg[0];
+        return super.allow(this, allowManager);
+    }
+
+    deny(): string {
+        const denyManager = this.command.commandsArg[0];
+        return super.deny(this, denyManager);
     }
 }
