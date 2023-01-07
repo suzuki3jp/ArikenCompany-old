@@ -11,6 +11,7 @@
   "author": "suzuki3jp",
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^4.17.15",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "eslint": "^8.28.0",
