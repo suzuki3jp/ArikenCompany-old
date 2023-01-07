@@ -18,5 +18,8 @@
         ],
         "command": true,
         "cooltime": 120
+    },
+    "api": {
+        "port": 3150
     }
 }

@@ -43,3 +43,8 @@
 [2023/1/4 22:45:22] SYSTEM: discord client is ready.
 [2023/1/4 22:45:22] INFO: twitch token on resfresh.
 [2023/1/4 22:45:23] SYSTEM: twitch client is ready.
+[2023/1/7 19:46:35] SYSTEM: api is ready.
+[2023/1/7 19:49:07] SYSTEM: api is ready. listening at http://localhost:3150/
+[2023/1/7 19:49:08] INFO: twitch token on resfresh.
+[2023/1/7 19:49:09] SYSTEM: discord client is ready.
+[2023/1/7 19:49:09] SYSTEM: twitch client is ready.

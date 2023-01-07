@@ -7,6 +7,9 @@ import { writeFileSync } from 'fs';
 import path from 'path';
 import { CustomError, Logger, EnvParser } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
+import express from 'express';
+const app = express();
+import http from 'http';
 
 // import modules
 import { TwitchClient } from '@suzuki3jp/twitch.js';
@@ -61,7 +64,8 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
 
         const twitchClient = new TwitchClient(authConfig, twitchOptions);
         const discordClient = new Client(discordOptions);
-        eventsIndex(twitchClient, discordClient, discordToken, logger);
+        const apiServer = http.createServer(app);
+        eventsIndex({ server: apiServer, app }, twitchClient, discordClient, discordToken, logger);
     })();
 } else {
     throw new CustomError('ENV_ERROR', 'environment variables are invalid.');
