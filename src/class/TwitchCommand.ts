@@ -59,15 +59,15 @@ export class TwitchCommand extends CommandManager {
     }
 
     countMessage(): void {
-        const MessageCounter = JSON.parse(readFileSync(messageCounterPath, { encoding: 'utf-8' }));
+        const MessageCounter = JSON.parse(readFileSync(messageCounterPath, 'utf-8'));
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
             const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(messageCounterPath, newData, { encoding: 'utf-8' });
+            writeFileSync(messageCounterPath, newData, 'utf-8');
         } else {
             MessageCounter[this.message.member.name] = 1;
             const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(messageCounterPath, newData, { encoding: 'utf-8' });
+            writeFileSync(messageCounterPath, newData, 'utf-8');
         }
     }
 
@@ -144,7 +144,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, { encoding: 'utf-8' }));
+        const Commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

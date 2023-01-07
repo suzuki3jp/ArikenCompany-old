@@ -41,7 +41,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         };
         const newEnvData = EnvParser.parseToEnv(envDataObj);
 
-        writeFileSync(path.resolve(__dirname, '../.env'), newEnvData, { encoding: 'utf-8' });
+        writeFileSync(path.resolve(__dirname, '../.env'), newEnvData, 'utf-8');
         logger.info('twitch token on resfresh.');
     };
 

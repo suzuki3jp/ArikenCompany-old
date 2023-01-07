@@ -110,7 +110,7 @@ export class ValueParser {
     private parseAlias(codeRaw: string): string {
         const targetCommand = codeRaw.slice(6).toLowerCase();
         const commands: Record<string, string> = JSON.parse(
-            readFileSync(path.resolve(__dirname, '../data/Commands.json'), { encoding: 'utf-8' })
+            readFileSync(path.resolve(__dirname, '../data/Commands.json'), 'utf-8')
         );
         return commands[targetCommand];
     }

@@ -23,50 +23,44 @@ export class CommandManagersManager extends CoolTimeManager {
     }
 
     currentCommandStatus(): boolean {
-        const settings: { twitch: { command: boolean } } = JSON.parse(
-            readFileSync(settingsPath, { encoding: 'utf-8' })
-        );
+        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         return settings.twitch.command;
     }
 
     on(): string {
-        const settings: { twitch: { command: boolean } } = JSON.parse(
-            readFileSync(settingsPath, { encoding: 'utf-8' })
-        );
+        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (settings.twitch.command) return managersError.alreadyOn;
         settings.twitch.command = true;
         const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(settingsPath, newSettings, { encoding: 'utf-8' });
+        writeFileSync(settingsPath, newSettings, 'utf-8');
         return 'コマンドを有効にしました';
     }
 
     off(): string {
-        const settings: { twitch: { command: boolean } } = JSON.parse(
-            readFileSync(settingsPath, { encoding: 'utf-8' })
-        );
+        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (!settings.twitch.command) return managersError.alreadyOff;
         settings.twitch.command = false;
         const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(settingsPath, newSettings, { encoding: 'utf-8' });
+        writeFileSync(settingsPath, newSettings, 'utf-8');
         return 'コマンドを無効にしました';
     }
 
     allow(twitchCommand: TwitchCommand, target: string): string {
         if (this.isManagersByTarget(target)) return managersError.alreadyManager;
-        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, { encoding: 'utf-8' }));
+        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
         managers.managers.push(target);
         const newManagersData = JSON.stringify(managers, null, '\t');
-        writeFileSync(managersPath, newManagersData, { encoding: 'utf-8' });
+        writeFileSync(managersPath, newManagersData, 'utf-8');
         return `${target} に管理者権限を付与しました`;
     }
 
     deny(twitchCommand: TwitchCommand, target: string): string {
         if (!this.isManagersByTarget(target)) return managersError.isNotAlreadyManager;
-        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, { encoding: 'utf-8' }));
+        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
         const targetIndex = managers.managers.findIndex((value, index) => value === target);
         managers.managers.splice(targetIndex, 1);
         const newManagersData = JSON.stringify(managers, null, '\t');
-        writeFileSync(managersPath, newManagersData, { encoding: 'utf-8' });
+        writeFileSync(managersPath, newManagersData, 'utf-8');
         return `${target} から管理者権限を剥奪しました`;
     }
 }

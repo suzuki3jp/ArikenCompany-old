@@ -15,7 +15,7 @@ export class CommandManager extends CommandManagersManager {
     }
 
     async addCom(commandName: string, value: string, message: Message): Promise<string> {
-        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
+        const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
         const name = commandName.toLowerCase();
         if (commands[name]) return manageCommandError.existCommandName;
 
@@ -24,12 +24,12 @@ export class CommandManager extends CommandManagersManager {
 
         commands[name] = value;
         const writeData = JSON.stringify(commands, null, '\t');
-        writeFileSync(commandsFilePath, writeData, { encoding: 'utf-8' });
+        writeFileSync(commandsFilePath, writeData, 'utf-8');
         return `${name} を追加しました`;
     }
 
     async editCom(commandName: string, value: string, message: Message): Promise<string> {
-        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
+        const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -38,17 +38,17 @@ export class CommandManager extends CommandManagersManager {
 
         commands[name] = value;
         const writeData = JSON.stringify(commands, null, '\t');
-        writeFileSync(commandsFilePath, writeData, { encoding: 'utf-8' });
+        writeFileSync(commandsFilePath, writeData, 'utf-8');
         return `${name} を ${value} に変更しました`;
     }
 
     removeCom(commandName: string): string {
-        const commands = JSON.parse(readFileSync(commandsFilePath, { encoding: 'utf-8' }));
+        const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];
         const writeData = JSON.stringify(commands, null, '\t');
-        writeFileSync(commandsFilePath, writeData, { encoding: 'utf-8' });
+        writeFileSync(commandsFilePath, writeData, 'utf-8');
         return `${name} を削除しました`;
     }
 }
