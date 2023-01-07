@@ -164,6 +164,63 @@ export class ValueParser {
     }
 }
 
+export class PubValueParser {
+    parse(value: string): ValueParseResult {
+        const startBracketLength = StringUtils.countBy(value, '{');
+        const endBracketLength = StringUtils.countBy(value, '}');
+
+        if (startBracketLength === endBracketLength) {
+            // 構文的に有効な場合
+            const length = value.length;
+            let index = 0;
+            const result: ValueParseResult = {
+                status: 200,
+                content: '',
+            };
+
+            while (index < length) {
+                if (value[index] === '$') {
+                    const startIndex = index + 2;
+                    const endIndex = value.indexOf('}', startIndex);
+                    index = index + endIndex;
+                    const codeRaw = value.slice(startIndex, endIndex);
+                    const parsedCode = this.parseCode(codeRaw);
+
+                    result.status = parsedCode.status;
+                    result.content = result.content + parsedCode.content;
+                    index = index + 1;
+                } else {
+                    result.content = result.content + value[index];
+                    index = index + 1;
+                }
+            }
+
+            return result;
+        } else {
+            // 構文的に無効な場合
+            const result: ValueParseResult = {
+                status: 400,
+                content: '${}の対応関係が崩れています',
+            };
+            return result;
+        }
+    }
+
+    private parseCode(codeRaw: string): ParseCodeResult {
+        if (codeRaw.startsWith('fetch ')) {
+            return {
+                status: 200,
+                content: '[fetch]',
+            };
+        } else {
+            return {
+                status: 200,
+                content: codeRaw,
+            };
+        }
+    }
+}
+
 export interface ValueParseResult {
     status: ParseStatus;
     content: string;

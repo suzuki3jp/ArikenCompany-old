@@ -1,11 +1,13 @@
+import { ObjectUtils } from '@suzuki3jp/utils';
 import type { Message } from '@suzuki3jp/twitch.js';
-import { ValueParser } from './ValueParser';
+import { ValueParser, PubValueParser } from './ValueParser';
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { CommandManagersManager } from './CommandManagers';
 
 const commandsFilePath = resolve(__dirname, '../data/Commands.json');
+const publicCommandsPath = resolve(__dirname, '../data/PublicCommands.json');
 
 export class CommandManager extends CommandManagersManager {
     public valueParser: ValueParser;
@@ -25,6 +27,7 @@ export class CommandManager extends CommandManagersManager {
         commands[name] = value;
         const writeData = JSON.stringify(commands, null, '\t');
         writeFileSync(commandsFilePath, writeData, 'utf-8');
+        this.createPublicList();
         return `${name} を追加しました`;
     }
 
@@ -39,6 +42,7 @@ export class CommandManager extends CommandManagersManager {
         commands[name] = value;
         const writeData = JSON.stringify(commands, null, '\t');
         writeFileSync(commandsFilePath, writeData, 'utf-8');
+        this.createPublicList();
         return `${name} を ${value} に変更しました`;
     }
 
@@ -49,7 +53,22 @@ export class CommandManager extends CommandManagersManager {
         delete commands[name];
         const writeData = JSON.stringify(commands, null, '\t');
         writeFileSync(commandsFilePath, writeData, 'utf-8');
+        this.createPublicList();
         return `${name} を削除しました`;
+    }
+
+    createPublicList(): Record<string, string> {
+        const commands: Record<string, string> = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+        let publicCommands: Record<string, string> = {};
+        ObjectUtils.forEach(commands, (key, value) => {
+            if (typeof value !== 'string' || typeof key !== 'string') return;
+            const parsedData = new PubValueParser().parse(value);
+            publicCommands[key] = parsedData.content;
+        });
+
+        const writeData = JSON.stringify(publicCommands, null, '\t');
+        writeFileSync(publicCommandsPath, writeData, 'utf-8');
+        return publicCommands;
     }
 }
 
