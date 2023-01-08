@@ -1,4 +1,7 @@
 {
+    "discord": {
+        "modRoleId": "996289686479851590"
+    },
     "twitch": {
         "channelName": "pre_ariken_company",
         "channels": ["suzuki3_jp", "ariken_company", "pre_ariken_company"],

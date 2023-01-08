@@ -1,11 +1,10 @@
 import { TwitchClient, Message } from '@suzuki3jp/twitch.js';
-import type { Logger } from '@suzuki3jp/utils';
 
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
 import { twitch } from '../../data/settings.json';
 
-export const twitchMessage = async (client: TwitchClient, logger: Logger, message: Message) => {
+export const twitchMessage = async (client: TwitchClient, message: Message) => {
     const reply = message.reply;
     const twitchCommand = new TwitchCommand(client, message, twitch.manageCommands);
 

@@ -1,6 +1,5 @@
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { TwitchClient, Message } from '@suzuki3jp/twitch.js';
-import { JSTDate } from '@suzuki3jp/utils';
 import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 
@@ -10,8 +9,6 @@ import { CommandManager } from './Command';
 const managersPath = path.resolve(__dirname, '../data/Managers.json');
 const messageCounterPath = path.resolve(__dirname, '../data/MessageCounter.json');
 const commandsPath = path.resolve(__dirname, '../data/Commands.json');
-const cooltimePath = path.resolve(__dirname, '../data/Cooltime.json');
-const settingsPath = path.resolve(__dirname, '../data/settings.json');
 
 export class TwitchCommand extends CommandManager {
     public client: TwitchClient;
@@ -82,7 +79,7 @@ export class TwitchCommand extends CommandManager {
         | '!allow'
         | '!deny'
         | 'none' {
-        const commandName = this.command.commandName.toLowerCase();
+        const commandName = this.command.commandName;
 
         switch (commandName) {
             case '!oncom':

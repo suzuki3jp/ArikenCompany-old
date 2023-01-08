@@ -34,5 +34,5 @@ export const eventsIndex = (
     // twitch events
     twitchClient.on('ready', () => twitchReady(twitchClient, logger));
 
-    twitchClient.on('messageCreate', (message) => twitchMessage(twitchClient, logger, message));
+    twitchClient.on('messageCreate', (message) => twitchMessage(twitchClient, message));
 };
