@@ -6,7 +6,7 @@ import type { Client } from 'discord.js';
 import type { Logger } from '@suzuki3jp/utils';
 import type { Express } from 'express';
 
-import { discordReady } from './discord/index';
+import { discordMessage, discordReady } from './discord/index';
 import { twitchReady, twitchMessage } from './twitch/index';
 import { router } from '../api/Router';
 
@@ -30,6 +30,8 @@ export const eventsIndex = (
 
     // discord events
     discordClient.on('ready', () => discordReady(discordClient, logger));
+
+    discordClient.on('messageCreate', (message) => discordMessage(discordClient, message));
 
     // twitch events
     twitchClient.on('ready', () => twitchReady(twitchClient, logger));
