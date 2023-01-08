@@ -165,11 +165,11 @@ export class TwitchCommand extends CommandManager {
 
     allow(): string {
         const allowManager = this.command.commandsArg[0];
-        return super.allow(this, allowManager);
+        return super.allow(allowManager);
     }
 
     deny(): string {
         const denyManager = this.command.commandsArg[0];
-        return super.deny(this, denyManager);
+        return super.deny(denyManager);
     }
 }

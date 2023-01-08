@@ -45,7 +45,7 @@ export class CommandManagersManager extends CoolTimeManager {
         return 'コマンドを無効にしました';
     }
 
-    allow(twitchCommand: TwitchCommand, target: string): string {
+    allow(target: string): string {
         if (this.isManagersByTarget(target)) return managersError.alreadyManager;
         const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
         managers.managers.push(target);
@@ -54,7 +54,7 @@ export class CommandManagersManager extends CoolTimeManager {
         return `${target} に管理者権限を付与しました`;
     }
 
-    deny(twitchCommand: TwitchCommand, target: string): string {
+    deny(target: string): string {
         if (!this.isManagersByTarget(target)) return managersError.isNotAlreadyManager;
         const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
         const targetIndex = managers.managers.findIndex((value, index) => value === target);

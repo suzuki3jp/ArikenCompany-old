@@ -15,6 +15,27 @@ export const discordMessage = async (client: Client, message: Message) => {
     if (!discordCommand.isCommand()) return;
 
     if (discordCommand.isManageCommands()) {
+        const manageCommandName = discordCommand.manageCommandName();
+
+        if (manageCommandName === '!oncom') {
+            reply(discordCommand.onCom());
+        } else if (manageCommandName === '!offcom') {
+            reply(discordCommand.offCom());
+        } else if (manageCommandName === '!addcom') {
+            reply(await discordCommand.addCom());
+        } else if (manageCommandName === '!editcom') {
+            reply(await discordCommand.editCom());
+        } else if (manageCommandName === '!rmcom') {
+            reply(discordCommand.removeCom());
+        } else if (manageCommandName === '!allow') {
+            reply(discordCommand.allow());
+        } else if (manageCommandName === '!deny') {
+            reply(discordCommand.deny());
+        } else if (manageCommandName === '!cooltime') {
+            reply(discordCommand.coolTime());
+        } else if (manageCommandName === '!setcooltime') {
+            reply(discordCommand.changeCoolTime());
+        }
     } else {
         if (!discordCommand.isOnCom()) return;
         const commandValue = discordCommand.commandValue();

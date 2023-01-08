@@ -87,4 +87,48 @@ export class DiscordCommand extends CommandManager {
         const result = Commands[this.command.commandName];
         return result ?? null;
     }
+
+    onCom(): string {
+        return super.on();
+    }
+
+    offCom(): string {
+        return super.off();
+    }
+
+    async addCom(): Promise<string> {
+        const targetCommand = this.command.commandsArg[0];
+        const value = this.command.commandsArg.slice(1).join(' ');
+        return await super.addCom(targetCommand, value, this.message);
+    }
+
+    async editCom(): Promise<string> {
+        const targetCommand = this.command.commandsArg[0];
+        const value = this.command.commandsArg.slice(1).join(' ');
+        return await super.editCom(targetCommand, value, this.message);
+    }
+
+    removeCom(): string {
+        const targetCommand = this.command.commandsArg[0];
+        return super.removeCom(targetCommand);
+    }
+
+    coolTime(): string {
+        return String(super.currentCoolTime());
+    }
+
+    changeCoolTime(): string {
+        const newCoolTime = this.command.commandsArg[0];
+        return super.changeCoolTime(newCoolTime);
+    }
+
+    allow(): string {
+        const allowManager = this.command.commandsArg[0];
+        return super.allow(allowManager);
+    }
+
+    deny(): string {
+        const denyManager = this.command.commandsArg[0];
+        return super.deny(denyManager);
+    }
 }
