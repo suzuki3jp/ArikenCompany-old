@@ -1,4 +1,4 @@
-import { JSTDate } from '@suzuki3jp/utils';
+import { JST } from '@suzuki3jp/utils';
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -29,7 +29,7 @@ export class CoolTimeManager {
         const commandName = twitchCommand.command.commandName;
         const cooltimes = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
 
-        cooltimes[commandName] = JSTDate.getDate().getTime();
+        cooltimes[commandName] = JST.getDate().getTime();
         const writeData = JSON.stringify(cooltimes, null, '\t');
         writeFileSync(cooltimePath, writeData, 'utf-8');
     }
@@ -40,7 +40,7 @@ export class CoolTimeManager {
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
         const currentCooltime = this.currentCoolTime();
-        const currentTime = JSTDate.getDate().getTime();
+        const currentTime = JST.getDate().getTime();
         const diffTime = currentTime - cooltimes[twitchCommand.command.commandName];
         if (currentCooltime < diffTime) return true;
         return false;

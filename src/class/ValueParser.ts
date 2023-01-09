@@ -1,4 +1,4 @@
-import { Request, ArrayUtils, JSTDate, StringUtils } from '@suzuki3jp/utils';
+import { Request, ArrayUtils, JST, StringUtils } from '@suzuki3jp/utils';
 import type { Message as TwtichMessage } from '@suzuki3jp/twitch.js';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { Agent } from 'https';
@@ -84,7 +84,7 @@ export class ValueParser {
         } else if (codeRaw.startsWith('time')) {
             return {
                 status: 200,
-                content: JSTDate.getDateString(),
+                content: JST.getDateString(),
             };
         } else if (codeRaw.startsWith('mod ')) {
             return {
@@ -135,7 +135,7 @@ export class ValueParser {
             } else if (newCodeRaw.startsWith('time')) {
                 return {
                     status: 200,
-                    content: JSTDate.getDateString(),
+                    content: JST.getDateString(),
                 };
             } else if (newCodeRaw.startsWith('channel')) {
                 return {
@@ -249,7 +249,7 @@ export class DiscordValueParser {
         } else if (codeRaw.startsWith('time')) {
             return {
                 status: 200,
-                content: JSTDate.getDateString(),
+                content: JST.getDateString(),
             };
         } else if (codeRaw.startsWith('mod ')) {
             return {
@@ -301,7 +301,7 @@ export class DiscordValueParser {
             } else if (newCodeRaw.startsWith('time')) {
                 return {
                     status: 200,
-                    content: JSTDate.getDateString(),
+                    content: JST.getDateString(),
                 };
             } else if (newCodeRaw.startsWith('channel')) {
                 if (message.channel instanceof TextChannel) {
