@@ -1,4 +1,4 @@
-import { Client, ChatInputCommandInteraction, ButtonBuilder } from 'discord.js';
+import { Client, CommandInteraction } from 'discord.js';
 import { pageManagerActionRow, commandManagerActionRow } from '../../data/Components';
 import { createCommandPanelEmbeds } from '../../utils/Embed';
 import { readFileSync, writeFileSync } from 'fs';
@@ -6,7 +6,7 @@ import { resolve } from 'path';
 
 const settingsPath = resolve(__dirname, '../../data/settings.json');
 
-export const commandInteraction = async (client: Client, interaction: ChatInputCommandInteraction) => {
+export const commandInteraction = async (client: Client, interaction: CommandInteraction) => {
     const settings: { discord: { modRoleId: string; manageCommandPanelId: string | null } } = JSON.parse(
         readFileSync(settingsPath, 'utf-8')
     );
@@ -14,12 +14,9 @@ export const commandInteraction = async (client: Client, interaction: ChatInputC
 
     if (member?.roles.cache.has(settings.discord.modRoleId)) {
         if (interaction.options.getSubcommand() === 'panel') {
-            if (pageManagerActionRow.components[0] instanceof ButtonBuilder) {
-                pageManagerActionRow.components[0].setDisabled(true);
-            }
+            pageManagerActionRow.components[0].setDisabled(true);
             const panel = await interaction.channel?.send({
                 embeds: [createCommandPanelEmbeds()[0]],
-                // @ts-ignore
                 components: [pageManagerActionRow, commandManagerActionRow],
             });
             settings.discord.manageCommandPanelId = panel?.id ?? null;

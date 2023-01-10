@@ -1,7 +1,7 @@
 // import packages
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits } from 'discord.js';
-import type { ClientOptions as DiscordOptions, BitFieldResolvable } from 'discord.js';
+import { Client, Intents } from 'discord.js';
+import type { ClientOptions as DiscordOptions } from 'discord.js';
 import type { AccessToken } from '@twurple/auth';
 import { writeFileSync } from 'fs';
 import path from 'path';
@@ -59,7 +59,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         };
         const twitchOptions: ClientOptions = { channels: twitch.channels };
         const discordOptions: DiscordOptions = {
-            intents: Object.values(GatewayIntentBits) as BitFieldResolvable<keyof typeof GatewayIntentBits, number>,
+            intents: Object.values(Intents.FLAGS),
         };
 
         const twitchClient = new TwitchClient(authConfig, twitchOptions);

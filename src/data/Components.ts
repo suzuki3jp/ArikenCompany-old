@@ -1,11 +1,5 @@
-import {
-    ButtonBuilder,
-    ButtonStyle,
-    ModalBuilder,
-    TextInputBuilder,
-    TextInputStyle,
-    ActionRowBuilder,
-} from 'discord.js';
+import { MessageButton, Modal, TextInputComponent, MessageActionRow, ModalActionRowComponent } from 'discord.js';
+import { MessageButtonStyles, TextInputStyles } from 'discord.js/typings/enums';
 
 export const ComponentCustomIds = {
     button: {
@@ -50,70 +44,70 @@ const ComponentLabels = {
 const ArikenCompanyHP = 'https://arikencompany.github.io/pages/home.html';
 
 // Buttons
-export const nextButton = new ButtonBuilder()
+export const nextButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.next)
-    .setStyle(ButtonStyle.Primary)
+    .setStyle(MessageButtonStyles.PRIMARY)
     .setLabel(ComponentLabels.button.next);
-export const previousButton = new ButtonBuilder()
+export const previousButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.previous)
-    .setStyle(ButtonStyle.Primary)
+    .setStyle(MessageButtonStyles.PRIMARY)
     .setLabel(ComponentLabels.button.previous);
 
-export const addButton = new ButtonBuilder()
+export const addButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.add)
-    .setStyle(ButtonStyle.Success)
+    .setStyle(MessageButtonStyles.SUCCESS)
     .setLabel(ComponentLabels.button.add);
-export const editButton = new ButtonBuilder()
+export const editButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.edit)
-    .setStyle(ButtonStyle.Success)
+    .setStyle(MessageButtonStyles.SUCCESS)
     .setLabel(ComponentLabels.button.edit);
-export const removeButton = new ButtonBuilder()
+export const removeButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.remove)
-    .setStyle(ButtonStyle.Success)
+    .setStyle(MessageButtonStyles.SUCCESS)
     .setLabel(ComponentLabels.button.remove);
-export const siteButton = new ButtonBuilder()
+export const siteButton = new MessageButton()
     .setLabel(ComponentLabels.button.site)
-    .setStyle(ButtonStyle.Link)
+    .setStyle(MessageButtonStyles.LINK)
     .setURL(ArikenCompanyHP);
 
 // TextInputs
-const targetCommandInput = new TextInputBuilder()
+const targetCommandInput = new TextInputComponent()
     .setCustomId(ComponentCustomIds.text.commandName)
     .setLabel(ComponentLabels.text.commandName)
     .setValue('!')
-    .setStyle(TextInputStyle.Short);
+    .setStyle(TextInputStyles.SHORT);
 
-const valueInput = new TextInputBuilder()
+const valueInput = new TextInputComponent()
     .setCustomId(ComponentCustomIds.text.value)
     .setLabel(ComponentLabels.text.value)
-    .setStyle(TextInputStyle.Paragraph);
+    .setStyle(TextInputStyles.PARAGRAPH);
 
 // ActionRows
-export const pageManagerActionRow = new ActionRowBuilder().addComponents(previousButton, nextButton);
-export const commandManagerActionRow = new ActionRowBuilder().addComponents(
+export const pageManagerActionRow = new MessageActionRow().addComponents(previousButton, nextButton);
+export const commandManagerActionRow = new MessageActionRow().addComponents(
     addButton,
     editButton,
     removeButton,
     siteButton
 );
 
-const commandNameInputActionRow = new ActionRowBuilder().addComponents(targetCommandInput);
-const valueInputActionRow = new ActionRowBuilder().addComponents(valueInput);
+const commandNameInputActionRow = new MessageActionRow<ModalActionRowComponent>().addComponents(targetCommandInput);
+const valueInputActionRow = new MessageActionRow<ModalActionRowComponent>().addComponents(valueInput);
 
 // Modals
-export const addModal = new ModalBuilder()
+export const addModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.add)
     .setTitle(ComponentLabels.modal.add)
     // @ts-ignore
     .addComponents(commandNameInputActionRow, valueInputActionRow);
 
-export const editModal = new ModalBuilder()
+export const editModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.edit)
     .setTitle(ComponentLabels.modal.edit)
     // @ts-ignore
     .addComponents(commandNameInputActionRow, valueInputActionRow);
 
-export const removeModal = new ModalBuilder()
+export const removeModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.remove)
     .setTitle(ComponentLabels.modal.remove)
     // @ts-ignore

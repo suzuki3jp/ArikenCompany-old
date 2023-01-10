@@ -11,7 +11,6 @@ export const discordMessage = async (client: Client, message: Message) => {
     const settings: { twitch: { manageCommands: string[] } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
     const discordCommand = new DiscordCommand(client, message, settings.twitch.manageCommands);
     const reply = message.reply;
-
     if (!discordCommand.isCommand()) return;
 
     if (discordCommand.isManageCommands()) {
