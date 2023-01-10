@@ -5,7 +5,7 @@ import type { ClientOptions as DiscordOptions, BitFieldResolvable } from 'discor
 import type { AccessToken } from '@twurple/auth';
 import { writeFileSync } from 'fs';
 import path from 'path';
-import { CustomError, Logger, EnvParser } from '@suzuki3jp/utils';
+import { CustomError, Logger, Env } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
 import express from 'express';
 const app = express();
@@ -42,7 +42,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
             TWITCH_CLIENTSECRET: twitchClientSecret,
             DISCORD_TOKEN: discordToken,
         };
-        const newEnvData = EnvParser.parseToEnv(envDataObj);
+        const newEnvData = Env.parseToEnv(envDataObj);
 
         writeFileSync(path.resolve(__dirname, '../.env'), newEnvData, 'utf-8');
         logger.info('twitch token on resfresh.');

@@ -6,7 +6,7 @@ import type { Client } from 'discord.js';
 import type { Logger } from '@suzuki3jp/utils';
 import type { Express } from 'express';
 
-import { discordMessage, discordReady } from './discord/index';
+import { discordMessage, discordReady, discordInteraction } from './discord/index';
 import { twitchReady, twitchMessage } from './twitch/index';
 import { router } from '../api/Router';
 
@@ -21,7 +21,7 @@ export const eventsIndex = (
     logger: Logger
 ) => {
     // client login
-    twitchClient.login();
+    // twitchClient.login();
     discordClient.login(discordToken);
     api.server.listen(settings.api.port, () => {
         logger.system(`api is ready. listening at http://localhost:${settings.api.port}/`);
@@ -32,6 +32,8 @@ export const eventsIndex = (
     discordClient.on('ready', () => discordReady(discordClient, logger));
 
     discordClient.on('messageCreate', (message) => discordMessage(discordClient, message));
+
+    discordClient.on('interactionCreate', (interaction) => discordInteraction(discordClient, interaction));
 
     // twitch events
     twitchClient.on('ready', () => twitchReady(twitchClient, logger));
