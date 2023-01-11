@@ -65,13 +65,7 @@ export const currentPage = (embed: MessageEmbed | APIEmbed): number => {
 };
 
 export const isFirstPageByFooter = (embed: MessageEmbed | APIEmbed): boolean => {
-    if (embed.footer?.text) {
-        const currentFooterText = embed.footer.text;
-        const [footerTitle, currentPage, _, pageLength] = currentFooterText.split(' ');
-        return currentPage === '1';
-    } else {
-        return false;
-    }
+    return currentPage(embed) === 1;
 };
 
 export const isLastPageByFooter = (embed: MessageEmbed | APIEmbed): boolean => {
