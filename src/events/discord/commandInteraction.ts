@@ -1,5 +1,5 @@
-import { Client, CommandInteraction } from 'discord.js';
-import { pageManagerActionRow, commandManagerActionRow } from '../../data/Components';
+import { Client, CommandInteraction, MessageActionRow } from 'discord.js';
+import { pageManagerActionRow, commandManagerActionRow, addTemplateButton } from '../../data/Components';
 import { createCommandPanelEmbeds } from '../../utils/Embed';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
@@ -23,6 +23,17 @@ export const commandInteraction = async (client: Client, interaction: CommandInt
             const writeData = JSON.stringify(settings, null, '\t');
             writeFileSync(settingsPath, writeData, 'utf-8');
         } else if (interaction.options.getSubcommand() === 'template') {
+            const targetCommandName = interaction.options.getString('command');
+            if (!targetCommandName) return;
+            interaction.channel?.send({
+                embeds: [
+                    {
+                        title: targetCommandName,
+                        description: 'ボタンを押すとあらかじめ設定された値に変更',
+                    },
+                ],
+                components: [new MessageActionRow().addComponents(addTemplateButton)],
+            });
         }
     } else {
         interaction.reply({ content: 'このコマンドを実行する権限がありません', ephemeral: true });
