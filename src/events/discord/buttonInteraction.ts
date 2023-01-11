@@ -9,7 +9,7 @@ export const buttonInteraction = (client: Client, interaction: ButtonInteraction
             const manageCommandPanel = interaction.message;
             const embeds = manageCommandPanel.embeds;
             const components = manageCommandPanel.components;
-            if (!components || !isAPIMessage(manageCommandPanel)) return;
+            if (!components || !isMessage(manageCommandPanel)) return;
             const isFirstPage = isFirstPageByFooter(interaction.message.embeds[0]);
             const currentPageNumber = currentPage(interaction.message.embeds[0]);
             const newPage = createCommandPanelEmbeds()[currentPageNumber];
@@ -51,7 +51,7 @@ export const buttonInteraction = (client: Client, interaction: ButtonInteraction
         const manageCommandPanel = interaction.message;
         const embeds = manageCommandPanel.embeds;
         const components = manageCommandPanel.components;
-        if (!components || !isAPIMessage(manageCommandPanel)) return;
+        if (!components || !isMessage(manageCommandPanel)) return;
         const isLastPage = isLastPageByFooter(interaction.message.embeds[0]);
         const currentPageNumber = currentPage(interaction.message.embeds[0]);
         const newPage = createCommandPanelEmbeds()[currentPageNumber - 2];
@@ -91,6 +91,6 @@ export const buttonInteraction = (client: Client, interaction: ButtonInteraction
     }
 };
 
-const isAPIMessage = (data: any): data is Message => {
+const isMessage = (data: any): data is Message => {
     return true;
 };
