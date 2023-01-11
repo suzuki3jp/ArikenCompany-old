@@ -19,6 +19,7 @@ export const ComponentCustomIds = {
         add: 'addModal',
         edit: 'editModal',
         remove: 'removeModal',
+        addTemplate: 'addTemplateModal',
     },
 };
 
@@ -40,6 +41,7 @@ const ComponentLabels = {
         add: 'コマンドを追加する',
         edit: 'コマンドを編集する',
         remove: 'コマンドを削除する',
+        addTemplate: 'コマンドの定型文を追加する',
     },
 };
 
@@ -116,3 +118,8 @@ export const removeModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.remove)
     .setTitle(ComponentLabels.modal.remove)
     .addComponents(commandNameInputActionRow);
+
+export const addTemplateModal = new Modal()
+    .setCustomId(ComponentCustomIds.modal.addTemplate)
+    .setTitle(ComponentLabels.modal.addTemplate)
+    .addComponents(valueInputActionRow);

@@ -1,9 +1,10 @@
 import { Message, MessageButton } from 'discord.js';
 import type { Client, ButtonInteraction } from 'discord.js';
-import { ComponentCustomIds } from '../../data/Components';
+import { ComponentCustomIds, addTemplateModal } from '../../data/Components';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../../utils/Embed';
 
 export const buttonInteraction = (client: Client, interaction: ButtonInteraction) => {
+    //コマンドパネルの次へボタン
     if (interaction.customId === ComponentCustomIds.button.next) {
         if (interaction.message.embeds[0]) {
             const manageCommandPanel = interaction.message;
@@ -47,7 +48,10 @@ export const buttonInteraction = (client: Client, interaction: ButtonInteraction
                 interaction.deferUpdate();
             }
         }
-    } else if (interaction.customId === ComponentCustomIds.button.previous) {
+    }
+
+    // コマンドパネルの戻るボタン
+    if (interaction.customId === ComponentCustomIds.button.previous) {
         const manageCommandPanel = interaction.message;
         const embeds = manageCommandPanel.embeds;
         const components = manageCommandPanel.components;
@@ -88,6 +92,11 @@ export const buttonInteraction = (client: Client, interaction: ButtonInteraction
             });
             interaction.deferUpdate();
         }
+    }
+
+    // テンプレートの追加ボタン
+    if (interaction.customId === ComponentCustomIds.button.addTemplate) {
+        interaction.showModal(addTemplateModal);
     }
 };
 
