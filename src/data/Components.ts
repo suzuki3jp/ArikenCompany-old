@@ -9,6 +9,7 @@ export const ComponentCustomIds = {
         edit: 'editButton',
         remove: 'removeButton',
         site: 'siteButton',
+        addTemplate: 'addTemplateButton',
     },
     text: {
         commandName: 'targetCommandInput',
@@ -29,6 +30,7 @@ const ComponentLabels = {
         edit: 'edit',
         remove: 'remove',
         site: 'HP',
+        addTemplate: '追加',
     },
     text: {
         commandName: '操作するコマンド名(!付き)',
@@ -70,6 +72,11 @@ export const siteButton = new MessageButton()
     .setStyle(MessageButtonStyles.LINK)
     .setURL(ArikenCompanyHP);
 
+export const addTemplateButton = new MessageButton()
+    .setCustomId(ComponentCustomIds.button.addTemplate)
+    .setLabel(ComponentLabels.button.addTemplate)
+    .setStyle(MessageButtonStyles.DANGER);
+
 // TextInputs
 const targetCommandInput = new TextInputComponent()
     .setCustomId(ComponentCustomIds.text.commandName)
@@ -98,17 +105,14 @@ const valueInputActionRow = new MessageActionRow<ModalActionRowComponent>().addC
 export const addModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.add)
     .setTitle(ComponentLabels.modal.add)
-    // @ts-ignore
     .addComponents(commandNameInputActionRow, valueInputActionRow);
 
 export const editModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.edit)
     .setTitle(ComponentLabels.modal.edit)
-    // @ts-ignore
     .addComponents(commandNameInputActionRow, valueInputActionRow);
 
 export const removeModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.remove)
     .setTitle(ComponentLabels.modal.remove)
-    // @ts-ignore
     .addComponents(commandNameInputActionRow);
