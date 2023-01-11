@@ -5,9 +5,11 @@ import { ValueParser } from '../../class/ValueParser';
 import { twitch } from '../../data/settings.json';
 
 export const twitchMessage = async (client: TwitchClient, message: Message) => {
-    const reply = message.reply;
     const twitchCommand = new TwitchCommand(client, message, twitch.manageCommands);
 
+    const reply = (content: string) => {
+        message.reply(content);
+    };
     twitchCommand.countMessage();
     if (!twitchCommand.isCommand()) return;
     if (twitchCommand.isManageCommand()) {

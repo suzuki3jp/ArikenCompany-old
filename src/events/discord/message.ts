@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import path from 'path';
-import type { Client, Message } from 'discord.js';
+import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { DiscordValueParser } from '../../class/ValueParser';
@@ -8,9 +8,13 @@ import { DiscordValueParser } from '../../class/ValueParser';
 const settingsPath = path.resolve(__dirname, '../../data/settings.json');
 
 export const discordMessage = async (client: Client, message: Message) => {
+    if (message.author.bot) return;
     const settings: { twitch: { manageCommands: string[] } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
     const discordCommand = new DiscordCommand(client, message, settings.twitch.manageCommands);
-    const reply = message.reply;
+    const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
+        message.reply(options);
+    };
+
     if (!discordCommand.isCommand()) return;
 
     if (discordCommand.isManageCommands()) {
