@@ -1,7 +1,7 @@
 import { Client, ButtonInteraction, GuildMember, MessageButton, Message } from 'discord.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { ComponentCustomIds, addTemplateModal } from '../data/Components';
+import { ComponentCustomIds, addTemplateModal, addModal, editModal, removeModal } from '../data/Components';
 import { isFirstPageByFooter, isLastPageByFooter, createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
@@ -125,6 +125,20 @@ export class DiscordButton {
 
     addTemplate() {
         this.interaction.showModal(addTemplateModal);
+    }
+
+    editCommandByTemlate() {}
+
+    async addCommand() {
+        await this.interaction.showModal(addModal);
+    }
+
+    async editCommand() {
+        await this.interaction.showModal(editModal);
+    }
+
+    async removeCommand() {
+        await this.interaction.showModal(removeModal);
     }
 
     async reply(content: string, ephemeral?: boolean) {
