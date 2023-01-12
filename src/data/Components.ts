@@ -10,6 +10,7 @@ export const ComponentCustomIds = {
         remove: 'removeButton',
         site: 'siteButton',
         addTemplate: 'addTemplateButton',
+        commandTemplate: 'template',
     },
     text: {
         commandName: 'targetCommandInput',
