@@ -82,7 +82,7 @@ export class DiscordModal {
 
     async reply(content: string, ephemeral?: boolean) {
         const isEphemeral = ephemeral ?? false;
-        this.interaction.reply({ content, ephemeral: isEphemeral });
+        await this.interaction.reply({ content, ephemeral: isEphemeral });
     }
 }
 
