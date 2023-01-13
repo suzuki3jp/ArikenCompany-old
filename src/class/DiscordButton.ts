@@ -129,13 +129,13 @@ export class DiscordButton extends CommandManager {
         this.interaction.showModal(addTemplateModal);
     }
 
-    editCommandByTemlate() {
+    async editCommandByTemlate() {
         const targetCommand = this.interaction.message.embeds[0].title;
         const value = this.interaction.component.label;
         if (!targetCommand || !value) return;
         if (this.interaction.message instanceof Message) {
-            super.editCom(targetCommand, value, this.interaction.message);
-            super.syncCommandPanel(this.interaction.client);
+            await super.editCom(targetCommand, value, this.interaction.message);
+            await super.syncCommandPanel(this.interaction.client);
             this.interaction.deferUpdate();
         } else return;
     }

@@ -136,14 +136,14 @@ class DiscordButton extends Command_1.CommandManager {
     addTemplate() {
         this.interaction.showModal(Components_1.addTemplateModal);
     }
-    editCommandByTemlate() {
+    async editCommandByTemlate() {
         const targetCommand = this.interaction.message.embeds[0].title;
         const value = this.interaction.component.label;
         if (!targetCommand || !value)
             return;
         if (this.interaction.message instanceof discord_js_1.Message) {
-            super.editCom(targetCommand, value, this.interaction.message);
-            super.syncCommandPanel(this.interaction.client);
+            await super.editCom(targetCommand, value, this.interaction.message);
+            await super.syncCommandPanel(this.interaction.client);
             this.interaction.deferUpdate();
         }
         else
