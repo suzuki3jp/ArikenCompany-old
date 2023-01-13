@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 import { Client, Intents } from 'discord.js';
 import type { ClientOptions as DiscordOptions } from 'discord.js';
 import type { AccessToken } from '@twurple/auth';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { CustomError, Logger, Env } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
 import express from 'express';
 const app = express();
-import http from 'http';
+import https from 'https';
 
 // import modules
 import { TwitchClient } from '@suzuki3jp/twitch.js';
@@ -64,7 +64,13 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
 
         const twitchClient = new TwitchClient(authConfig, twitchOptions);
         const discordClient = new Client(discordOptions);
-        const apiServer = http.createServer(app);
+        const apiServer = https.createServer(
+            {
+                key: readFileSync(`/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem`),
+                cert: readFileSync(`/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem`),
+            },
+            app
+        );
         eventsIndex({ server: apiServer, app }, twitchClient, discordClient, discordToken, logger);
     })();
 } else {

@@ -11,7 +11,7 @@ const path_1 = __importDefault(require("path"));
 const utils_1 = require("@suzuki3jp/utils");
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
-const http_1 = __importDefault(require("http"));
+const https_1 = __importDefault(require("https"));
 // import modules
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
 const settings_json_1 = require("./data/settings.json");
@@ -58,7 +58,10 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         };
         const twitchClient = new twitch_js_1.TwitchClient(authConfig, twitchOptions);
         const discordClient = new discord_js_1.Client(discordOptions);
-        const apiServer = http_1.default.createServer(app);
+        const apiServer = https_1.default.createServer({
+            key: (0, fs_1.readFileSync)(`/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem`),
+            cert: (0, fs_1.readFileSync)(`/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem`),
+        }, app);
         (0, index_1.eventsIndex)({ server: apiServer, app }, twitchClient, discordClient, discordToken, logger);
     })();
 }
