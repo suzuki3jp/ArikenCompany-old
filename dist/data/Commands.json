@@ -1,0 +1,22 @@
+{
+	"!rank": "${fetch https://suzuki-dev.com/api/jp/rank/%E3%81%82%E3%82%8A%E3%81%91%E3%82%93/130kg}",
+	"!uptime": "${fetch https://suzuki-dev.com/api/jp/uptime/ariken }",
+	"!wins": "現在使用不可",
+	"!member": "ごきげんななめ（敬称略）",
+	"!sens": "800dpi 0.306",
+	"!now": "VALORANT (ソロラン)",
+	"!crosshair": "1420 イエロー",
+	"!edpi": "244.8",
+	"!commands": "https://arikencompany.github.io/pages/commands.html",
+	"!vip": "${mod dashboard.twitch.tv/u/arikendebu/community/roles}",
+	"!bunny": "${mod youtu.be/_5ChaARDZso}",
+	"!hand": "${mod youtu.be/QPgHgE1jgBc}",
+	"!ダイエット": "ハンドクラップ or 腕立て15 or 背筋50 or スクワッド30 or バニトレ or バービー15 or モモ上げ30 or 腹筋10",
+	"!duo": "${alias !member}",
+	"!trio": "${alias !member}",
+	"!command": "alias !commands",
+	"!twitter": "https://twitter.com/guraburuslot777",
+	"!youtube": "https://www.youtube.com/@arikenDB",
+	"!multi": "https://multistre.am/arikendebu/akamikarubi/takagitv/layout6/",
+	"!rule": "10年、賞金１万。終わって余裕があったらもう10年"
+}
