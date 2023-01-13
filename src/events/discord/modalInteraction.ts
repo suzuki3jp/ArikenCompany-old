@@ -1,3 +1,4 @@
+import { Message } from 'discord.js';
 import type { Client, ModalSubmitInteraction, MessageButton } from 'discord.js';
 import { ComponentCustomIds } from '../../data/Components';
 import { DiscordModal } from '../../class/DiscordModal';
@@ -5,11 +6,22 @@ import { DiscordModal } from '../../class/DiscordModal';
 export const modalInteraction = async (client: Client, interaction: ModalSubmitInteraction) => {
     const modal = new DiscordModal(client, interaction);
 
-    switch (interaction.customId) {
-        case ComponentCustomIds.modal.addTemplate:
-            modal.reply(await modal.addTemplate(), true);
-            break;
-        default:
-            break;
+    if (interaction.message instanceof Message) {
+        switch (modal.type) {
+            case 'templateAdd':
+                modal.reply(await modal.addTemplate(), true);
+                break;
+            case 'commandAdd':
+                modal.reply(await modal.addCommand(), true);
+                break;
+            case 'commandEdit':
+                modal.reply(await modal.editCommand(), true);
+                break;
+            case 'commandRemove':
+                modal.reply(await modal.removeCommand(), true);
+                break;
+            default:
+                break;
+        }
     }
 };

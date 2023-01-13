@@ -3,6 +3,8 @@ import { randomUUID } from 'crypto';
 import { Client, MessageActionRow, MessageButton, ModalSubmitInteraction, Message } from 'discord.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
+import { CommandManager } from './Command';
+
 export class DiscordModal {
     public client: Client;
     public interaction: ModalSubmitInteraction;
@@ -10,12 +12,14 @@ export class DiscordModal {
     public type: ModalTypes;
     public commandName: string | null;
     public value: string | null;
+    public comManager: CommandManager;
 
     constructor(client: Client, modalInteraction: ModalSubmitInteraction) {
         this.client = client;
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
         this.type = this.modalType();
+        this.comManager = new CommandManager();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);
         } catch {
@@ -78,6 +82,30 @@ export class DiscordModal {
                 }
             } else return '予期せぬエラー';
         }
+    }
+
+    async addCommand(): Promise<string> {
+        if (this.commandName && this.value && this.interaction.message instanceof Message) {
+            const result = await this.comManager.addCom(this.commandName, this.value, this.interaction.message);
+            await this.comManager.syncCommandPanel(this.interaction.client);
+            return result;
+        } else return '予期せぬエラーによって処理を実行できませんでした';
+    }
+
+    async editCommand(): Promise<string> {
+        if (this.commandName && this.value && this.interaction.message instanceof Message) {
+            const result = await this.comManager.editCom(this.commandName, this.value, this.interaction.message);
+            await this.comManager.syncCommandPanel(this.interaction.client);
+            return result;
+        } else return '予期せぬエラーによって処理を実行できませんでした';
+    }
+
+    async removeCommand() {
+        if (this.commandName) {
+            const result = this.comManager.removeCom(this.commandName);
+            await this.comManager.syncCommandPanel(this.interaction.client);
+            return result;
+        } else return '予期せぬエラーによって処理を実行できませんでした';
     }
 
     async reply(content: string, ephemeral?: boolean) {
