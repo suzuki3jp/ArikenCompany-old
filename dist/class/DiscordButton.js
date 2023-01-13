@@ -143,6 +143,7 @@ class DiscordButton extends Command_1.CommandManager {
             return;
         if (this.interaction.message instanceof discord_js_1.Message) {
             super.editCom(targetCommand, value, this.interaction.message);
+            super.syncCommandPanel(this.interaction.client);
             this.interaction.deferUpdate();
         }
         else
