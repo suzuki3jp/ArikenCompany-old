@@ -1,12 +1,13 @@
 import { Client, ButtonInteraction, GuildMember, MessageButton, Message } from 'discord.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { CommandManager } from '../class/Command';
 import { ComponentCustomIds, addTemplateModal, addModal, editModal, removeModal } from '../data/Components';
 import { isFirstPageByFooter, isLastPageByFooter, createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
 
-export class DiscordButton {
+export class DiscordButton extends CommandManager {
     public client: Client;
     public interaction: ButtonInteraction;
     public member: GuildMember | null;
@@ -14,6 +15,7 @@ export class DiscordButton {
     public customId: string;
 
     constructor(client: Client, interaction: ButtonInteraction) {
+        super();
         this.client = client;
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
@@ -127,7 +129,14 @@ export class DiscordButton {
         this.interaction.showModal(addTemplateModal);
     }
 
-    editCommandByTemlate() {}
+    editCommandByTemlate() {
+        const targetCommand = this.interaction.message.embeds[0].title;
+        const value = this.interaction.component.label;
+        if (!targetCommand || !value) return;
+        if (this.interaction.message instanceof Message) {
+            super.editCom(targetCommand, value, this.interaction.message);
+        } else return;
+    }
 
     async addCommand() {
         await this.interaction.showModal(addModal);
