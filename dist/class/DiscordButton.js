@@ -4,16 +4,18 @@ exports.DiscordButton = void 0;
 const discord_js_1 = require("discord.js");
 const fs_1 = require("fs");
 const path_1 = require("path");
+const Command_1 = require("../class/Command");
 const Components_1 = require("../data/Components");
 const Embed_1 = require("../utils/Embed");
 const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
-class DiscordButton {
+class DiscordButton extends Command_1.CommandManager {
     client;
     interaction;
     member;
     type;
     customId;
     constructor(client, interaction) {
+        super();
         this.client = client;
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
@@ -134,7 +136,17 @@ class DiscordButton {
     addTemplate() {
         this.interaction.showModal(Components_1.addTemplateModal);
     }
-    editCommandByTemlate() { }
+    editCommandByTemlate() {
+        const targetCommand = this.interaction.message.embeds[0].title;
+        const value = this.interaction.component.label;
+        if (!targetCommand || !value)
+            return;
+        if (this.interaction.message instanceof discord_js_1.Message) {
+            super.editCom(targetCommand, value, this.interaction.message);
+        }
+        else
+            return;
+    }
     async addCommand() {
         await this.interaction.showModal(Components_1.addModal);
     }
