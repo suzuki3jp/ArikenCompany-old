@@ -1,29 +1,35 @@
 {
-    "discord": {
-        "modRoleId": "972795199774392330",
-        "guildId": "927440256633028649"
-    },
-    "twitch": {
-        "channelName": "pre_ariken_company",
-        "channels": ["suzuki3_jp", "ariken_company", "pre_ariken_company"],
-        "manageCommands": [
-            "!addcom",
-            "!editcom",
-            "!rmcom",
-            "!removecom",
-            "!cooltime",
-            "!setcooltime",
-            "!ct",
-            "!setct",
-            "!allow",
-            "!deny",
-            "!oncom",
-            "!offcom"
-        ],
-        "command": true,
-        "cooltime": 120
-    },
-    "api": {
-        "port": 3150
-    }
+	"discord": {
+		"modRoleId": "972795199774392330",
+		"guildId": "927440256633028649",
+		"manageCommandChannelId": "948320206193819678",
+		"manageCommandPanelId": "1063537778824056852"
+	},
+	"twitch": {
+		"channelName": "pre_ariken_company",
+		"channels": [
+			"suzuki3_jp",
+			"ariken_company",
+			"pre_ariken_company"
+		],
+		"manageCommands": [
+			"!addcom",
+			"!editcom",
+			"!rmcom",
+			"!removecom",
+			"!cooltime",
+			"!setcooltime",
+			"!ct",
+			"!setct",
+			"!allow",
+			"!deny",
+			"!oncom",
+			"!offcom"
+		],
+		"command": true,
+		"cooltime": 120
+	},
+	"api": {
+		"port": 3150
+	}
 }
