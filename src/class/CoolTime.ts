@@ -20,7 +20,7 @@ export class CoolTimeManager {
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
         const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(cooltimePath, newSettings, 'utf-8');
+        writeFileSync(settingsPath, newSettings, 'utf-8');
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
 
@@ -39,7 +39,7 @@ export class CoolTimeManager {
         const cooltimes: Record<string, number> = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
-        const currentCooltime = this.currentCoolTime();
+        const currentCooltime = this.currentCoolTime() * 1000;
         const currentTime = JST.getDate().getTime();
         const diffTime = currentTime - cooltimes[twitchCommand.command.commandName];
         if (currentCooltime < diffTime) return true;
