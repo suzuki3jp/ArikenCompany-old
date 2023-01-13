@@ -135,6 +135,7 @@ export class DiscordButton extends CommandManager {
         if (!targetCommand || !value) return;
         if (this.interaction.message instanceof Message) {
             super.editCom(targetCommand, value, this.interaction.message);
+            super.syncCommandPanel(this.interaction.client);
             this.interaction.deferUpdate();
         } else return;
     }
