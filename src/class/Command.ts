@@ -1,12 +1,15 @@
 import { ObjectUtils } from '@suzuki3jp/utils';
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
-import { Message as DiscordMessage } from 'discord.js';
+import { Client, Message as DiscordMessage, TextChannel, MessageButton } from 'discord.js';
 import { ValueParser, PubValueParser, DiscordValueParser } from './ValueParser';
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
+import { createCommandPanelEmbeds } from '../utils/Embed';
+
 import { CommandManagersManager } from './CommandManagers';
 
+const settingsPath = resolve(__dirname, '../data/settings.json');
 const commandsFilePath = resolve(__dirname, '../data/Commands.json');
 const publicCommandsPath = resolve(__dirname, '../data/PublicCommands.json');
 
@@ -90,6 +93,26 @@ export class CommandManager extends CommandManagersManager {
         writeFileSync(commandsFilePath, writeData, 'utf-8');
         this.createPublicList();
         return `${name} を削除しました`;
+    }
+
+    async syncCommandPanel(client: Client) {
+        const settings: { discord: { manageCommandChannelId: string; manageCommandPanelId: string } } = JSON.parse(
+            readFileSync(settingsPath, 'utf-8')
+        );
+        const newPage = createCommandPanelEmbeds()[0];
+        const manageCommandChannel = client.channels.cache.get(settings.discord.manageCommandChannelId);
+        if (manageCommandChannel instanceof TextChannel) {
+            const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
+            const components = panel.components;
+            if (
+                components[0].components[0] instanceof MessageButton &&
+                components[0].components[1] instanceof MessageButton
+            ) {
+                components[0].components[0].setDisabled(true);
+                components[0].components[1].setDisabled(false);
+                panel.edit({ embeds: [newPage], components });
+            }
+        } else return;
     }
 
     createPublicList(): Record<string, string> {

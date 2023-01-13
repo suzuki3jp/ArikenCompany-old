@@ -99,18 +99,24 @@ export class DiscordCommand extends CommandManager {
     async addCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        return await super.addCom(targetCommand, value, this.message);
+        const result = await super.addCom(targetCommand, value, this.message);
+        await super.syncCommandPanel(this.client);
+        return result;
     }
 
     async editCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        return await super.editCom(targetCommand, value, this.message);
+        const result = await super.editCom(targetCommand, value, this.message);
+        await super.syncCommandPanel(this.client);
+        return result;
     }
 
     removeCom(): string {
         const targetCommand = this.command.commandsArg[0];
-        return super.removeCom(targetCommand);
+        const result = super.removeCom(targetCommand);
+        super.syncCommandPanel(this.client);
+        return result;
     }
 
     coolTime(): string {

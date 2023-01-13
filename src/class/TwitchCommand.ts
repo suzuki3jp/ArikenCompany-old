@@ -1,5 +1,6 @@
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { TwitchClient, Message } from '@suzuki3jp/twitch.js';
+import type { Client } from 'discord.js';
 import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 
@@ -12,12 +13,14 @@ const commandsPath = path.resolve(__dirname, '../data/Commands.json');
 
 export class TwitchCommand extends CommandManager {
     public client: TwitchClient;
+    public discordClient: Client;
     public command: CommandParser;
     public message: Message;
 
-    constructor(client: TwitchClient, message: Message, manageCommands: string[]) {
+    constructor(client: TwitchClient, discordClient: Client, message: Message, manageCommands: string[]) {
         super();
         this.client = client;
+        this.discordClient = discordClient;
         this.command = new CommandParser(message.content, { manageCommands });
         this.message = message;
     }
@@ -126,18 +129,24 @@ export class TwitchCommand extends CommandManager {
     async addCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        return await super.addCom(targetCommand, value, this.message);
+        const result = await super.addCom(targetCommand, value, this.message);
+        await super.syncCommandPanel(this.discordClient);
+        return result;
     }
 
     async editCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        return await super.editCom(targetCommand, value, this.message);
+        const result = await super.editCom(targetCommand, value, this.message);
+        await super.syncCommandPanel(this.discordClient);
+        return result;
     }
 
     removeCom(): string {
         const targetCommand = this.command.commandsArg[0];
-        return super.removeCom(targetCommand);
+        const result = super.removeCom(targetCommand);
+        super.syncCommandPanel(this.discordClient);
+        return result;
     }
 
     commandValue(): string | null {

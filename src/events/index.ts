@@ -5,13 +5,16 @@ import type { TwitchClient } from '@suzuki3jp/twitch.js';
 import type { Client } from 'discord.js';
 import type { Logger } from '@suzuki3jp/utils';
 import type { Express } from 'express';
+import { TwitchCommand } from '../class/TwitchCommand';
 
 import { discordMessage, discordReady, discordInteraction } from './discord/index';
 import { twitchReady, twitchMessage } from './twitch/index';
 import { router } from '../api/Router';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
-const settings: { api: { port: number } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+const settings: { api: { port: number }; twitch: { manageCommands: string[] } } = JSON.parse(
+    readFileSync(settingsPath, 'utf-8')
+);
 
 export const eventsIndex = (
     api: { server: http.Server; app: Express },
@@ -21,7 +24,7 @@ export const eventsIndex = (
     logger: Logger
 ) => {
     // client login
-    // twitchClient.login();
+    twitchClient.login();
     discordClient.login(discordToken);
     api.server.listen(settings.api.port, () => {
         logger.system(`api is ready. listening at http://localhost:${settings.api.port}/`);
@@ -38,5 +41,7 @@ export const eventsIndex = (
     // twitch events
     twitchClient.on('ready', () => twitchReady(twitchClient, logger));
 
-    twitchClient.on('messageCreate', (message) => twitchMessage(twitchClient, message));
+    twitchClient.on('messageCreate', (message) =>
+        twitchMessage(new TwitchCommand(twitchClient, discordClient, message, settings.twitch.manageCommands), message)
+    );
 };
