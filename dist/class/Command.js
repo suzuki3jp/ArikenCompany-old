@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManager = void 0;
 const utils_1 = require("@suzuki3jp/utils");
 const discord_js_1 = require("discord.js");
-const ValueParser_1 = require("./ValueParser");
 const fs_1 = require("fs");
 const path_1 = require("path");
-const Embed_1 = require("../utils/Embed");
+// モジュールをインポート
 const CommandManagers_1 = require("./CommandManagers");
+const Embed_1 = require("../utils/Embed");
+const ValueParser_1 = require("./ValueParser");
 const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
 const commandsFilePath = (0, path_1.resolve)(__dirname, '../data/Commands.json');
 const publicCommandsPath = (0, path_1.resolve)(__dirname, '../data/PublicCommands.json');

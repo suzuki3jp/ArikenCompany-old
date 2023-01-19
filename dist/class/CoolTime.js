@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoolTimeManager = void 0;
+// nodeモジュールをインポート
 const utils_1 = require("@suzuki3jp/utils");
 const fs_1 = require("fs");
 const path_1 = require("path");

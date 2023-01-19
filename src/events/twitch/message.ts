@@ -1,5 +1,7 @@
+// nodeモジュールをインポート
 import { Message } from '@suzuki3jp/twitch.js';
 
+// モジュールをインポート
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
 

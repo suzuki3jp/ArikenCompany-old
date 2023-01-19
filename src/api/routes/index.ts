@@ -1,3 +1,4 @@
-export { chatters } from './chatters';
+// モジュールをインポート
 export { commands } from './commands';
+export { chatters } from './chatters';
 export { managers } from './managers';

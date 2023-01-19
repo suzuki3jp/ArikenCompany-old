@@ -1,15 +1,16 @@
-import type { Client, Message } from 'discord.js';
+// nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
-import { writeFileSync, readFileSync } from 'fs';
+import type { Client, Message } from 'discord.js';
+import { readFileSync } from 'fs';
 import path from 'path';
 
-import { SettingsJson, CommandsJson } from '../data/JsonTypes';
+// モジュールをインポート
+import { CommandManager } from './Command';
+import { CommandsJson, SettingsJson } from '../data/JsonTypes';
 
 // paths
 const settingsPath = path.resolve(__dirname, '../data/settings.json');
 const commandsPath = path.resolve(__dirname, '../data/Commands.json');
-
-import { CommandManager } from './Command';
 
 export class DiscordCommand extends CommandManager {
     public client: Client;

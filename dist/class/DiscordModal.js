@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordModal = void 0;
-const Components_1 = require("../data/Components");
+// nodeモジュールをインポート
 const crypto_1 = require("crypto");
 const discord_js_1 = require("discord.js");
+// モジュールをインポート
 const Command_1 = require("./Command");
+const Components_1 = require("../data/Components");
 class DiscordModal {
     client;
     interaction;

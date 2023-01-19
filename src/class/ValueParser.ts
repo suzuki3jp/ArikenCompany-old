@@ -1,10 +1,12 @@
-import { Request, ArrayUtils, JST, StringUtils } from '@suzuki3jp/utils';
+// nodeモジュールをインポート
+import { ArrayUtils, JST, Request, StringUtils } from '@suzuki3jp/utils';
 import type { Message as TwtichMessage } from '@suzuki3jp/twitch.js';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { Agent } from 'https';
 import path from 'path';
 import { readFileSync } from 'fs';
 
+// モジュールをインポート
 import { CommandsJson, SettingsJson } from '../data/JsonTypes';
 
 // paths

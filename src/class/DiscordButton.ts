@@ -1,11 +1,13 @@
-import { Client, ButtonInteraction, GuildMember, MessageButton, Message } from 'discord.js';
+// nodeモジュールをインポート
+import { ButtonInteraction, Client, GuildMember, Message, MessageButton } from 'discord.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { CommandManager } from '../class/Command';
-import { ComponentCustomIds, addTemplateModal, addModal, editModal, removeModal } from '../data/Components';
-import { isFirstPageByFooter, isLastPageByFooter, createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 
+// モジュールをインポート
+import { CommandManager } from '../class/Command';
+import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from '../data/Components';
 import { SettingsJson } from '../data/JsonTypes';
+import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
 

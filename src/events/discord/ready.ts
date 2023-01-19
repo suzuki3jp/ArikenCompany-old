@@ -1,10 +1,11 @@
+// nodeモジュールをインポート
+import type { Logger } from '@suzuki3jp/utils';
+import type { Client } from 'discord.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import type { Client } from 'discord.js';
-import type { Logger } from '@suzuki3jp/utils';
 
+// モジュールをインポート
 import { CommandManager } from '../../class/Command';
-
 import { slashCommands } from '../../data/SlashCommands';
 import { SettingsJson } from '../../data/JsonTypes';
 

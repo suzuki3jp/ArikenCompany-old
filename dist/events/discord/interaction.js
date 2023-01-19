@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.discordInteraction = void 0;
+// モジュールをインポート
 const commandInteraction_1 = require("./commandInteraction");
 const buttonInteraction_1 = require("./buttonInteraction");
 const modalInteraction_1 = require("./modalInteraction");

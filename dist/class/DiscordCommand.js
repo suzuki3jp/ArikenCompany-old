@@ -4,13 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordCommand = void 0;
+// nodeモジュールをインポート
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
+// モジュールをインポート
+const Command_1 = require("./Command");
 // paths
 const settingsPath = path_1.default.resolve(__dirname, '../data/settings.json');
 const commandsPath = path_1.default.resolve(__dirname, '../data/Commands.json');
-const Command_1 = require("./Command");
 class DiscordCommand extends Command_1.CommandManager {
     client;
     message;

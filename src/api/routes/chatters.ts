@@ -1,3 +1,4 @@
+// nodeモジュールをインポート
 import type { Request, Response } from 'express';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';

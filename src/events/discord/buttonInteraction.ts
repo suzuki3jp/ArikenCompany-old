@@ -1,4 +1,5 @@
-import type { Client, ButtonInteraction } from 'discord.js';
+// nodeモジュールをインポート
+import type { ButtonInteraction, Client } from 'discord.js';
 import { DiscordButton } from '../../class/DiscordButton';
 
 export const buttonInteraction = (client: Client, interaction: ButtonInteraction) => {

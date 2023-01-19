@@ -1,7 +1,9 @@
+// nodeモジュールをインポート
+import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 import { readFileSync } from 'fs';
 import path from 'path';
-import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
+// モジュールをインポート
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { DiscordValueParser } from '../../class/ValueParser';
 import { SettingsJson } from '../../data/JsonTypes';

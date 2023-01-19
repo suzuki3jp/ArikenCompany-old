@@ -1,3 +1,3 @@
-export { discordReady } from './ready';
-export { discordMessage } from './message';
 export { discordInteraction } from './interaction';
+export { discordMessage } from './message';
+export { discordReady } from './ready';

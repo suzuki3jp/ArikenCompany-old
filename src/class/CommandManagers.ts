@@ -1,8 +1,10 @@
+// nodeモジュールをインポート
+import { readFileSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
+
+// モジュールをインポート
 import { CoolTimeManager } from './CoolTime';
 import { ManagersJson, SettingsJson } from '../data/JsonTypes';
-
-import { writeFileSync, readFileSync } from 'fs';
-import { resolve } from 'path';
 
 const managersPath = resolve(__dirname, '../data/Managers.json');
 const settingsPath = resolve(__dirname, '../data/settings.json');

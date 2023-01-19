@@ -1,4 +1,5 @@
-import { MessageButton, Modal, TextInputComponent, MessageActionRow, ModalActionRowComponent } from 'discord.js';
+// nodeモジュールをインポート
+import { MessageActionRow, MessageButton, Modal, ModalActionRowComponent, TextInputComponent } from 'discord.js';
 import { MessageButtonStyles, TextInputStyles } from 'discord.js/typings/enums';
 
 export const ComponentCustomIds = {

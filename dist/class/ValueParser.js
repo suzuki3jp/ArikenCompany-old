@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PubValueParser = exports.DiscordValueParser = exports.ValueParser = void 0;
+// nodeモジュールをインポート
 const utils_1 = require("@suzuki3jp/utils");
 const discord_js_1 = require("discord.js");
 const https_1 = require("https");

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.discordMessage = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
+// モジュールをインポート
 const DiscordCommand_1 = require("../../class/DiscordCommand");
 const ValueParser_1 = require("../../class/ValueParser");
 const settingsPath = path_1.default.resolve(__dirname, '../../data/settings.json');

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLastPageByFooter = exports.isFirstPageByFooter = exports.currentPage = exports.createCommandPanelEmbeds = void 0;
+// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
 const fs_1 = require("fs");
 const path_1 = require("path");

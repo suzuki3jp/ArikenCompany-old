@@ -1,5 +1,8 @@
+// nodeモジュールをインポート
 import { Message } from 'discord.js';
-import type { Client, ModalSubmitInteraction, MessageButton } from 'discord.js';
+import type { Client, ModalSubmitInteraction } from 'discord.js';
+
+// モジュールをインポート
 import { DiscordModal } from '../../class/DiscordModal';
 
 export const modalInteraction = async (client: Client, interaction: ModalSubmitInteraction) => {

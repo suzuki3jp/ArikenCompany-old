@@ -1,7 +1,10 @@
+// nodeモジュールをインポート
 import { MessageEmbed } from 'discord.js';
 import { APIEmbed } from 'discord-api-types/v9';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+
+// モジュールをインポート
 import { CommandsJson } from '../data/JsonTypes';
 
 const commandsPath = resolve(__dirname, '../data/Commands.json');

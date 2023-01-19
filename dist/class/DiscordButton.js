@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordButton = void 0;
+// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
 const fs_1 = require("fs");
 const path_1 = require("path");
+// モジュールをインポート
 const Command_1 = require("../class/Command");
 const Components_1 = require("../data/Components");
 const Embed_1 = require("../utils/Embed");

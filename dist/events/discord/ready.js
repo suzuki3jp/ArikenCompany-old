@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.discordReady = void 0;
 const fs_1 = require("fs");
 const path_1 = require("path");
+// モジュールをインポート
 const Command_1 = require("../../class/Command");
 const SlashCommands_1 = require("../../data/SlashCommands");
 // paths

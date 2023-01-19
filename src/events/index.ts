@@ -1,17 +1,18 @@
-import http from 'http';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+// nodeモジュールをインポート
 import type { TwitchClient } from '@suzuki3jp/twitch.js';
-import type { Client } from 'discord.js';
 import type { Logger } from '@suzuki3jp/utils';
+import type { Client } from 'discord.js';
 import type { Express } from 'express';
-import { TwitchCommand } from '../class/TwitchCommand';
+import { readFileSync } from 'fs';
+import http from 'http';
+import { resolve } from 'path';
 
-import { discordMessage, discordReady, discordInteraction } from './discord/index';
-import { twitchReady, twitchMessage } from './twitch/index';
+// モジュールをインポート
 import { router } from '../api/Router';
-
+import { TwitchCommand } from '../class/TwitchCommand';
 import { SettingsJson } from '../data/JsonTypes';
+import { discordInteraction, discordMessage, discordReady } from './discord/index';
+import { twitchMessage, twitchReady } from './twitch/index';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
 const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));

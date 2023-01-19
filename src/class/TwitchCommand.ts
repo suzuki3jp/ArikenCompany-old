@@ -1,11 +1,13 @@
+// nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { TwitchClient, Message } from '@suzuki3jp/twitch.js';
 import type { Client } from 'discord.js';
-import { writeFileSync, readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
+// モジュールをインポート
 import { CommandManager } from './Command';
-import { ManagersJson, MessageCounterJson, CommandsJson } from '../data/JsonTypes';
+import { CommandsJson, ManagersJson, MessageCounterJson } from '../data/JsonTypes';
 
 // paths
 const managersPath = path.resolve(__dirname, '../data/Managers.json');

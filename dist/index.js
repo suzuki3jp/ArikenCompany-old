@@ -3,16 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import packages
+// nodeモジュールをインポート
+const utils_1 = require("@suzuki3jp/utils");
 const dotenv_1 = __importDefault(require("dotenv"));
 const discord_js_1 = require("discord.js");
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
-const utils_1 = require("@suzuki3jp/utils");
 const express_1 = __importDefault(require("express"));
-const app = (0, express_1.default)();
+const fs_1 = require("fs");
 const https_1 = __importDefault(require("https"));
-// import modules
+const path_1 = __importDefault(require("path"));
+const app = (0, express_1.default)();
+// モジュールをインポート
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
 const settings_json_1 = require("./data/settings.json");
 const index_1 = require("./events/index");

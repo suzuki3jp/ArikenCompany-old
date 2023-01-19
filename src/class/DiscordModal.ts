@@ -1,9 +1,11 @@
-import { ComponentCustomIds } from '../data/Components';
+// nodeモジュールをインポート
 import { randomUUID } from 'crypto';
-import { Client, MessageActionRow, MessageButton, ModalSubmitInteraction, Message } from 'discord.js';
+import { Client, Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
+// モジュールをインポート
 import { CommandManager } from './Command';
+import { ComponentCustomIds } from '../data/Components';
 
 export class DiscordModal {
     public client: Client;

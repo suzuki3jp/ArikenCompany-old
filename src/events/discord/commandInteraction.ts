@@ -1,10 +1,12 @@
+// nodeモジュールをインポート
 import { Client, CommandInteraction, MessageActionRow } from 'discord.js';
-import { pageManagerActionRow, commandManagerActionRow, addTemplateButton } from '../../data/Components';
-import { createCommandPanelEmbeds } from '../../utils/Embed';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
+// モジュールをインポート
+import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../../data/Components';
 import { SettingsJson } from '../../data/JsonTypes';
+import { createCommandPanelEmbeds } from '../../utils/Embed';
 
 const settingsPath = resolve(__dirname, '../../data/settings.json');
 

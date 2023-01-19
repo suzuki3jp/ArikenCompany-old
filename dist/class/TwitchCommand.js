@@ -4,9 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwitchCommand = void 0;
+// nodeモジュールをインポート
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
+// モジュールをインポート
 const Command_1 = require("./Command");
 // paths
 const managersPath = path_1.default.resolve(__dirname, '../data/Managers.json');

@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManagersManager = void 0;
-const CoolTime_1 = require("./CoolTime");
+// nodeモジュールをインポート
 const fs_1 = require("fs");
 const path_1 = require("path");
+// モジュールをインポート
+const CoolTime_1 = require("./CoolTime");
 const managersPath = (0, path_1.resolve)(__dirname, '../data/Managers.json');
 const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
 class CommandManagersManager extends CoolTime_1.CoolTimeManager {

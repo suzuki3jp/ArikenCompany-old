@@ -1,17 +1,17 @@
-// import packages
+// nodeモジュールをインポート
+import { CustomError, Env, Logger } from '@suzuki3jp/utils';
+import type { LoggerOptions } from '@suzuki3jp/utils';
+import type { AccessToken } from '@twurple/auth';
 import dotenv from 'dotenv';
 import { Client, Intents } from 'discord.js';
 import type { ClientOptions as DiscordOptions } from 'discord.js';
-import type { AccessToken } from '@twurple/auth';
-import { writeFileSync, readFileSync } from 'fs';
-import path from 'path';
-import { CustomError, Logger, Env } from '@suzuki3jp/utils';
-import type { LoggerOptions } from '@suzuki3jp/utils';
 import express from 'express';
-const app = express();
+import { readFileSync, writeFileSync } from 'fs';
 import https from 'https';
+import path from 'path';
+const app = express();
 
-// import modules
+// モジュールをインポート
 import { TwitchClient } from '@suzuki3jp/twitch.js';
 import type { AuthConfig, ClientOptions } from '@suzuki3jp/twitch.js';
 import { twitch } from './data/settings.json';

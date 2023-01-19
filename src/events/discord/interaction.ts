@@ -1,4 +1,7 @@
+// nodeモジュールをインポート
 import type { Client, Interaction } from 'discord.js';
+
+// モジュールをインポート
 import { commandInteraction } from './commandInteraction';
 import { buttonInteraction } from './buttonInteraction';
 import { modalInteraction } from './modalInteraction';

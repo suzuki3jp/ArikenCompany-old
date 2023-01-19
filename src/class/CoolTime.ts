@@ -1,9 +1,11 @@
+// nodeモジュールをインポート
 import { JST } from '@suzuki3jp/utils';
-import { writeFileSync, readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
+// モジュールをインポート
+import { CooltimeJson, SettingsJson } from '../data/JsonTypes';
 import type { TwitchCommand } from './TwitchCommand';
-import { SettingsJson, CooltimeJson } from '../data/JsonTypes';
 
 const cooltimePath = resolve(__dirname, '../data/Cooltime.json');
 const settingsPath = resolve(__dirname, '../data/settings.json');

@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commandInteraction = void 0;
+// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
-const Components_1 = require("../../data/Components");
-const Embed_1 = require("../../utils/Embed");
 const fs_1 = require("fs");
 const path_1 = require("path");
+// モジュールをインポート
+const Components_1 = require("../../data/Components");
+const Embed_1 = require("../../utils/Embed");
 const settingsPath = (0, path_1.resolve)(__dirname, '../../data/settings.json');
 const commandInteraction = async (client, interaction) => {
     const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));

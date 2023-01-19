@@ -1,4 +1,5 @@
-import { ApplicationCommandDataResolvable, ApplicationCommandOptionType } from 'discord.js';
+// nodeモジュールをインポート
+import { ApplicationCommandDataResolvable } from 'discord.js';
 
 const optionTypes = {
     SubCommand: 1,

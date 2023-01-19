@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addTemplateModal = exports.removeModal = exports.editModal = exports.addModal = exports.commandManagerActionRow = exports.pageManagerActionRow = exports.addTemplateButton = exports.siteButton = exports.removeButton = exports.editButton = exports.addButton = exports.previousButton = exports.nextButton = exports.ComponentCustomIds = void 0;
+// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
 exports.ComponentCustomIds = {
     button: {

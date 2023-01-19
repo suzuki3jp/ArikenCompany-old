@@ -1,13 +1,15 @@
-import { ObjectUtils } from '@suzuki3jp/utils';
+// nodeモジュールをインポート
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
-import { Client, Message as DiscordMessage, TextChannel, MessageButton } from 'discord.js';
-import { ValueParser, PubValueParser, DiscordValueParser } from './ValueParser';
-import { writeFileSync, readFileSync } from 'fs';
+import { ObjectUtils } from '@suzuki3jp/utils';
+import { Client, Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
+import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-import { createCommandPanelEmbeds } from '../utils/Embed';
-import { SettingsJson, CommandsJson, PublicCommandsJson } from '../data/JsonTypes';
+// モジュールをインポート
 import { CommandManagersManager } from './CommandManagers';
+import { CommandsJson, PublicCommandsJson, SettingsJson } from '../data/JsonTypes';
+import { createCommandPanelEmbeds } from '../utils/Embed';
+import { DiscordValueParser, PubValueParser, ValueParser } from './ValueParser';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
 const commandsFilePath = resolve(__dirname, '../data/Commands.json');

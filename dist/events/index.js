@@ -3,10 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.eventsIndex = void 0;
 const fs_1 = require("fs");
 const path_1 = require("path");
+// モジュールをインポート
+const Router_1 = require("../api/Router");
 const TwitchCommand_1 = require("../class/TwitchCommand");
 const index_1 = require("./discord/index");
 const index_2 = require("./twitch/index");
-const Router_1 = require("../api/Router");
 const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
 const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
 const eventsIndex = (api, twitchClient, discordClient, discordToken, logger) => {
