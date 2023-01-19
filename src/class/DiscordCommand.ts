@@ -3,6 +3,8 @@ import { CommandParser } from '@suzuki3jp/twitch.js';
 import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 
+import { SettingsJson, CommandsJson } from '../data/JsonTypes';
+
 // paths
 const settingsPath = path.resolve(__dirname, '../data/settings.json');
 const commandsPath = path.resolve(__dirname, '../data/Commands.json');
@@ -30,7 +32,7 @@ export class DiscordCommand extends CommandManager {
     }
 
     isManager(): boolean {
-        const settings: { discord: { modRoleId: string } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (this.message.member?.roles.cache.has(settings.discord.modRoleId)) return true;
         return false;
     }
@@ -83,7 +85,7 @@ export class DiscordCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const Commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

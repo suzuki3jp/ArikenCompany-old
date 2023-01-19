@@ -97,6 +97,8 @@ class CommandManager extends CommandManagers_1.CommandManagersManager {
         const newPage = (0, Embed_1.createCommandPanelEmbeds)()[0];
         const manageCommandChannel = client.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof discord_js_1.TextChannel) {
+            if (!settings.discord.manageCommandPanelId)
+                return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
             const components = panel.components;
             if (components[0].components[0] instanceof discord_js_1.MessageButton &&

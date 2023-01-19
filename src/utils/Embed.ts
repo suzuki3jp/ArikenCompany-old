@@ -2,11 +2,12 @@ import { MessageEmbed } from 'discord.js';
 import { APIEmbed } from 'discord-api-types/v9';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { CommandsJson } from '../data/JsonTypes';
 
 const commandsPath = resolve(__dirname, '../data/Commands.json');
 
 export const createCommandPanelEmbeds = (): MessageEmbed[] => {
-    const commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+    const commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
     const commandsArr = Object.entries(commands);
     const pagesLength = Math.floor(commandsArr.length / 10) + 1;
     let index = 0;

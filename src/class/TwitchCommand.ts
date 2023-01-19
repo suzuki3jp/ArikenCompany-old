@@ -5,6 +5,7 @@ import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 
 import { CommandManager } from './Command';
+import { ManagersJson, MessageCounterJson, CommandsJson } from '../data/JsonTypes';
 
 // paths
 const managersPath = path.resolve(__dirname, '../data/Managers.json');
@@ -34,7 +35,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     isManager(): boolean {
-        const managersData: { managers: string[] } = JSON.parse(
+        const managersData: ManagersJson = JSON.parse(
             readFileSync(managersPath, {
                 encoding: 'utf-8',
             })
@@ -46,7 +47,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     isVip(): boolean {
-        const managersData: { managers: string[] } = JSON.parse(
+        const managersData: ManagersJson = JSON.parse(
             readFileSync(managersPath, {
                 encoding: 'utf-8',
             })
@@ -59,7 +60,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     countMessage(): void {
-        const MessageCounter = JSON.parse(readFileSync(messageCounterPath, 'utf-8'));
+        const MessageCounter: MessageCounterJson = JSON.parse(readFileSync(messageCounterPath, 'utf-8'));
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
             const newData = JSON.stringify(MessageCounter, null, '\t');
@@ -150,7 +151,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const Commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

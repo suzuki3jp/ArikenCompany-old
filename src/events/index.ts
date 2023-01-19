@@ -11,10 +11,10 @@ import { discordMessage, discordReady, discordInteraction } from './discord/inde
 import { twitchReady, twitchMessage } from './twitch/index';
 import { router } from '../api/Router';
 
+import { SettingsJson } from '../data/JsonTypes';
+
 const settingsPath = resolve(__dirname, '../data/settings.json');
-const settings: { api: { port: number }; twitch: { manageCommands: string[] } } = JSON.parse(
-    readFileSync(settingsPath, 'utf-8')
-);
+const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
 
 export const eventsIndex = (
     api: { server: http.Server; app: Express },

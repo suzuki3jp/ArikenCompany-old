@@ -5,6 +5,8 @@ import { Agent } from 'https';
 import path from 'path';
 import { readFileSync } from 'fs';
 
+import { CommandsJson, SettingsJson } from '../data/JsonTypes';
+
 // paths
 const commandsPath = path.resolve(__dirname, '../data/Commands.json');
 const settingsPath = path.resolve(__dirname, '../data/settings.json');
@@ -114,7 +116,7 @@ export class ValueParser {
 
     private parseAlias(codeRaw: string): string {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        const commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
         return commands[targetCommand];
     }
 
@@ -279,13 +281,13 @@ export class DiscordValueParser {
 
     private parseAlias(codeRaw: string): string {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        const commands: Record<string, string> = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
         return commands[targetCommand];
     }
 
     private async parseMod(codeRaw: string, message: DiscordMessage): Promise<ParseModResult> {
         const newCodeRaw = codeRaw.slice(4);
-        const settings: { discord: { modRoleId: string } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
 
         if (message.member?.roles.cache.has(settings.discord.modRoleId)) {
             if (newCodeRaw.startsWith('fetch ')) {

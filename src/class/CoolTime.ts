@@ -3,6 +3,7 @@ import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import type { TwitchCommand } from './TwitchCommand';
+import { SettingsJson, CooltimeJson } from '../data/JsonTypes';
 
 const cooltimePath = resolve(__dirname, '../data/Cooltime.json');
 const settingsPath = resolve(__dirname, '../data/settings.json');
@@ -11,12 +12,12 @@ export class CoolTimeManager {
     constructor() {}
 
     currentCoolTime(): number {
-        const settings: { twitch: { cooltime: number } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         return settings.twitch.cooltime;
     }
 
     changeCoolTime(newCoolTime: string | number): string {
-        const settings: { twitch: { cooltime: number } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
         const newSettings = JSON.stringify(settings, null, '\t');
@@ -27,7 +28,7 @@ export class CoolTimeManager {
     save(twitchCommand: TwitchCommand) {
         if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
+        const cooltimes: CooltimeJson = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
 
         cooltimes[commandName] = JST.getDate().getTime();
         const writeData = JSON.stringify(cooltimes, null, '\t');
@@ -36,7 +37,7 @@ export class CoolTimeManager {
 
     isPassedCoolTime(twitchCommand: TwitchCommand): boolean {
         if (twitchCommand.isVip()) return true;
-        const cooltimes: Record<string, number> = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
+        const cooltimes: CooltimeJson = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
         const currentCooltime = this.currentCoolTime() * 1000;

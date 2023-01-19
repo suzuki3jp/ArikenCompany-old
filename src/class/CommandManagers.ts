@@ -1,5 +1,5 @@
 import { CoolTimeManager } from './CoolTime';
-import type { TwitchCommand } from './TwitchCommand';
+import { ManagersJson, SettingsJson } from '../data/JsonTypes';
 
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
@@ -13,7 +13,7 @@ export class CommandManagersManager extends CoolTimeManager {
     }
 
     isManagersByTarget(target: string) {
-        const managersData: { managers: string[] } = JSON.parse(
+        const managersData: ManagersJson = JSON.parse(
             readFileSync(managersPath, {
                 encoding: 'utf-8',
             })
@@ -23,12 +23,12 @@ export class CommandManagersManager extends CoolTimeManager {
     }
 
     currentCommandStatus(): boolean {
-        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         return settings.twitch.command;
     }
 
     on(): string {
-        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (settings.twitch.command) return managersError.alreadyOn;
         settings.twitch.command = true;
         const newSettings = JSON.stringify(settings, null, '\t');
@@ -37,7 +37,7 @@ export class CommandManagersManager extends CoolTimeManager {
     }
 
     off(): string {
-        const settings: { twitch: { command: boolean } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         if (!settings.twitch.command) return managersError.alreadyOff;
         settings.twitch.command = false;
         const newSettings = JSON.stringify(settings, null, '\t');
@@ -47,7 +47,7 @@ export class CommandManagersManager extends CoolTimeManager {
 
     allow(target: string): string {
         if (this.isManagersByTarget(target)) return managersError.alreadyManager;
-        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
+        const managers: ManagersJson = JSON.parse(readFileSync(managersPath, 'utf-8'));
         managers.managers.push(target);
         const newManagersData = JSON.stringify(managers, null, '\t');
         writeFileSync(managersPath, newManagersData, 'utf-8');
@@ -56,7 +56,7 @@ export class CommandManagersManager extends CoolTimeManager {
 
     deny(target: string): string {
         if (!this.isManagersByTarget(target)) return managersError.isNotAlreadyManager;
-        const managers: { managers: string[] } = JSON.parse(readFileSync(managersPath, 'utf-8'));
+        const managers: ManagersJson = JSON.parse(readFileSync(managersPath, 'utf-8'));
         const targetIndex = managers.managers.findIndex((value, index) => value === target);
         managers.managers.splice(targetIndex, 1);
         const newManagersData = JSON.stringify(managers, null, '\t');

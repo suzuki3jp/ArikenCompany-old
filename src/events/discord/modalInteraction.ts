@@ -1,6 +1,5 @@
 import { Message } from 'discord.js';
 import type { Client, ModalSubmitInteraction, MessageButton } from 'discord.js';
-import { ComponentCustomIds } from '../../data/Components';
 import { DiscordModal } from '../../class/DiscordModal';
 
 export const modalInteraction = async (client: Client, interaction: ModalSubmitInteraction) => {

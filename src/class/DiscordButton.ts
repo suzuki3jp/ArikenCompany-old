@@ -5,6 +5,8 @@ import { CommandManager } from '../class/Command';
 import { ComponentCustomIds, addTemplateModal, addModal, editModal, removeModal } from '../data/Components';
 import { isFirstPageByFooter, isLastPageByFooter, createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 
+import { SettingsJson } from '../data/JsonTypes';
+
 const settingsPath = resolve(__dirname, '../data/settings.json');
 
 export class DiscordButton extends CommandManager {
@@ -35,7 +37,7 @@ export class DiscordButton extends CommandManager {
     }
 
     isMod(): boolean {
-        const settings: { discord: { modRoleId: string } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
 

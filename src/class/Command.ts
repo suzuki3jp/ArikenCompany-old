@@ -6,7 +6,7 @@ import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { createCommandPanelEmbeds } from '../utils/Embed';
-
+import { SettingsJson, CommandsJson, PublicCommandsJson } from '../data/JsonTypes';
 import { CommandManagersManager } from './CommandManagers';
 
 const settingsPath = resolve(__dirname, '../data/settings.json');
@@ -25,7 +25,7 @@ export class CommandManager extends CommandManagersManager {
     async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
         if (message instanceof DiscordMessage) {
             // discord
-            const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
             const name = commandName.toLowerCase();
             if (commands[name]) return manageCommandError.existCommandName;
 
@@ -39,7 +39,7 @@ export class CommandManager extends CommandManagersManager {
             return `${name} を追加しました`;
         } else {
             // twitch
-            const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
             const name = commandName.toLowerCase();
             if (commands[name]) return manageCommandError.existCommandName;
 
@@ -56,7 +56,7 @@ export class CommandManager extends CommandManagersManager {
 
     async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
         if (message instanceof DiscordMessage) {
-            const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
             const name = commandName.toLowerCase();
             if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -69,7 +69,7 @@ export class CommandManager extends CommandManagersManager {
             this.createPublicList();
             return `${name} を ${value} に変更しました`;
         } else {
-            const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
             const name = commandName.toLowerCase();
             if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -85,7 +85,7 @@ export class CommandManager extends CommandManagersManager {
     }
 
     removeCom(commandName: string): string {
-        const commands = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+        const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];
@@ -96,12 +96,11 @@ export class CommandManager extends CommandManagersManager {
     }
 
     async syncCommandPanel(client: Client) {
-        const settings: { discord: { manageCommandChannelId: string; manageCommandPanelId: string } } = JSON.parse(
-            readFileSync(settingsPath, 'utf-8')
-        );
+        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
         const newPage = createCommandPanelEmbeds()[0];
         const manageCommandChannel = client.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof TextChannel) {
+            if (!settings.discord.manageCommandPanelId) return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
             const components = panel.components;
             if (
@@ -115,9 +114,9 @@ export class CommandManager extends CommandManagersManager {
         } else return;
     }
 
-    createPublicList(): Record<string, string> {
-        const commands: Record<string, string> = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
-        let publicCommands: Record<string, string> = {};
+    createPublicList(): PublicCommandsJson {
+        const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+        let publicCommands: PublicCommandsJson = {};
         ObjectUtils.forEach(commands, (key, value) => {
             if (typeof value !== 'string' || typeof key !== 'string') return;
             const parsedData = new PubValueParser().parse(value);

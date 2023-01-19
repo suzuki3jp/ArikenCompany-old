@@ -4,12 +4,13 @@ import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'disco
 
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { DiscordValueParser } from '../../class/ValueParser';
+import { SettingsJson } from '../../data/JsonTypes';
 
 const settingsPath = path.resolve(__dirname, '../../data/settings.json');
 
 export const discordMessage = async (client: Client, message: Message) => {
     if (message.author.bot) return;
-    const settings: { twitch: { manageCommands: string[] } } = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+    const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
     const discordCommand = new DiscordCommand(client, message, settings.twitch.manageCommands);
     const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
         message.reply(options);
