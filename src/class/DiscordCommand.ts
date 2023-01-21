@@ -1,16 +1,13 @@
 // nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { Client, Message } from 'discord.js';
-import { readFileSync } from 'fs';
-import path from 'path';
 
 // モジュールをインポート
 import { CommandManager } from './Command';
-import { CommandsJson, SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 
-// paths
-const settingsPath = path.resolve(__dirname, '../data/settings.json');
-const commandsPath = path.resolve(__dirname, '../data/Commands.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class DiscordCommand extends CommandManager {
     public client: Client;
@@ -33,7 +30,7 @@ export class DiscordCommand extends CommandManager {
     }
 
     isManager(): boolean {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         if (this.message.member?.roles.cache.has(settings.discord.modRoleId)) return true;
         return false;
     }
@@ -86,7 +83,7 @@ export class DiscordCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const Commands = DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

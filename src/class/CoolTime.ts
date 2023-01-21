@@ -1,45 +1,41 @@
 // nodeモジュールをインポート
 import { JST } from '@suzuki3jp/utils';
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
 
 // モジュールをインポート
-import { CooltimeJson, SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 import type { TwitchCommand } from './TwitchCommand';
 
-const cooltimePath = resolve(__dirname, '../data/Cooltime.json');
-const settingsPath = resolve(__dirname, '../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class CoolTimeManager {
     constructor() {}
 
     currentCoolTime(): number {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         return settings.twitch.cooltime;
     }
 
     changeCoolTime(newCoolTime: string | number): string {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
-        const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(settingsPath, newSettings, 'utf-8');
+        DM.setSettings(settings);
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
 
     save(twitchCommand: TwitchCommand) {
         if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes: CooltimeJson = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
+        const cooltimes = DM.getCooltime();
 
         cooltimes[commandName] = JST.getDate().getTime();
-        const writeData = JSON.stringify(cooltimes, null, '\t');
-        writeFileSync(cooltimePath, writeData, 'utf-8');
+        DM.setCooltime(cooltimes);
     }
 
     isPassedCoolTime(twitchCommand: TwitchCommand): boolean {
         if (twitchCommand.isVip()) return true;
-        const cooltimes: CooltimeJson = JSON.parse(readFileSync(cooltimePath, 'utf-8'));
+        const cooltimes = DM.getCooltime();
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
         const currentCooltime = this.currentCoolTime() * 1000;

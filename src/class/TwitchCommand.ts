@@ -2,17 +2,13 @@
 import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { TwitchClient, Message } from '@suzuki3jp/twitch.js';
 import type { Client } from 'discord.js';
-import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
 
 // モジュールをインポート
 import { CommandManager } from './Command';
-import { CommandsJson, ManagersJson, MessageCounterJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 
-// paths
-const managersPath = path.resolve(__dirname, '../data/Managers.json');
-const messageCounterPath = path.resolve(__dirname, '../data/MessageCounter.json');
-const commandsPath = path.resolve(__dirname, '../data/Commands.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class TwitchCommand extends CommandManager {
     public client: TwitchClient;
@@ -37,11 +33,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     isManager(): boolean {
-        const managersData: ManagersJson = JSON.parse(
-            readFileSync(managersPath, {
-                encoding: 'utf-8',
-            })
-        );
+        const managersData = DM.getManagers();
         if (this.message.member.isMod) return true;
         if (this.message.member.isBroadCaster) return true;
         if (managersData.managers.includes(this.message.member.name)) return true;
@@ -49,11 +41,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     isVip(): boolean {
-        const managersData: ManagersJson = JSON.parse(
-            readFileSync(managersPath, {
-                encoding: 'utf-8',
-            })
-        );
+        const managersData = DM.getManagers();
         if (this.message.member.isVip) return true;
         if (this.message.member.isBroadCaster) return true;
         if (this.message.member.isMod) return true;
@@ -62,15 +50,13 @@ export class TwitchCommand extends CommandManager {
     }
 
     countMessage(): void {
-        const MessageCounter: MessageCounterJson = JSON.parse(readFileSync(messageCounterPath, 'utf-8'));
+        const MessageCounter = DM.getMessageCounter();
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
-            const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(messageCounterPath, newData, 'utf-8');
+            DM.setMessageCounter(MessageCounter);
         } else {
             MessageCounter[this.message.member.name] = 1;
-            const newData = JSON.stringify(MessageCounter, null, '\t');
-            writeFileSync(messageCounterPath, newData, 'utf-8');
+            DM.setMessageCounter(MessageCounter);
         }
     }
 
@@ -153,7 +139,7 @@ export class TwitchCommand extends CommandManager {
     }
 
     commandValue(): string | null {
-        const Commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const Commands = DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

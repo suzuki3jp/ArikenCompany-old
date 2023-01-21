@@ -1,13 +1,9 @@
-// nodeモジュールをインポート
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
-
 // モジュールをインポート
 import { CoolTimeManager } from './CoolTime';
-import { ManagersJson, SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 
-const managersPath = resolve(__dirname, '../data/Managers.json');
-const settingsPath = resolve(__dirname, '../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class CommandManagersManager extends CoolTimeManager {
     constructor() {
@@ -15,54 +11,46 @@ export class CommandManagersManager extends CoolTimeManager {
     }
 
     isManagersByTarget(target: string) {
-        const managersData: ManagersJson = JSON.parse(
-            readFileSync(managersPath, {
-                encoding: 'utf-8',
-            })
-        );
+        const managersData = DM.getManagers();
         if (managersData.managers.includes(target)) return true;
         return false;
     }
 
     currentCommandStatus(): boolean {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         return settings.twitch.command;
     }
 
     on(): string {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         if (settings.twitch.command) return managersError.alreadyOn;
         settings.twitch.command = true;
-        const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(settingsPath, newSettings, 'utf-8');
+        DM.setSettings(settings);
         return 'コマンドを有効にしました';
     }
 
     off(): string {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         if (!settings.twitch.command) return managersError.alreadyOff;
         settings.twitch.command = false;
-        const newSettings = JSON.stringify(settings, null, '\t');
-        writeFileSync(settingsPath, newSettings, 'utf-8');
+        DM.setSettings(settings);
         return 'コマンドを無効にしました';
     }
 
     allow(target: string): string {
         if (this.isManagersByTarget(target)) return managersError.alreadyManager;
-        const managers: ManagersJson = JSON.parse(readFileSync(managersPath, 'utf-8'));
+        const managers = DM.getManagers();
         managers.managers.push(target);
-        const newManagersData = JSON.stringify(managers, null, '\t');
-        writeFileSync(managersPath, newManagersData, 'utf-8');
+        DM.setManagers(managers);
         return `${target} に管理者権限を付与しました`;
     }
 
     deny(target: string): string {
         if (!this.isManagersByTarget(target)) return managersError.isNotAlreadyManager;
-        const managers: ManagersJson = JSON.parse(readFileSync(managersPath, 'utf-8'));
+        const managers = DM.getManagers();
         const targetIndex = managers.managers.findIndex((value, index) => value === target);
         managers.managers.splice(targetIndex, 1);
-        const newManagersData = JSON.stringify(managers, null, '\t');
-        writeFileSync(managersPath, newManagersData, 'utf-8');
+        DM.setManagers(managers);
         return `${target} から管理者権限を剥奪しました`;
     }
 }

@@ -2,18 +2,16 @@
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import { ObjectUtils } from '@suzuki3jp/utils';
 import { Client, Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
 
 // モジュールをインポート
 import { CommandManagersManager } from './CommandManagers';
-import { CommandsJson, PublicCommandsJson, SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
+import { PublicCommandsJson } from '../data/JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { DiscordValueParser, PubValueParser, ValueParser } from './ValueParser';
 
-const settingsPath = resolve(__dirname, '../data/settings.json');
-const commandsFilePath = resolve(__dirname, '../data/Commands.json');
-const publicCommandsPath = resolve(__dirname, '../data/PublicCommands.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class CommandManager extends CommandManagersManager {
     public valueParser: ValueParser;
@@ -27,7 +25,7 @@ export class CommandManager extends CommandManagersManager {
     async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
         if (message instanceof DiscordMessage) {
             // discord
-            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands = DM.getCommands();
             const name = commandName.toLowerCase();
             if (commands[name]) return manageCommandError.existCommandName;
 
@@ -35,13 +33,12 @@ export class CommandManager extends CommandManagersManager {
             if (valueResult.status !== 200) return valueResult.content;
 
             commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            writeFileSync(commandsFilePath, writeData, 'utf-8');
+            DM.setCommands(commands);
             this.createPublicList();
             return `${name} を追加しました`;
         } else {
             // twitch
-            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands = DM.getCommands();
             const name = commandName.toLowerCase();
             if (commands[name]) return manageCommandError.existCommandName;
 
@@ -49,8 +46,7 @@ export class CommandManager extends CommandManagersManager {
             if (valueResult.status !== 200) return valueResult.content;
 
             commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            writeFileSync(commandsFilePath, writeData, 'utf-8');
+            DM.setCommands(commands);
             this.createPublicList();
             return `${name} を追加しました`;
         }
@@ -58,7 +54,7 @@ export class CommandManager extends CommandManagersManager {
 
     async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
         if (message instanceof DiscordMessage) {
-            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands = DM.getCommands();
             const name = commandName.toLowerCase();
             if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -66,12 +62,11 @@ export class CommandManager extends CommandManagersManager {
             if (valueResult.status !== 200) return valueResult.content;
 
             commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            writeFileSync(commandsFilePath, writeData, 'utf-8');
+            DM.setCommands(commands);
             this.createPublicList();
             return `${name} を ${value} に変更しました`;
         } else {
-            const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+            const commands = DM.getCommands();
             const name = commandName.toLowerCase();
             if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -79,26 +74,24 @@ export class CommandManager extends CommandManagersManager {
             if (valueResult.status !== 200) return valueResult.content;
 
             commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            writeFileSync(commandsFilePath, writeData, 'utf-8');
+            DM.setCommands(commands);
             this.createPublicList();
             return `${name} を ${value} に変更しました`;
         }
     }
 
     removeCom(commandName: string): string {
-        const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+        const commands = DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];
-        const writeData = JSON.stringify(commands, null, '\t');
-        writeFileSync(commandsFilePath, writeData, 'utf-8');
+        DM.setCommands(commands);
         this.createPublicList();
         return `${name} を削除しました`;
     }
 
     async syncCommandPanel(client: Client) {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         const newPage = createCommandPanelEmbeds()[0];
         const manageCommandChannel = client.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof TextChannel) {
@@ -117,7 +110,7 @@ export class CommandManager extends CommandManagersManager {
     }
 
     createPublicList(): PublicCommandsJson {
-        const commands: CommandsJson = JSON.parse(readFileSync(commandsFilePath, 'utf-8'));
+        const commands = DM.getCommands();
         let publicCommands: PublicCommandsJson = {};
         ObjectUtils.forEach(commands, (key, value) => {
             if (typeof value !== 'string' || typeof key !== 'string') return;
@@ -125,8 +118,7 @@ export class CommandManager extends CommandManagersManager {
             publicCommands[key] = parsedData.content;
         });
 
-        const writeData = JSON.stringify(publicCommands, null, '\t');
-        writeFileSync(publicCommandsPath, writeData, 'utf-8');
+        DM.setPublicCommands(publicCommands);
         return publicCommands;
     }
 }

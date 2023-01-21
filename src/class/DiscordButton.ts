@@ -1,15 +1,14 @@
 // nodeモジュールをインポート
 import { ButtonInteraction, Client, GuildMember, Message, MessageButton } from 'discord.js';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 
 // モジュールをインポート
-import { CommandManager } from '../class/Command';
+import { CommandManager } from './Command';
 import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from '../data/Components';
-import { SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
-const settingsPath = resolve(__dirname, '../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class DiscordButton extends CommandManager {
     public client: Client;
@@ -39,7 +38,7 @@ export class DiscordButton extends CommandManager {
     }
 
     isMod(): boolean {
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
 

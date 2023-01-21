@@ -3,15 +3,12 @@ import { ArrayUtils, JST, Request, StringUtils } from '@suzuki3jp/utils';
 import type { Message as TwtichMessage } from '@suzuki3jp/twitch.js';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { Agent } from 'https';
-import path from 'path';
-import { readFileSync } from 'fs';
 
 // モジュールをインポート
-import { CommandsJson, SettingsJson } from '../data/JsonTypes';
+import { DataManager } from './DataManager';
 
-// paths
-const commandsPath = path.resolve(__dirname, '../data/Commands.json');
-const settingsPath = path.resolve(__dirname, '../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export class ValueParser {
     async parse(value: string, message: TwtichMessage): Promise<ValueParseResult> {
@@ -118,7 +115,7 @@ export class ValueParser {
 
     private parseAlias(codeRaw: string): string {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        const commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const commands = DM.getCommands();
         return commands[targetCommand];
     }
 
@@ -283,13 +280,13 @@ export class DiscordValueParser {
 
     private parseAlias(codeRaw: string): string {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        const commands: CommandsJson = JSON.parse(readFileSync(commandsPath, 'utf-8'));
+        const commands = DM.getCommands();
         return commands[targetCommand];
     }
 
     private async parseMod(codeRaw: string, message: DiscordMessage): Promise<ParseModResult> {
         const newCodeRaw = codeRaw.slice(4);
-        const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+        const settings = DM.getSettings();
 
         if (message.member?.roles.cache.has(settings.discord.modRoleId)) {
             if (newCodeRaw.startsWith('fetch ')) {
