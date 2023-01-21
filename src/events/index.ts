@@ -3,19 +3,19 @@ import type { TwitchClient } from '@suzuki3jp/twitch.js';
 import type { Logger } from '@suzuki3jp/utils';
 import type { Client } from 'discord.js';
 import type { Express } from 'express';
-import { readFileSync } from 'fs';
 import http from 'http';
-import { resolve } from 'path';
 
 // モジュールをインポート
 import { router } from '../api/Router';
+import { DataManager } from '../class/DataManager';
 import { TwitchCommand } from '../class/TwitchCommand';
-import { SettingsJson } from '../data/JsonTypes';
 import { discordInteraction, discordMessage, discordReady } from './discord/index';
 import { twitchMessage, twitchReady } from './twitch/index';
 
-const settingsPath = resolve(__dirname, '../data/settings.json');
-const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+// JSON Data Manager
+const DM = new DataManager();
+
+const settings = DM.getSettings();
 
 export const eventsIndex = (
     api: { server: http.Server; app: Express },

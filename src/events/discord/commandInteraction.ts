@@ -1,17 +1,16 @@
 // nodeモジュールをインポート
 import { Client, CommandInteraction, MessageActionRow } from 'discord.js';
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
 
 // モジュールをインポート
+import { DataManager } from '../../class/DataManager';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../../data/Components';
-import { SettingsJson } from '../../data/JsonTypes';
 import { createCommandPanelEmbeds } from '../../utils/Embed';
 
-const settingsPath = resolve(__dirname, '../../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export const commandInteraction = async (client: Client, interaction: CommandInteraction) => {
-    const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+    const settings = DM.getSettings();
     const member = interaction.guild?.members.resolve(interaction.user);
 
     if (member?.roles.cache.has(settings.discord.modRoleId)) {
@@ -22,8 +21,7 @@ export const commandInteraction = async (client: Client, interaction: CommandInt
                 components: [pageManagerActionRow, commandManagerActionRow],
             });
             settings.discord.manageCommandPanelId = panel?.id ?? null;
-            const writeData = JSON.stringify(settings, null, '\t');
-            writeFileSync(settingsPath, writeData, 'utf-8');
+            DM.setSettings(settings);
         } else if (interaction.options.getSubcommand() === 'template') {
             const targetCommandName = interaction.options.getString('command');
             if (!targetCommandName) return;

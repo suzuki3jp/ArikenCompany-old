@@ -1,18 +1,17 @@
 // nodeモジュールをインポート
 import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
-import { readFileSync } from 'fs';
-import path from 'path';
 
 // モジュールをインポート
+import { DataManager } from '../../class/DataManager';
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { DiscordValueParser } from '../../class/ValueParser';
-import { SettingsJson } from '../../data/JsonTypes';
 
-const settingsPath = path.resolve(__dirname, '../../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager();
 
 export const discordMessage = async (client: Client, message: Message) => {
     if (message.author.bot) return;
-    const settings: SettingsJson = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+    const settings = DM.getSettings();
     const discordCommand = new DiscordCommand(client, message, settings.twitch.manageCommands);
     const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
         message.reply(options);
