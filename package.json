@@ -24,7 +24,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "@suzuki3jp/twitch.js": "^1.1.1",
+    "@suzuki3jp/twitch.js": "^1.1.4",
     "@suzuki3jp/utils": "^3.0.1",
     "@twurple/api": "^5.2.7",
     "@twurple/auth": "^5.2.7",
