@@ -116,7 +116,7 @@ export class ValueParser extends ValueVariables {
     }
 
     async _parseCode(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseCodeResult> {
-        const result = await this._parseVariables(codeRaw, message);
+        const result = await this._parseVariables(codeRaw.trim(), message);
         if (result.status === 200) return result;
         if (result.status === 403) return result;
         return { status: result.status, content: ParseErrorMessages.variablesNotFound };
