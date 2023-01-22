@@ -1,7 +1,7 @@
 // nodeモジュールをインポート
 import { ArrayUtils, JST, RequestClient, StringUtils } from '@suzuki3jp/utils';
-import { Message as TwtichMessage } from '@suzuki3jp/twitch.js';
-import { Message as DiscordMessage, MessageActionRow, TextChannel } from 'discord.js';
+import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
+import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { Agent } from 'https';
 
 // モジュールをインポート
@@ -21,16 +21,16 @@ class ValueVariables {
         return JST.getDateString();
     }
 
-    getChannel(message: TwtichMessage | DiscordMessage): string {
-        if (message instanceof TwtichMessage) {
+    getChannel(message: TwitchMessage | DiscordMessage): string {
+        if (message instanceof TwitchMessage) {
             return message.channel.name;
         } else if (message.channel instanceof TextChannel) {
             return message.channel.name;
         } else return ParseErrorMessages.invalidDiscordChannel;
     }
 
-    getUser(message: TwtichMessage | DiscordMessage): string {
-        if (message instanceof TwtichMessage) {
+    getUser(message: TwitchMessage | DiscordMessage): string {
+        if (message instanceof TwitchMessage) {
             return message.member.name;
         } else {
             return message.author.tag;
@@ -47,7 +47,16 @@ class ValueVariables {
     }
 
     getCommandByAlias(commandName: string): string {
-        return DM.getCommands()[commandName];
+        return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
+    }
+
+    isMod(message: TwitchMessage | DiscordMessage): boolean {
+        if (message instanceof TwitchMessage) {
+            return message.member.isMod;
+        } else {
+            const settings = DM.getSettings();
+            return message.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
+        }
     }
 }
 
@@ -61,7 +70,7 @@ export class ValueParser extends ValueVariables {
         };
     }
 
-    async parse(value: string, message: TwtichMessage): Promise<ValueParseResult> {
+    async parse(value: string, message: TwitchMessage | DiscordMessage): Promise<ValueParseResult> {
         const startBracketLength = StringUtils.countBy(value, '{');
         const endBracketLength = StringUtils.countBy(value, '}');
 
@@ -88,7 +97,7 @@ export class ValueParser extends ValueVariables {
                         result.status = parsedCode.status;
                         result.content = parsedCode.content;
                     }
-                    index = index + 1;
+                    index = endIndex + 1;
                 } else {
                     result.content = result.content + value[index];
                     index = index + 1;
@@ -106,7 +115,41 @@ export class ValueParser extends ValueVariables {
         }
     }
 
-    async _parseCode(codeRaw: string, message: TwtichMessage): Promise<ParseCodeResult> {
+    async _parseCode(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseCodeResult> {
+        const result = await this._parseVariables(codeRaw, message);
+        if (result.status === 200) return result;
+        if (result.status === 403) return result;
+        return { status: result.status, content: ParseErrorMessages.variablesNotFound };
+    }
+
+    async _parseFetch(codeRaw: string): Promise<string> {
+        const url = codeRaw.slice(this.variablesLength.fetch);
+        return await super.fetch(url);
+    }
+
+    _parseRandom(codeRaw: string): string {
+        const choices = codeRaw.slice(this.variablesLength.random).split(' ');
+        return super.random(choices);
+    }
+
+    _parseAlias(codeRaw: string): string {
+        const targetCommand = codeRaw.slice(6).toLowerCase();
+        return super.getCommandByAlias(targetCommand);
+    }
+
+    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseModResult> {
+        const newCodeRaw = codeRaw.slice(4);
+        if (super.isMod(message)) {
+            const result = await this._parseVariables(newCodeRaw, message);
+            if (result.status === 200) return result;
+            return { status: 200, content: result.content };
+        } else return { status: 403, content: ParseErrorMessages.isOnlyMods };
+    }
+
+    async _parseVariables(
+        codeRaw: string,
+        message: TwitchMessage | DiscordMessage
+    ): Promise<{ status: 200 | 403 | 404; content: string }> {
         if (codeRaw.startsWith('fetch ')) {
             return {
                 status: 200,
@@ -145,70 +188,7 @@ export class ValueParser extends ValueVariables {
         } else {
             return {
                 status: 404,
-                content: '変数が見つかりませんでした',
-            };
-        }
-    }
-
-    async _parseFetch(codeRaw: string): Promise<string> {
-        const url = codeRaw.slice(this.variablesLength.fetch);
-        return await super.fetch(url);
-    }
-
-    _parseRandom(codeRaw: string): string {
-        const choices = codeRaw.slice(this.variablesLength.random).split(' ');
-        return super.random(choices);
-    }
-
-    _parseAlias(codeRaw: string): string {
-        const targetCommand = codeRaw.slice(6).toLowerCase();
-        return super.getCommandByAlias(targetCommand);
-    }
-
-    async _parseMod(codeRaw: string, message: TwtichMessage): Promise<ParseModResult> {
-        const newCodeRaw = codeRaw.slice(4);
-
-        if (message.member.isMod) {
-            if (newCodeRaw.startsWith('fetch ')) {
-                return {
-                    status: 200,
-                    content: await this._parseFetch(newCodeRaw),
-                };
-            } else if (newCodeRaw.startsWith('random ')) {
-                return {
-                    status: 200,
-                    content: this._parseRandom(newCodeRaw),
-                };
-            } else if (newCodeRaw.startsWith('time')) {
-                return {
-                    status: 200,
-                    content: JST.getDateString(),
-                };
-            } else if (newCodeRaw.startsWith('channel')) {
-                return {
-                    status: 200,
-                    content: message.channel.name,
-                };
-            } else if (newCodeRaw.startsWith('user')) {
-                return {
-                    status: 200,
-                    content: message.member.name,
-                };
-            } else if (newCodeRaw.startsWith('alias ')) {
-                return {
-                    status: 200,
-                    content: this._parseAlias(newCodeRaw),
-                };
-            } else {
-                return {
-                    status: 200,
-                    content: newCodeRaw,
-                };
-            }
-        } else {
-            return {
-                status: 403,
-                content: ParseErrorMessages.isOnlyMods,
+                content: codeRaw,
             };
         }
     }
@@ -455,7 +435,7 @@ export interface ParseCodeResult {
 }
 
 export interface ParseModResult {
-    status: 200 | 403;
+    status: 200 | 403 | 404;
     content: string;
 }
 
@@ -463,7 +443,9 @@ export type ParseStatus = 200 | 400 | 403 | 404;
 
 const ParseErrorMessages = {
     invalidDiscordChannel: 'テキストチャンネル以外でこの変数は使用できません',
-    isOnlyMods: 'モデレータ専用コマンドです。',
+    isOnlyMods: 'モデレータ専用コマンドです',
+    variablesNotFound: '変数が見つかりませんでした',
+    commandNotFound: 'コマンドが見つかりませんでした',
 };
 
 // ${fetch https://example.com}hoge
@@ -475,6 +457,6 @@ const ParseErrorMessages = {
 // ${mod fetch https://example.com}
 
 // 200 - 成功
-// 404 - 変数が見つからない
 // 400 - 構文が無効
 // 403 - 権限不足
+// 404 - 変数が見つからない
