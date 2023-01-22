@@ -4,7 +4,7 @@ import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'disco
 // モジュールをインポート
 import { DataManager } from '../../class/DataManager';
 import { DiscordCommand } from '../../class/DiscordCommand';
-import { DiscordValueParser } from '../../class/ValueParser';
+import { ValueParser } from '../../class/ValueParser';
 
 // JSON Data Manager
 const DM = new DataManager();
@@ -45,7 +45,7 @@ export const discordMessage = async (client: Client, message: Message) => {
         if (!discordCommand.isOnCom()) return;
         const commandValue = discordCommand.commandValue();
         if (!commandValue) return;
-        const valueParser = new DiscordValueParser();
+        const valueParser = new ValueParser();
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200) return;
         reply(valueParseResult.content);

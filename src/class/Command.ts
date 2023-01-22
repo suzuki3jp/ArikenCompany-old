@@ -8,76 +8,44 @@ import { CommandManagersManager } from './CommandManagers';
 import { DataManager } from './DataManager';
 import { PublicCommandsJson } from '../data/JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
-import { DiscordValueParser, PubValueParser, ValueParser } from './ValueParser';
+import { PubValueParser, ValueParser } from './ValueParser';
 
 // JSON Data Manager
 const DM = new DataManager();
 
 export class CommandManager extends CommandManagersManager {
     public valueParser: ValueParser;
-    public discordValueParser: DiscordValueParser;
     constructor() {
         super();
         this.valueParser = new ValueParser();
-        this.discordValueParser = new DiscordValueParser();
     }
 
     async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
-        if (message instanceof DiscordMessage) {
-            // discord
-            const commands = DM.getCommands();
-            const name = commandName.toLowerCase();
-            if (commands[name]) return manageCommandError.existCommandName;
+        const commands = DM.getCommands();
+        const name = commandName.toLowerCase();
+        if (commands[name]) return manageCommandError.existCommandName;
 
-            const valueResult = await this.discordValueParser.parse(value, message);
-            if (valueResult.status !== 200) return valueResult.content;
+        const valueResult = await this.valueParser.parse(value, message);
+        if (valueResult.status !== 200) return valueResult.content;
 
-            commands[name] = value;
-            DM.setCommands(commands);
-            this.createPublicList();
-            return `${name} を追加しました`;
-        } else {
-            // twitch
-            const commands = DM.getCommands();
-            const name = commandName.toLowerCase();
-            if (commands[name]) return manageCommandError.existCommandName;
-
-            const valueResult = await this.valueParser.parse(value, message);
-            if (valueResult.status !== 200) return valueResult.content;
-
-            commands[name] = value;
-            DM.setCommands(commands);
-            this.createPublicList();
-            return `${name} を追加しました`;
-        }
+        commands[name] = value;
+        DM.setCommands(commands);
+        this.createPublicList();
+        return `${name} を追加しました`;
     }
 
     async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
-        if (message instanceof DiscordMessage) {
-            const commands = DM.getCommands();
-            const name = commandName.toLowerCase();
-            if (!commands[name]) return manageCommandError.notExistCommandName;
+        const commands = DM.getCommands();
+        const name = commandName.toLowerCase();
+        if (!commands[name]) return manageCommandError.notExistCommandName;
 
-            const valueResult = await this.discordValueParser.parse(value, message);
-            if (valueResult.status !== 200) return valueResult.content;
+        const valueResult = await this.valueParser.parse(value, message);
+        if (valueResult.status !== 200) return valueResult.content;
 
-            commands[name] = value;
-            DM.setCommands(commands);
-            this.createPublicList();
-            return `${name} を ${value} に変更しました`;
-        } else {
-            const commands = DM.getCommands();
-            const name = commandName.toLowerCase();
-            if (!commands[name]) return manageCommandError.notExistCommandName;
-
-            const valueResult = await this.valueParser.parse(value, message);
-            if (valueResult.status !== 200) return valueResult.content;
-
-            commands[name] = value;
-            DM.setCommands(commands);
-            this.createPublicList();
-            return `${name} を ${value} に変更しました`;
-        }
+        commands[name] = value;
+        DM.setCommands(commands);
+        this.createPublicList();
+        return `${name} を ${value} に変更しました`;
     }
 
     removeCom(commandName: string): string {
