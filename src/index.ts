@@ -15,10 +15,12 @@ const app = express();
 
 // モジュールをインポート
 import { api } from './api/index';
+import { DataManager } from './class/DataManager';
 import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
 
 dotenv.config();
+const DM = new DataManager();
 const twitchToken = process.env.TWITCH_TOKEN;
 const twitchRefreshToken = process.env.TWITCH_REFRESHTOKEN;
 const twitchClientId = process.env.TWITCH_CLIENTID;
@@ -67,8 +69,8 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         const discordClient = new Client(discordOptions);
         const apiServer = https.createServer(
             {
-                key: readFileSync(`/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem`),
-                cert: readFileSync(`/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem`),
+                key: DM.getKey(),
+                cert: DM.getCert(),
             },
             app
         );

@@ -14,8 +14,10 @@ import {
 
 export class DataManager {
     public _paths: {
+        cert: string;
         commands: string;
         cooltime: string;
+        key: string;
         managers: string;
         messageCounter: string;
         publicCommands: string;
@@ -24,13 +26,19 @@ export class DataManager {
 
     constructor() {
         this._paths = {
+            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
             commands: resolve(__dirname, '../data/Commands.json'),
             cooltime: resolve(__dirname, '../data/Cooltime.json'),
+            key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
             managers: resolve(__dirname, '../data/Managers.json'),
             messageCounter: resolve(__dirname, '../data/MessageCounter.json'),
             publicCommands: resolve(__dirname, '../data/PublicCommands.json'),
             settings: resolve(__dirname, '../data/settings.json'),
         };
+    }
+
+    getCert(): string {
+        return readFileSync(this._paths.cert, 'utf-8');
     }
 
     getCommands(): CommandsJson {
@@ -47,6 +55,10 @@ export class DataManager {
 
     setCooltime(data: string | CooltimeJson) {
         this._writeFile(this._paths.cooltime, data);
+    }
+
+    getKey(): string {
+        return readFileSync(this._paths.key, 'utf-8');
     }
 
     getManagers(): ManagersJson {
