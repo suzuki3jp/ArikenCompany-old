@@ -51,32 +51,29 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         logger.info('twitch token on resfresh.');
     };
 
-    // initial function
-    (async () => {
-        const authConfig: AuthConfig = {
-            accessToken: twitchToken,
-            refreshToken: twitchRefreshToken,
-            clientId: twitchClientId,
-            clientSecret: twitchClientSecret,
-            onRefresh,
-        };
-        const twitchOptions: ClientOptions = { channels: twitch.channels };
-        const discordOptions: DiscordOptions = {
-            intents: Object.values(Intents.FLAGS),
-        };
+    const authConfig: AuthConfig = {
+        accessToken: twitchToken,
+        refreshToken: twitchRefreshToken,
+        clientId: twitchClientId,
+        clientSecret: twitchClientSecret,
+        onRefresh,
+    };
+    const twitchOptions: ClientOptions = { channels: twitch.channels };
+    const discordOptions: DiscordOptions = {
+        intents: Object.values(Intents.FLAGS),
+    };
 
-        const twitchClient = new TwitchClient(authConfig, twitchOptions);
-        const discordClient = new Client(discordOptions);
-        const apiServer = https.createServer(
-            {
-                key: DM.getKey(),
-                cert: DM.getCert(),
-            },
-            app
-        );
-        eventsIndex(twitchClient, discordClient, discordToken, logger);
-        api(app, apiServer, logger);
-    })();
+    const twitchClient = new TwitchClient(authConfig, twitchOptions);
+    const discordClient = new Client(discordOptions);
+    const apiServer = https.createServer(
+        {
+            key: DM.getKey(),
+            cert: DM.getCert(),
+        },
+        app
+    );
+    eventsIndex(twitchClient, discordClient, discordToken, logger);
+    api(app, apiServer, logger);
 } else {
     throw new CustomError('ENV_ERROR', 'environment variables are invalid.');
 }
