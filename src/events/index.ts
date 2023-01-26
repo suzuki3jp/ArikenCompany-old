@@ -2,11 +2,8 @@
 import type { TwitchClient } from '@suzuki3jp/twitch.js';
 import type { Logger } from '@suzuki3jp/utils';
 import type { Client } from 'discord.js';
-import type { Express } from 'express';
-import http from 'http';
 
 // モジュールをインポート
-import { router } from '../api/Router';
 import { DataManager } from '../class/DataManager';
 import { TwitchCommand } from '../class/TwitchCommand';
 import { discordInteraction, discordMessage, discordReady } from './discord/index';
@@ -18,7 +15,6 @@ const DM = new DataManager();
 const settings = DM.getSettings();
 
 export const eventsIndex = (
-    api: { server: http.Server; app: Express },
     twitchClient: TwitchClient,
     discordClient: Client,
     discordToken: string,
@@ -27,10 +23,6 @@ export const eventsIndex = (
     // client login
     twitchClient.login();
     discordClient.login(discordToken);
-    api.server.listen(settings.api.port, () => {
-        logger.system(`api is ready. listening at http://localhost:${settings.api.port}/`);
-    });
-    api.app.use('/', router);
 
     // discord events
     discordClient.on('ready', () => discordReady(discordClient, logger));

@@ -14,6 +14,7 @@ import path from 'path';
 const app = express();
 
 // モジュールをインポート
+import { api } from './api/index';
 import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
 
@@ -72,6 +73,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
             app
         );
         eventsIndex(twitchClient, discordClient, discordToken, logger);
+        api(app, apiServer, logger);
     })();
 } else {
     throw new CustomError('ENV_ERROR', 'environment variables are invalid.');
