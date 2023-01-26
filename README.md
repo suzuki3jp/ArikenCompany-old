@@ -1,10 +1,13 @@
 # ArikenCompany
 [ArikenCompany](https://github.com/ArikenCompany) dev repository.
 
-## Dependencies
-- [@twurple/auth](https://github.com/twurple/twurple)
-- [@twurple/api](https://github.com/twurple/twurple)
-- [@twurple/chat](https://github.com/twurple/twurple)
-- [discord.js](https://github.com/discordjs/discord.js)
-- [express](https://github.com/expressjs/express)
-- [dotenv](https://github.com/motdotla/dotenv)
+## コミットメッセージ規則
+- フォーマット（種別: 詳細）
+- 詳細は日本語
+- 種別
+    - feat 機能追加
+    - fix バグ修正
+    - refactor リファクタリング
+    - update 上記３つに該当しない変更
+    - upgrade パッケージ更新
+    - delete パッケージ削除
