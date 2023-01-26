@@ -18,6 +18,7 @@ import { api } from './api/index';
 import { DataManager } from './class/DataManager';
 import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
+import { createApiServer } from './utils/API';
 
 dotenv.config();
 const DM = new DataManager();
@@ -51,6 +52,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         logger.info('twitch token on resfresh.');
     };
 
+    // それぞれクライアントオプション定義
     const authConfig: AuthConfig = {
         accessToken: twitchToken,
         refreshToken: twitchRefreshToken,
@@ -63,15 +65,11 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
         intents: Object.values(Intents.FLAGS),
     };
 
+    // クライアント定義
     const twitchClient = new TwitchClient(authConfig, twitchOptions);
     const discordClient = new Client(discordOptions);
-    const apiServer = https.createServer(
-        {
-            key: DM.getKey(),
-            cert: DM.getCert(),
-        },
-        app
-    );
+    const apiServer = createApiServer(app);
+
     eventsIndex(twitchClient, discordClient, discordToken, logger);
     api(app, apiServer, logger);
 } else {

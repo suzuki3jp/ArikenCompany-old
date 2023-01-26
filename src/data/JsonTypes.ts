@@ -26,5 +26,6 @@ export interface SettingsJson {
     };
     api: {
         port: number;
+        isSecure: boolean;
     };
 }
