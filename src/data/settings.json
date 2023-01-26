@@ -26,6 +26,7 @@
         "cooltime": 120
     },
     "api": {
-        "port": 3150
+        "port": 3150,
+        "isSecure": false
     }
 }
