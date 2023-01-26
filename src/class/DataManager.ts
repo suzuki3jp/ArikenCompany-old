@@ -19,6 +19,7 @@ export class DataManager {
         cooltime: string;
         env: string;
         key: string;
+        log: string;
         managers: string;
         messageCounter: string;
         publicCommands: string;
@@ -32,6 +33,7 @@ export class DataManager {
             cooltime: resolve(__dirname, '../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
+            log: resolve(__dirname, '../data/log/log.csv'),
             managers: resolve(__dirname, '../data/Managers.json'),
             messageCounter: resolve(__dirname, '../data/MessageCounter.json'),
             publicCommands: resolve(__dirname, '../data/PublicCommands.json'),

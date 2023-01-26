@@ -3,19 +3,21 @@ import { Logger } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
 import dotenv from 'dotenv';
 import express from 'express';
-import path from 'path';
 const app = express();
 dotenv.config();
 
 // モジュールをインポート
 import { api } from './api/index';
+import { DataManager } from './class/DataManager';
 import { eventsIndex } from './events/index';
 import { createApiServer } from './utils/API';
 import { createClients } from './utils/Client';
 
+const DM = new DataManager();
+
 const loggerOptions: LoggerOptions = {
     isSaveLogToCsv: true,
-    logFilePath: path.resolve(__dirname, './data/log/log.csv'),
+    logFilePath: DM._paths.log,
 };
 const logger = new Logger(loggerOptions);
 
