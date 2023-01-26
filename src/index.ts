@@ -8,20 +8,17 @@ import dotenv from 'dotenv';
 import { Client, Intents } from 'discord.js';
 import type { ClientOptions as DiscordOptions } from 'discord.js';
 import express from 'express';
-import { readFileSync, writeFileSync } from 'fs';
-import https from 'https';
+import { writeFileSync } from 'fs';
 import path from 'path';
 const app = express();
 
 // モジュールをインポート
 import { api } from './api/index';
-import { DataManager } from './class/DataManager';
 import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
 import { createApiServer } from './utils/API';
 
 dotenv.config();
-const DM = new DataManager();
 const twitchToken = process.env.TWITCH_TOKEN;
 const twitchRefreshToken = process.env.TWITCH_REFRESHTOKEN;
 const twitchClientId = process.env.TWITCH_CLIENTID;
