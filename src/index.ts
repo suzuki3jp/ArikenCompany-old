@@ -1,29 +1,17 @@
 // nodeモジュールをインポート
-import { TwitchClient } from '@suzuki3jp/twitch.js';
-import type { AuthConfig, ClientOptions } from '@suzuki3jp/twitch.js';
-import { CustomError, Env, Logger } from '@suzuki3jp/utils';
+import { Logger } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
-import type { AccessToken } from '@twurple/auth';
 import dotenv from 'dotenv';
-import { Client, Intents } from 'discord.js';
-import type { ClientOptions as DiscordOptions } from 'discord.js';
 import express from 'express';
-import { writeFileSync } from 'fs';
 import path from 'path';
 const app = express();
+dotenv.config();
 
 // モジュールをインポート
 import { api } from './api/index';
-import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
 import { createApiServer } from './utils/API';
-
-dotenv.config();
-const twitchToken = process.env.TWITCH_TOKEN;
-const twitchRefreshToken = process.env.TWITCH_REFRESHTOKEN;
-const twitchClientId = process.env.TWITCH_CLIENTID;
-const twitchClientSecret = process.env.TWITCH_CLIENTSECRET;
-const discordToken = process.env.DISCORD_TOKEN;
+import { createClients } from './utils/Client';
 
 const loggerOptions: LoggerOptions = {
     isSaveLogToCsv: true,
@@ -31,44 +19,12 @@ const loggerOptions: LoggerOptions = {
 };
 const logger = new Logger(loggerOptions);
 
-// .env
-if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken && discordToken) {
-    const onRefresh = (tokenInfo: AccessToken) => {
-        const newToken = tokenInfo.accessToken;
-        const newRefreshToken = tokenInfo.refreshToken;
-        const envDataObj = {
-            TWITCH_TOKEN: newToken,
-            TWITCH_REFRESHTOKEN: newRefreshToken,
-            TWITCH_CLIENTID: twitchClientId,
-            TWITCH_CLIENTSECRET: twitchClientSecret,
-            DISCORD_TOKEN: discordToken,
-        };
-        const newEnvData = Env.parseToEnv(envDataObj);
+// クライアント定義
+const clientInfo = createClients(logger);
+const twitchClient = clientInfo.twitch;
+const discordClient = clientInfo.discord.client;
+const discordToken = clientInfo.discord.token;
+const apiServer = createApiServer(app);
 
-        writeFileSync(path.resolve(__dirname, '../.env'), newEnvData, 'utf-8');
-        logger.info('twitch token on resfresh.');
-    };
-
-    // それぞれクライアントオプション定義
-    const authConfig: AuthConfig = {
-        accessToken: twitchToken,
-        refreshToken: twitchRefreshToken,
-        clientId: twitchClientId,
-        clientSecret: twitchClientSecret,
-        onRefresh,
-    };
-    const twitchOptions: ClientOptions = { channels: twitch.channels };
-    const discordOptions: DiscordOptions = {
-        intents: Object.values(Intents.FLAGS),
-    };
-
-    // クライアント定義
-    const twitchClient = new TwitchClient(authConfig, twitchOptions);
-    const discordClient = new Client(discordOptions);
-    const apiServer = createApiServer(app);
-
-    eventsIndex(twitchClient, discordClient, discordToken, logger);
-    api(app, apiServer, logger);
-} else {
-    throw new CustomError('ENV_ERROR', 'environment variables are invalid.');
-}
+eventsIndex(twitchClient, discordClient, discordToken, logger);
+api(app, apiServer, logger);
