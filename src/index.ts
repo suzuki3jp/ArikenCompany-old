@@ -1,4 +1,6 @@
 // nodeモジュールをインポート
+import { TwitchClient } from '@suzuki3jp/twitch.js';
+import type { AuthConfig, ClientOptions } from '@suzuki3jp/twitch.js';
 import { CustomError, Env, Logger } from '@suzuki3jp/utils';
 import type { LoggerOptions } from '@suzuki3jp/utils';
 import type { AccessToken } from '@twurple/auth';
@@ -12,8 +14,6 @@ import path from 'path';
 const app = express();
 
 // モジュールをインポート
-import { TwitchClient } from '@suzuki3jp/twitch.js';
-import type { AuthConfig, ClientOptions } from '@suzuki3jp/twitch.js';
 import { twitch } from './data/settings.json';
 import { eventsIndex } from './events/index';
 
@@ -71,7 +71,7 @@ if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken &&
             },
             app
         );
-        eventsIndex({ server: apiServer, app }, twitchClient, discordClient, discordToken, logger);
+        eventsIndex(twitchClient, discordClient, discordToken, logger);
     })();
 } else {
     throw new CustomError('ENV_ERROR', 'environment variables are invalid.');
