@@ -9,7 +9,7 @@ dotenv.config();
 // モジュールをインポート
 import { api } from './api/index';
 import { DataManager } from './class/DataManager';
-import { eventsIndex } from './events/index';
+import { events } from './events/index';
 import { createApiServer } from './utils/API';
 import { createClients } from './utils/Client';
 
@@ -28,5 +28,5 @@ const discordClient = clientInfo.discord.client;
 const discordToken = clientInfo.discord.token;
 const apiServer = createApiServer(app);
 
-eventsIndex(twitchClient, discordClient, discordToken, logger);
+events(twitchClient, discordClient, discordToken, logger);
 api(app, apiServer, logger);

@@ -14,12 +14,7 @@ const DM = new DataManager();
 
 const settings = DM.getSettings();
 
-export const eventsIndex = (
-    twitchClient: TwitchClient,
-    discordClient: Client,
-    discordToken: string,
-    logger: Logger
-) => {
+export const events = (twitchClient: TwitchClient, discordClient: Client, discordToken: string, logger: Logger) => {
     // client login
     twitchClient.login();
     discordClient.login(discordToken);
