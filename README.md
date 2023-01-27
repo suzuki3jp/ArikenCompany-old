@@ -8,6 +8,7 @@
     - feat 機能追加
     - fix バグ修正
     - refactor リファクタリング
-    - update 上記３つに該当しない変更
+    - style コードのスタイルを変更
+    - update 上記４つに該当しない変更
     - upgrade パッケージ更新
     - delete パッケージ削除
