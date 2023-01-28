@@ -1,41 +1,42 @@
 // nodeモジュールをインポート
-import { JST } from '@suzuki3jp/utils';
+import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { JST, Logger } from '@suzuki3jp/utils';
+import { Client as Discord } from 'discord.js';
 
 // モジュールをインポート
-import { DataManager } from './DataManager';
+import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
 
-// JSON Data Manager
-const DM = new DataManager();
-
-export class CoolTimeManager {
-    constructor() {}
+export class CoolTimeManager extends Base {
+    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger) {
+        super(twitchClient, discordClient, logger);
+    }
 
     currentCoolTime(): number {
-        const settings = DM.getSettings();
+        const settings = super.DM.getSettings();
         return settings.twitch.cooltime;
     }
 
     changeCoolTime(newCoolTime: string | number): string {
-        const settings = DM.getSettings();
+        const settings = super.DM.getSettings();
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
-        DM.setSettings(settings);
+        super.DM.setSettings(settings);
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
 
     save(twitchCommand: TwitchCommand) {
         if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes = DM.getCooltime();
+        const cooltimes = super.DM.getCooltime();
 
         cooltimes[commandName] = JST.getDate().getTime();
-        DM.setCooltime(cooltimes);
+        super.DM.setCooltime(cooltimes);
     }
 
     isPassedCoolTime(twitchCommand: TwitchCommand): boolean {
         if (twitchCommand.isVip()) return true;
-        const cooltimes = DM.getCooltime();
+        const cooltimes = super.DM.getCooltime();
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
         const currentCooltime = this.currentCoolTime() * 1000;
