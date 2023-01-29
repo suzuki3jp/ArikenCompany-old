@@ -1,5 +1,6 @@
 // nodeモジュールをインポート
 import type { AccessToken } from '@twurple/auth';
+import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { TwitchClient as Twitch, AuthConfig, ClientOptions as TwitchClientOptions } from '@suzuki3jp/twitch.js';
 import { CustomError, Env, Logger } from '@suzuki3jp/utils';
 import { Client as Discord, ClientOptions as DiscordClientOptions, Intents } from 'discord.js';
@@ -16,9 +17,16 @@ const twitchClientId = process.env.TWITCH_CLIENTID;
 const twitchClientSecret = process.env.TWITCH_CLIENTSECRET;
 const discordToken = process.env.DISCORD_TOKEN;
 
-export const createClients = (logger: Logger): { twitch: Twitch; discord: { client: Discord; token: string } } => {
+export const createClients = (
+    logger: Logger
+): { twitch: Twitch; eventSub: EventSubWsListener; discord: { client: Discord; token: string } } => {
     if (!discordToken) throw new CustomError('ENV_ERROR', '.env content is invalid.');
-    return { twitch: createTwitchClient(logger), discord: { client: createDiscordClient(), token: discordToken } };
+    const twitch = createTwitchClient(logger);
+    return {
+        twitch,
+        eventSub: createEventSubClient(twitch),
+        discord: { client: createDiscordClient(), token: discordToken },
+    };
 };
 
 const createTwitchClient = (logger: Logger): Twitch => {
@@ -28,6 +36,10 @@ const createTwitchClient = (logger: Logger): Twitch => {
 
 const createDiscordClient = (): Discord => {
     return new Discord(createDiscordClientOptions());
+};
+
+const createEventSubClient = (twitchClient: Twitch) => {
+    return new EventSubWsListener({ apiClient: twitchClient._api });
 };
 
 const createTwitchClientOptions = (logger: Logger): { authConfig: AuthConfig; options: TwitchClientOptions } => {
