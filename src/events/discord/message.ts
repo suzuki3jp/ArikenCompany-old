@@ -1,18 +1,20 @@
 // nodeモジュールをインポート
-import type { Client, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
+import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { Logger } from '@suzuki3jp/utils';
+import type { Client as Discord, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
 // モジュールをインポート
-import { DataManager } from '../../class/DataManager';
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { ValueParser } from '../../class/ValueParser';
 
-// JSON Data Manager
-const DM = new DataManager();
-
-export const discordMessage = async (client: Client, message: Message) => {
+export const discordMessage = async (
+    twitchClient: Twitch,
+    discordClient: Discord,
+    logger: Logger,
+    message: Message
+) => {
     if (message.author.bot) return;
-    const settings = DM.getSettings();
-    const discordCommand = new DiscordCommand(client, message, settings.twitch.manageCommands);
+    const discordCommand = new DiscordCommand(twitchClient, discordClient, logger, message);
     const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
         message.reply(options);
     };

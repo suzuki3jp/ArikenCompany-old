@@ -20,14 +20,16 @@ export const events = (twitchClient: TwitchClient, discordClient: Client, discor
     discordClient.login(discordToken);
 
     // discord events
-    discordClient.on('ready', () => discordReady(discordClient, logger));
+    discordClient.on('ready', () => discordReady(twitchClient, discordClient, logger));
 
-    discordClient.on('messageCreate', (message) => discordMessage(discordClient, message));
+    discordClient.on('messageCreate', (message) => discordMessage(twitchClient, discordClient, logger, message));
 
-    discordClient.on('interactionCreate', (interaction) => discordInteraction(discordClient, interaction));
+    discordClient.on('interactionCreate', (interaction) =>
+        discordInteraction(twitchClient, discordClient, logger, interaction)
+    );
 
     // twitch events
-    twitchClient.on('ready', () => twitchReady(twitchClient, logger)); //TODO: discord関連のクラスにもBaseを継承させる
+    twitchClient.on('ready', () => twitchReady(twitchClient, logger));
 
     twitchClient.on('messageCreate', (message) =>
         twitchMessage(new TwitchCommand(twitchClient, discordClient, message, logger), message)
