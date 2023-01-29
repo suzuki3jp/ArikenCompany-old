@@ -46,4 +46,13 @@ export class DiscordSlashCommand extends Base {
             components: [new MessageActionRow().addComponents(addTemplateButton)],
         });
     }
+
+    /**
+     *
+     * @param content
+     * @param ephemeral デフォルトでtrue
+     */
+    reply(content: string, ephemeral?: boolean) {
+        this.interaction.reply({ content, ephemeral: ephemeral ?? true });
+    }
 }

@@ -17,7 +17,5 @@ export const commandInteraction = async (
     if (slashCommandInteraction.isMod()) {
         if (slashCommandInteraction.subCommand === 'panel') return slashCommandInteraction.setupPanel();
         if (slashCommandInteraction.subCommand === 'template') return slashCommandInteraction.setupTemplate();
-    } else {
-        interaction.reply({ content: 'このコマンドを実行する権限がありません', ephemeral: true });
-    }
+    } else return slashCommandInteraction.reply('このコマンドを実行する権限がありません。');
 };
