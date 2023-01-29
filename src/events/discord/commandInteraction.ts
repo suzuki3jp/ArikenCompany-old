@@ -16,9 +16,8 @@ export const commandInteraction = async (
 ) => {
     const slashCommandInteraction = new DiscordSlashCommand(twitchClient, discordClient, logger, interaction);
     const settings = slashCommandInteraction.DM.getSettings();
-    const member = interaction.guild?.members.resolve(interaction.user);
 
-    if (member?.roles.cache.has(settings.discord.modRoleId)) {
+    if (slashCommandInteraction.isMod()) {
         if (interaction.options.getSubcommand() === 'panel') {
             pageManagerActionRow.components[0].setDisabled(true);
             const panel = await interaction.channel?.send({
@@ -26,7 +25,7 @@ export const commandInteraction = async (
                 components: [pageManagerActionRow, commandManagerActionRow],
             });
             settings.discord.manageCommandPanelId = panel?.id ?? null;
-            DM.setSettings(settings);
+            slashCommandInteraction.DM.setSettings(settings);
         } else if (interaction.options.getSubcommand() === 'template') {
             const targetCommandName = interaction.options.getString('command');
             if (!targetCommandName) return;
