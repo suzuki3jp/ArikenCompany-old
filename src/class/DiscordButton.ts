@@ -1,29 +1,28 @@
 // nodeモジュールをインポート
-import { ButtonInteraction, Client, GuildMember, Message, MessageButton } from 'discord.js';
+import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { Logger } from '@suzuki3jp/utils';
+import { ButtonInteraction, Client as Discord, GuildMember, Message, MessageButton } from 'discord.js';
 
 // モジュールをインポート
+import { Base } from './Base';
 import { CommandManager } from './Command';
 import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from '../data/Components';
-import { DataManager } from './DataManager';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
-// JSON Data Manager
-const DM = new DataManager();
-
-export class DiscordButton extends CommandManager {
-    public client: Client;
+export class DiscordButton extends Base {
     public interaction: ButtonInteraction;
     public member: GuildMember | null;
     public type: ButtonTypes;
     public customId: string;
+    public _commandManager: CommandManager;
 
-    constructor(client: Client, interaction: ButtonInteraction) {
-        super();
-        this.client = client;
+    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger, interaction: ButtonInteraction) {
+        super(twitchClient, discordClient, logger);
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
+        this._commandManager = new CommandManager(super.twitch, super.discord, super.logger);
     }
 
     buttonType(): ButtonTypes {
@@ -38,7 +37,7 @@ export class DiscordButton extends CommandManager {
     }
 
     isMod(): boolean {
-        const settings = DM.getSettings();
+        const settings = super.DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
 
@@ -137,8 +136,8 @@ export class DiscordButton extends CommandManager {
         const value = this.interaction.component.label;
         if (!targetCommand || !value) return;
         if (this.interaction.message instanceof Message) {
-            await super.editCom(targetCommand, value, this.interaction.message);
-            await super.syncCommandPanel(this.interaction.client);
+            await this._commandManager.editCom(targetCommand, value, this.interaction.message);
+            await this._commandManager.syncCommandPanel();
             this.interaction.deferUpdate();
         } else return;
     }

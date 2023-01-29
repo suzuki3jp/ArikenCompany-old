@@ -1,27 +1,34 @@
 // nodeモジュールをインポート
+import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { Logger } from '@suzuki3jp/utils';
 import { randomUUID } from 'crypto';
-import { Client, Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
+import { Client as Discord, Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
 // モジュールをインポート
+import { Base } from './Base';
 import { CommandManager } from './Command';
 import { ComponentCustomIds } from '../data/Components';
 
-export class DiscordModal {
-    public client: Client;
+export class DiscordModal extends Base {
     public interaction: ModalSubmitInteraction;
     public customId: any;
     public type: ModalTypes;
     public commandName: string | null;
     public value: string | null;
-    public comManager: CommandManager;
+    public _commandManager: CommandManager;
 
-    constructor(client: Client, modalInteraction: ModalSubmitInteraction) {
-        this.client = client;
+    constructor(
+        twitchClient: Twitch,
+        discordClient: Discord,
+        logger: Logger,
+        modalInteraction: ModalSubmitInteraction
+    ) {
+        super(twitchClient, discordClient, logger);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
+        this._commandManager = new CommandManager(super.twitch, super.discord, super.logger);
         this.type = this.modalType();
-        this.comManager = new CommandManager();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);
         } catch {
@@ -88,24 +95,24 @@ export class DiscordModal {
 
     async addCommand(): Promise<string> {
         if (this.commandName && this.value && this.interaction.message instanceof Message) {
-            const result = await this.comManager.addCom(this.commandName, this.value, this.interaction.message);
-            await this.comManager.syncCommandPanel(this.interaction.client);
+            const result = await this._commandManager.addCom(this.commandName, this.value, this.interaction.message);
+            await this._commandManager.syncCommandPanel();
             return result;
         } else return '予期せぬエラーによって処理を実行できませんでした';
     }
 
     async editCommand(): Promise<string> {
         if (this.commandName && this.value && this.interaction.message instanceof Message) {
-            const result = await this.comManager.editCom(this.commandName, this.value, this.interaction.message);
-            await this.comManager.syncCommandPanel(this.interaction.client);
+            const result = await this._commandManager.editCom(this.commandName, this.value, this.interaction.message);
+            await this._commandManager.syncCommandPanel();
             return result;
         } else return '予期せぬエラーによって処理を実行できませんでした';
     }
 
     async removeCommand() {
         if (this.commandName) {
-            const result = this.comManager.removeCom(this.commandName);
-            await this.comManager.syncCommandPanel(this.interaction.client);
+            const result = this._commandManager.removeCom(this.commandName);
+            await this._commandManager.syncCommandPanel();
             return result;
         } else return '予期せぬエラーによって処理を実行できませんでした';
     }
