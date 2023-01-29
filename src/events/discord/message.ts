@@ -4,20 +4,17 @@ import { Logger } from '@suzuki3jp/utils';
 import type { Client as Discord, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
 // モジュールをインポート
+import { Base } from '../../class/Base';
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { ValueParser } from '../../class/ValueParser';
 
-export const discordMessage = async (
-    twitchClient: Twitch,
-    discordClient: Discord,
-    logger: Logger,
-    message: Message
-) => {
+export const discordMessage = async (base: Base, message: Message) => {
     if (message.author.bot) return;
-    const discordCommand = new DiscordCommand(twitchClient, discordClient, logger, message);
+    const discordCommand = new DiscordCommand(base, message);
     const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
         message.reply(options);
     };
+    setTimeout(() => {}, 0);
 
     if (!discordCommand.isCommand()) return;
 

@@ -1,18 +1,12 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import { Client as Discord, CommandInteraction } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
+import { Base } from '../../class/Base';
 
 // モジュールをインポート
 import { DiscordSlashCommand } from '../../class/DiscordSlashCommand';
 
-export const commandInteraction = async (
-    twitchClient: Twitch,
-    discordClient: Discord,
-    logger: Logger,
-    interaction: CommandInteraction
-) => {
-    const slashCommandInteraction = new DiscordSlashCommand(twitchClient, discordClient, logger, interaction);
+export const commandInteraction = async (base: Base, interaction: CommandInteraction) => {
+    const slashCommandInteraction = new DiscordSlashCommand(base, interaction);
 
     if (slashCommandInteraction.isMod()) {
         switch (slashCommandInteraction.subCommand) {

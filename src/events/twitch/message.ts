@@ -2,10 +2,12 @@
 import { Message } from '@suzuki3jp/twitch.js';
 
 // モジュールをインポート
+import { Base } from '../../class/Base';
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
 
-export const twitchMessage = async (twitchCommand: TwitchCommand, message: Message) => {
+export const twitchMessage = async (base: Base, message: Message) => {
+    const twitchCommand = new TwitchCommand(base, message);
     const reply = (content: string) => {
         message.reply(content);
     };

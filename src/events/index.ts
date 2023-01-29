@@ -1,37 +1,22 @@
-// nodeモジュールをインポート
-import type { TwitchClient } from '@suzuki3jp/twitch.js';
-import type { Logger } from '@suzuki3jp/utils';
-import type { Client } from 'discord.js';
-
 // モジュールをインポート
-import { DataManager } from '../class/DataManager';
-import { TwitchCommand } from '../class/TwitchCommand';
+import { Base } from '../class/Base';
 import { discordInteraction, discordMessage, discordReady } from './discord/index';
 import { twitchMessage, twitchReady } from './twitch/index';
 
-// JSON Data Manager
-const DM = new DataManager();
-
-const settings = DM.getSettings();
-
-export const events = (twitchClient: TwitchClient, discordClient: Client, discordToken: string, logger: Logger) => {
+export const events = (base: Base, discordToken: string) => {
     // client login
-    twitchClient.login();
-    discordClient.login(discordToken);
+    base.twitch.login();
+    base.discord.login(discordToken);
 
     // discord events
-    discordClient.on('ready', () => discordReady(twitchClient, discordClient, logger));
+    base.discord.on('ready', () => discordReady(base));
 
-    discordClient.on('messageCreate', (message) => discordMessage(twitchClient, discordClient, logger, message));
+    base.discord.on('messageCreate', (message) => discordMessage(base, message));
 
-    discordClient.on('interactionCreate', (interaction) =>
-        discordInteraction(twitchClient, discordClient, logger, interaction)
-    );
+    base.discord.on('interactionCreate', (interaction) => discordInteraction(base, interaction));
 
     // twitch events
-    twitchClient.on('ready', () => twitchReady(twitchClient, logger));
+    base.twitch.on('ready', () => twitchReady(base));
 
-    twitchClient.on('messageCreate', (message) =>
-        twitchMessage(new TwitchCommand(twitchClient, discordClient, message, logger), message)
-    );
+    base.twitch.on('messageCreate', (message) => twitchMessage(base, message));
 };
