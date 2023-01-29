@@ -1,16 +1,21 @@
 // nodeモジュールをインポート
-import { Client, CommandInteraction, MessageActionRow } from 'discord.js';
+import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { Logger } from '@suzuki3jp/utils';
+import { Client as Discord, CommandInteraction, MessageActionRow } from 'discord.js';
 
 // モジュールをインポート
-import { DataManager } from '../../class/DataManager';
+import { DiscordSlashCommand } from '../../class/DiscordSlashCommand';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../../data/Components';
 import { createCommandPanelEmbeds } from '../../utils/Embed';
 
-// JSON Data Manager
-const DM = new DataManager();
-
-export const commandInteraction = async (client: Client, interaction: CommandInteraction) => {
-    const settings = DM.getSettings();
+export const commandInteraction = async (
+    twitchClient: Twitch,
+    discordClient: Discord,
+    logger: Logger,
+    interaction: CommandInteraction
+) => {
+    const slashCommandInteraction = new DiscordSlashCommand(twitchClient, discordClient, logger, interaction);
+    const settings = slashCommandInteraction.DM.getSettings();
     const member = interaction.guild?.members.resolve(interaction.user);
 
     if (member?.roles.cache.has(settings.discord.modRoleId)) {
