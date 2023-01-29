@@ -15,7 +15,15 @@ export const commandInteraction = async (
     const slashCommandInteraction = new DiscordSlashCommand(twitchClient, discordClient, logger, interaction);
 
     if (slashCommandInteraction.isMod()) {
-        if (slashCommandInteraction.subCommand === 'panel') return slashCommandInteraction.setupPanel();
-        if (slashCommandInteraction.subCommand === 'template') return slashCommandInteraction.setupTemplate();
+        switch (slashCommandInteraction.subCommand) {
+            case 'panel':
+                slashCommandInteraction.setupPanel();
+                break;
+            case 'template':
+                slashCommandInteraction.setupTemplate();
+                break;
+            default:
+                break;
+        }
     } else return slashCommandInteraction.reply('このコマンドを実行する権限がありません。');
 };
