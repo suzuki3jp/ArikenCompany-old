@@ -81,3 +81,15 @@ export interface SettingsJson {
         isSecure: boolean;
     };
 }
+
+export interface StreamStatusJson {
+    users: TwitchUser[];
+}
+
+export interface TwitchUser {
+    id: string;
+    name: string;
+    displayName: string;
+    isStreaming: boolean;
+    notificationChannelId: string;
+}

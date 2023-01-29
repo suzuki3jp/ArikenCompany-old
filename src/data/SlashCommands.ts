@@ -38,6 +38,19 @@ export const slashCommands: ApplicationCommandDataResolvable[] = [
                     },
                 ],
             },
+            {
+                type: optionTypes.SubCommand,
+                name: 'notification',
+                description: 'setup notification of onStream',
+                options: [
+                    {
+                        type: optionTypes.String,
+                        name: 'user',
+                        description: 'tracking user name',
+                        required: true,
+                    },
+                ],
+            },
         ],
     },
 ];
