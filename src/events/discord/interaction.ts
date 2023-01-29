@@ -15,6 +15,6 @@ export const discordInteraction = (
     interaction: Interaction
 ) => {
     if (interaction.isButton()) return buttonInteraction(twitchClient, discordClient, logger, interaction);
-    if (interaction.isCommand()) return commandInteraction(discordClient, interaction);
+    if (interaction.isCommand()) return commandInteraction(twitchClient, discordClient, logger, interaction);
     if (interaction.isModalSubmit()) return modalInteraction(twitchClient, discordClient, logger, interaction);
 };
