@@ -1,7 +1,6 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch, CommandParser } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import type { Client as Discord, Message } from 'discord.js';
+import { CommandParser } from '@suzuki3jp/twitch.js';
+import type { Message } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -16,15 +15,15 @@ export class DiscordCommand extends Base {
     public _cooltimeManager: CoolTimeManager;
     public _managersManager: ManagersManager;
 
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger, message: Message) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, message: Message) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
         this.message = message;
         this.command = new CommandParser(message.content, {
             manageCommands: super.DM.getSettings().twitch.manageCommands,
         });
-        this._commandManager = new CommandManager(twitchClient, discordClient, logger);
-        this._cooltimeManager = new CoolTimeManager(twitchClient, discordClient, logger);
-        this._managersManager = new ManagersManager(twitchClient, discordClient, logger);
+        this._commandManager = new CommandManager(super.getMe());
+        this._cooltimeManager = new CoolTimeManager(super.getMe());
+        this._managersManager = new ManagersManager(super.getMe());
     }
 
     isCommand(): boolean {

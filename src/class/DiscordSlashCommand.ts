@@ -1,16 +1,16 @@
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import { Client as Discord, CommandInteraction, MessageActionRow } from 'discord.js';
+import { CommandInteraction, MessageActionRow } from 'discord.js';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../data/Components';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 
 import { Base } from './Base';
 
 export class DiscordSlashCommand extends Base {
+    public interaction: CommandInteraction;
     public subCommand: string | null;
 
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger, public interaction: CommandInteraction) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, interaction: CommandInteraction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
+        this.interaction = interaction;
         this.subCommand = this.interaction.options.getSubcommand();
     }
 

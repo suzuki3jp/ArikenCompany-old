@@ -12,7 +12,7 @@ export class TwitchStream extends Base {
     public user: TwitchUser | null;
     public userIndex: number | null;
     constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
-        super(base.twitch, base.discord, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger);
         this.users = super.DM.getStreamStatus().users;
         this.user = null;
         this.userIndex = null;

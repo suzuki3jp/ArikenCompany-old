@@ -1,8 +1,6 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
 import { randomUUID } from 'crypto';
-import { Client as Discord, Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
+import { Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
 // モジュールをインポート
@@ -18,16 +16,11 @@ export class DiscordModal extends Base {
     public value: string | null;
     public _commandManager: CommandManager;
 
-    constructor(
-        twitchClient: Twitch,
-        discordClient: Discord,
-        logger: Logger,
-        modalInteraction: ModalSubmitInteraction
-    ) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, modalInteraction: ModalSubmitInteraction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
-        this._commandManager = new CommandManager(super.twitch, super.discord, super.logger);
+        this._commandManager = new CommandManager(super.getMe());
         this.type = this.modalType();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);

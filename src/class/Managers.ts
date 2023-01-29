@@ -1,14 +1,9 @@
-// nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import { Client as Discord } from 'discord.js';
-
 // モジュールをインポート
 import { Base } from './Base';
 
 export class ManagersManager extends Base {
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
     }
 
     isManagersByTarget(target: string) {

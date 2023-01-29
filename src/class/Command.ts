@@ -1,7 +1,7 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch, Message as TwitchMessage } from '@suzuki3jp/twitch.js';
-import { Logger, ObjectUtils } from '@suzuki3jp/utils';
-import { Client as Discord, Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
+import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
+import { ObjectUtils } from '@suzuki3jp/utils';
+import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -11,8 +11,8 @@ import { PubValueParser, ValueParser } from './ValueParser';
 
 export class CommandManager extends Base {
     public valueParser: ValueParser;
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
         this.valueParser = new ValueParser();
     }
 

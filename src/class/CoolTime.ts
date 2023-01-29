@@ -1,15 +1,13 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { JST, Logger } from '@suzuki3jp/utils';
-import { Client as Discord } from 'discord.js';
+import { JST } from '@suzuki3jp/utils';
 
 // モジュールをインポート
 import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
 
 export class CoolTimeManager extends Base {
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger);
     }
 
     currentCoolTime(): number {
