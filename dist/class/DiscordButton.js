@@ -1,28 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordButton = void 0;
-// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
-const fs_1 = require("fs");
-const path_1 = require("path");
 // モジュールをインポート
-const Command_1 = require("../class/Command");
+const Base_1 = require("./Base");
+const Command_1 = require("./Command");
 const Components_1 = require("../data/Components");
 const Embed_1 = require("../utils/Embed");
-const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
-class DiscordButton extends Command_1.CommandManager {
-    client;
+class DiscordButton extends Base_1.Base {
     interaction;
     member;
     type;
     customId;
-    constructor(client, interaction) {
-        super();
-        this.client = client;
+    _commandManager;
+    constructor(twitchClient, discordClient, logger, interaction) {
+        super(twitchClient, discordClient, logger);
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
+        this._commandManager = new Command_1.CommandManager(super.twitch, super.discord, super.logger);
     }
     buttonType() {
         if (this.customId === Components_1.ComponentCustomIds.button.add)
@@ -42,7 +39,7 @@ class DiscordButton extends Command_1.CommandManager {
         return 'site';
     }
     isMod() {
-        const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
+        const settings = super.DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
     next() {
@@ -144,8 +141,8 @@ class DiscordButton extends Command_1.CommandManager {
         if (!targetCommand || !value)
             return;
         if (this.interaction.message instanceof discord_js_1.Message) {
-            await super.editCom(targetCommand, value, this.interaction.message);
-            await super.syncCommandPanel(this.interaction.client);
+            await this._commandManager.editCom(targetCommand, value, this.interaction.message);
+            await this._commandManager.syncCommandPanel();
             this.interaction.deferUpdate();
         }
         else

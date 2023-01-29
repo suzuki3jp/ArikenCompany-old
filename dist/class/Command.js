@@ -3,100 +3,75 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManager = void 0;
 const utils_1 = require("@suzuki3jp/utils");
 const discord_js_1 = require("discord.js");
-const fs_1 = require("fs");
-const path_1 = require("path");
 // モジュールをインポート
-const CommandManagers_1 = require("./CommandManagers");
+const Base_1 = require("./Base");
 const Embed_1 = require("../utils/Embed");
 const ValueParser_1 = require("./ValueParser");
-const settingsPath = (0, path_1.resolve)(__dirname, '../data/settings.json');
-const commandsFilePath = (0, path_1.resolve)(__dirname, '../data/Commands.json');
-const publicCommandsPath = (0, path_1.resolve)(__dirname, '../data/PublicCommands.json');
-class CommandManager extends CommandManagers_1.CommandManagersManager {
+class CommandManager extends Base_1.Base {
     valueParser;
-    discordValueParser;
-    constructor() {
-        super();
+    constructor(twitchClient, discordClient, logger) {
+        super(twitchClient, discordClient, logger);
         this.valueParser = new ValueParser_1.ValueParser();
-        this.discordValueParser = new ValueParser_1.DiscordValueParser();
+    }
+    on() {
+        const settings = super.DM.getSettings();
+        if (settings.twitch.command)
+            return manageCommandError.alreadyOn;
+        settings.twitch.command = true;
+        super.DM.setSettings(settings);
+        return 'コマンドを有効にしました';
+    }
+    off() {
+        const settings = super.DM.getSettings();
+        if (!settings.twitch.command)
+            return manageCommandError.alreadyOff;
+        settings.twitch.command = false;
+        super.DM.setSettings(settings);
+        return 'コマンドを無効にしました';
+    }
+    currentCommandStatus() {
+        return super.DM.getSettings().twitch.command;
     }
     async addCom(commandName, value, message) {
-        if (message instanceof discord_js_1.Message) {
-            // discord
-            const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
-            const name = commandName.toLowerCase();
-            if (commands[name])
-                return manageCommandError.existCommandName;
-            const valueResult = await this.discordValueParser.parse(value, message);
-            if (valueResult.status !== 200)
-                return valueResult.content;
-            commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            (0, fs_1.writeFileSync)(commandsFilePath, writeData, 'utf-8');
-            this.createPublicList();
-            return `${name} を追加しました`;
-        }
-        else {
-            // twitch
-            const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
-            const name = commandName.toLowerCase();
-            if (commands[name])
-                return manageCommandError.existCommandName;
-            const valueResult = await this.valueParser.parse(value, message);
-            if (valueResult.status !== 200)
-                return valueResult.content;
-            commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            (0, fs_1.writeFileSync)(commandsFilePath, writeData, 'utf-8');
-            this.createPublicList();
-            return `${name} を追加しました`;
-        }
+        const commands = super.DM.getCommands();
+        const name = commandName.toLowerCase();
+        if (commands[name])
+            return manageCommandError.existCommandName;
+        const valueResult = await this.valueParser.parse(value, message);
+        if (valueResult.status !== 200)
+            return valueResult.content;
+        commands[name] = value;
+        super.DM.setCommands(commands);
+        this.createPublicList();
+        return `${name} を追加しました`;
     }
     async editCom(commandName, value, message) {
-        if (message instanceof discord_js_1.Message) {
-            const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
-            const name = commandName.toLowerCase();
-            if (!commands[name])
-                return manageCommandError.notExistCommandName;
-            const valueResult = await this.discordValueParser.parse(value, message);
-            if (valueResult.status !== 200)
-                return valueResult.content;
-            commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            (0, fs_1.writeFileSync)(commandsFilePath, writeData, 'utf-8');
-            this.createPublicList();
-            return `${name} を ${value} に変更しました`;
-        }
-        else {
-            const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
-            const name = commandName.toLowerCase();
-            if (!commands[name])
-                return manageCommandError.notExistCommandName;
-            const valueResult = await this.valueParser.parse(value, message);
-            if (valueResult.status !== 200)
-                return valueResult.content;
-            commands[name] = value;
-            const writeData = JSON.stringify(commands, null, '\t');
-            (0, fs_1.writeFileSync)(commandsFilePath, writeData, 'utf-8');
-            this.createPublicList();
-            return `${name} を ${value} に変更しました`;
-        }
+        const commands = super.DM.getCommands();
+        const name = commandName.toLowerCase();
+        if (!commands[name])
+            return manageCommandError.notExistCommandName;
+        const valueResult = await this.valueParser.parse(value, message);
+        if (valueResult.status !== 200)
+            return valueResult.content;
+        commands[name] = value;
+        super.DM.setCommands(commands);
+        this.createPublicList();
+        return `${name} を ${value} に変更しました`;
     }
     removeCom(commandName) {
-        const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
+        const commands = super.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name])
             return manageCommandError.notExistCommandName;
         delete commands[name];
-        const writeData = JSON.stringify(commands, null, '\t');
-        (0, fs_1.writeFileSync)(commandsFilePath, writeData, 'utf-8');
+        super.DM.setCommands(commands);
         this.createPublicList();
         return `${name} を削除しました`;
     }
-    async syncCommandPanel(client) {
-        const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
+    async syncCommandPanel() {
+        const settings = super.DM.getSettings();
         const newPage = (0, Embed_1.createCommandPanelEmbeds)()[0];
-        const manageCommandChannel = client.channels.cache.get(settings.discord.manageCommandChannelId);
+        const manageCommandChannel = super.discord.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof discord_js_1.TextChannel) {
             if (!settings.discord.manageCommandPanelId)
                 return;
@@ -113,7 +88,7 @@ class CommandManager extends CommandManagers_1.CommandManagersManager {
             return;
     }
     createPublicList() {
-        const commands = JSON.parse((0, fs_1.readFileSync)(commandsFilePath, 'utf-8'));
+        const commands = super.DM.getCommands();
         let publicCommands = {};
         utils_1.ObjectUtils.forEach(commands, (key, value) => {
             if (typeof value !== 'string' || typeof key !== 'string')
@@ -121,8 +96,7 @@ class CommandManager extends CommandManagers_1.CommandManagersManager {
             const parsedData = new ValueParser_1.PubValueParser().parse(value);
             publicCommands[key] = parsedData.content;
         });
-        const writeData = JSON.stringify(publicCommands, null, '\t');
-        (0, fs_1.writeFileSync)(publicCommandsPath, writeData, 'utf-8');
+        super.DM.setPublicCommands(publicCommands);
         return publicCommands;
     }
 }
@@ -130,4 +104,6 @@ exports.CommandManager = CommandManager;
 const manageCommandError = {
     existCommandName: '存在するコマンド名です',
     notExistCommandName: '存在しないコマンド名です',
+    alreadyOn: 'すでにコマンドは有効です',
+    alreadyOff: 'すでにコマンドは無効です',
 };

@@ -1,20 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.discordMessage = void 0;
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
 // モジュールをインポート
 const DiscordCommand_1 = require("../../class/DiscordCommand");
 const ValueParser_1 = require("../../class/ValueParser");
-const settingsPath = path_1.default.resolve(__dirname, '../../data/settings.json');
-const discordMessage = async (client, message) => {
+const discordMessage = async (twitchClient, discordClient, logger, message) => {
     if (message.author.bot)
         return;
-    const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
-    const discordCommand = new DiscordCommand_1.DiscordCommand(client, message, settings.twitch.manageCommands);
+    const discordCommand = new DiscordCommand_1.DiscordCommand(twitchClient, discordClient, logger, message);
     const reply = (options) => {
         message.reply(options);
     };
@@ -56,7 +49,7 @@ const discordMessage = async (client, message) => {
         const commandValue = discordCommand.commandValue();
         if (!commandValue)
             return;
-        const valueParser = new ValueParser_1.DiscordValueParser();
+        const valueParser = new ValueParser_1.ValueParser();
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200)
             return;

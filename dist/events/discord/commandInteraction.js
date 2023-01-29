@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.commandInteraction = void 0;
 // nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
-const fs_1 = require("fs");
-const path_1 = require("path");
 // モジュールをインポート
+const DataManager_1 = require("../../class/DataManager");
 const Components_1 = require("../../data/Components");
 const Embed_1 = require("../../utils/Embed");
-const settingsPath = (0, path_1.resolve)(__dirname, '../../data/settings.json');
+// JSON Data Manager
+const DM = new DataManager_1.DataManager();
 const commandInteraction = async (client, interaction) => {
-    const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
+    const settings = DM.getSettings();
     const member = interaction.guild?.members.resolve(interaction.user);
     if (member?.roles.cache.has(settings.discord.modRoleId)) {
         if (interaction.options.getSubcommand() === 'panel') {
@@ -20,8 +20,7 @@ const commandInteraction = async (client, interaction) => {
                 components: [Components_1.pageManagerActionRow, Components_1.commandManagerActionRow],
             });
             settings.discord.manageCommandPanelId = panel?.id ?? null;
-            const writeData = JSON.stringify(settings, null, '\t');
-            (0, fs_1.writeFileSync)(settingsPath, writeData, 'utf-8');
+            DM.setSettings(settings);
         }
         else if (interaction.options.getSubcommand() === 'template') {
             const targetCommandName = interaction.options.getString('command');

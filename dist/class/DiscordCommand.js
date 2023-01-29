@@ -1,27 +1,28 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordCommand = void 0;
 // nodeモジュールをインポート
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
 // モジュールをインポート
+const Base_1 = require("./Base");
 const Command_1 = require("./Command");
-// paths
-const settingsPath = path_1.default.resolve(__dirname, '../data/settings.json');
-const commandsPath = path_1.default.resolve(__dirname, '../data/Commands.json');
-class DiscordCommand extends Command_1.CommandManager {
-    client;
+const CoolTime_1 = require("./CoolTime");
+const Managers_1 = require("./Managers");
+class DiscordCommand extends Base_1.Base {
     message;
     command;
-    constructor(client, message, manageCommands) {
-        super();
-        this.client = client;
+    _commandManager;
+    _cooltimeManager;
+    _managersManager;
+    constructor(twitchClient, discordClient, logger, message) {
+        super(twitchClient, discordClient, logger);
         this.message = message;
-        this.command = new twitch_js_1.CommandParser(message.content, { manageCommands });
+        this.command = new twitch_js_1.CommandParser(message.content, {
+            manageCommands: super.DM.getSettings().twitch.manageCommands,
+        });
+        this._commandManager = new Command_1.CommandManager(twitchClient, discordClient, logger);
+        this._cooltimeManager = new CoolTime_1.CoolTimeManager(twitchClient, discordClient, logger);
+        this._managersManager = new Managers_1.ManagersManager(twitchClient, discordClient, logger);
     }
     isCommand() {
         return this.command.isCommand();
@@ -30,7 +31,7 @@ class DiscordCommand extends Command_1.CommandManager {
         return this.command.isManageCommand();
     }
     isManager() {
-        const settings = JSON.parse((0, fs_1.readFileSync)(settingsPath, 'utf-8'));
+        const settings = super.DM.getSettings();
         if (this.message.member?.roles.cache.has(settings.discord.modRoleId))
             return true;
         return false;
@@ -67,53 +68,53 @@ class DiscordCommand extends Command_1.CommandManager {
         }
     }
     isOnCom() {
-        return super.currentCommandStatus();
+        return this._commandManager.currentCommandStatus();
     }
     commandValue() {
-        const Commands = JSON.parse((0, fs_1.readFileSync)(commandsPath, 'utf-8'));
+        const Commands = super.DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }
     onCom() {
-        return super.on();
+        return this._commandManager.on();
     }
     offCom() {
-        return super.off();
+        return this._commandManager.off();
     }
     async addCom() {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        const result = await super.addCom(targetCommand, value, this.message);
-        await super.syncCommandPanel(this.client);
+        const result = await this._commandManager.addCom(targetCommand, value, this.message);
+        await this._commandManager.syncCommandPanel();
         return result;
     }
     async editCom() {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
-        const result = await super.editCom(targetCommand, value, this.message);
-        await super.syncCommandPanel(this.client);
+        const result = await this._commandManager.editCom(targetCommand, value, this.message);
+        await this._commandManager.syncCommandPanel();
         return result;
     }
     removeCom() {
         const targetCommand = this.command.commandsArg[0];
-        const result = super.removeCom(targetCommand);
-        super.syncCommandPanel(this.client);
+        const result = this._commandManager.removeCom(targetCommand);
+        this._commandManager.syncCommandPanel();
         return result;
     }
     coolTime() {
-        return String(super.currentCoolTime());
+        return String(this._cooltimeManager.currentCoolTime());
     }
     changeCoolTime() {
         const newCoolTime = this.command.commandsArg[0];
-        return super.changeCoolTime(newCoolTime);
+        return this._cooltimeManager.changeCoolTime(newCoolTime);
     }
     allow() {
         const allowManager = this.command.commandsArg[0];
-        return super.allow(allowManager);
+        return this._managersManager.allow(allowManager);
     }
     deny() {
         const denyManager = this.command.commandsArg[0];
-        return super.deny(denyManager);
+        return this._managersManager.deny(denyManager);
     }
 }
 exports.DiscordCommand = DiscordCommand;

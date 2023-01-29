@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLastPageByFooter = exports.isFirstPageByFooter = exports.currentPage = exports.createCommandPanelEmbeds = void 0;
 // nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
-const fs_1 = require("fs");
-const path_1 = require("path");
-const commandsPath = (0, path_1.resolve)(__dirname, '../data/Commands.json');
+// モジュールをインポート
+const DataManager_1 = require("../class/DataManager");
+// JSON Data Manager
+const DM = new DataManager_1.DataManager();
 const createCommandPanelEmbeds = () => {
-    const commands = JSON.parse((0, fs_1.readFileSync)(commandsPath, 'utf-8'));
+    const commands = DM.getCommands();
     const commandsArr = Object.entries(commands);
     const pagesLength = Math.floor(commandsArr.length / 10) + 1;
     let index = 0;

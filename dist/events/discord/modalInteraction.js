@@ -1,12 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.modalInteraction = void 0;
-// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
 // モジュールをインポート
 const DiscordModal_1 = require("../../class/DiscordModal");
-const modalInteraction = async (client, interaction) => {
-    const modal = new DiscordModal_1.DiscordModal(client, interaction);
+const modalInteraction = async (twitchClient, discordClient, logger, interaction) => {
+    const modal = new DiscordModal_1.DiscordModal(twitchClient, discordClient, logger, interaction);
     if (interaction.message instanceof discord_js_1.Message) {
         switch (modal.type) {
             case 'templateAdd':
