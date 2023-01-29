@@ -1,6 +1,6 @@
 import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
 import { Logger } from '@suzuki3jp/utils';
-import { Client as Discord, CommandInteraction } from 'discord.js';
+import { Client as Discord, CommandInteraction, MessageActionRow } from 'discord.js';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../data/Components';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 
@@ -31,5 +31,19 @@ export class DiscordSlashCommand extends Base {
         });
         settings.discord.manageCommandPanelId = panel?.id ?? null;
         super.DM.setSettings(settings);
+    }
+
+    setupTemplate() {
+        const targetCommandName = this.interaction.options.getString('command');
+        if (!targetCommandName) return;
+        this.interaction.channel?.send({
+            embeds: [
+                {
+                    title: targetCommandName,
+                    description: 'ボタンを押すとあらかじめ設定された値に変更',
+                },
+            ],
+            components: [new MessageActionRow().addComponents(addTemplateButton)],
+        });
     }
 }
