@@ -91,4 +91,5 @@ export interface TwitchUser {
     name: string;
     displayName: string;
     isStreaming: boolean;
+    notificationChannelId: string;
 }
