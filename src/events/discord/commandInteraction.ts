@@ -18,7 +18,7 @@ export const commandInteraction = async (
     const settings = slashCommandInteraction.DM.getSettings();
 
     if (slashCommandInteraction.isMod()) {
-        if (interaction.options.getSubcommand() === 'panel') {
+        if (slashCommandInteraction.subCommand === 'panel') {
             pageManagerActionRow.components[0].setDisabled(true);
             const panel = await interaction.channel?.send({
                 embeds: [createCommandPanelEmbeds()[0]],
@@ -26,7 +26,7 @@ export const commandInteraction = async (
             });
             settings.discord.manageCommandPanelId = panel?.id ?? null;
             slashCommandInteraction.DM.setSettings(settings);
-        } else if (interaction.options.getSubcommand() === 'template') {
+        } else if (slashCommandInteraction.subCommand === 'template') {
             const targetCommandName = interaction.options.getString('command');
             if (!targetCommandName) return;
             interaction.channel?.send({

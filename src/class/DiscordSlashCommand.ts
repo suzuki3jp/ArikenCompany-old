@@ -5,8 +5,11 @@ import { Client as Discord, CommandInteraction, GuildMemberRoleManager } from 'd
 import { Base } from './Base';
 
 export class DiscordSlashCommand extends Base {
+    public subCommand: string | null;
+
     constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger, public interaction: CommandInteraction) {
         super(twitchClient, discordClient, logger);
+        this.subCommand = this.interaction.options.getSubcommand();
     }
 
     isMod(): boolean {
