@@ -10,6 +10,7 @@ import {
     MessageCounterJson,
     PublicCommandsJson,
     SettingsJson,
+    StreamStatusJson,
 } from '../data/JsonTypes';
 
 export class DataManager {
@@ -24,6 +25,7 @@ export class DataManager {
         messageCounter: string;
         publicCommands: string;
         settings: string;
+        streamStatus: string;
     };
 
     constructor() {
@@ -38,6 +40,7 @@ export class DataManager {
             messageCounter: resolve(__dirname, '../data/MessageCounter.json'),
             publicCommands: resolve(__dirname, '../data/PublicCommands.json'),
             settings: resolve(__dirname, '../data/settings.json'),
+            streamStatus: resolve(__dirname, '../data/StreamStatus.json'),
         };
     }
 
@@ -101,6 +104,14 @@ export class DataManager {
         this._writeFile(this._paths.settings, data);
     }
 
+    getStreamStatus(): StreamStatusJson {
+        return this._readFile(this._paths.streamStatus);
+    }
+
+    setStreamStatus(data: string | StreamStatusJson) {
+        this._writeFile(this._paths.streamStatus, data);
+    }
+
     _readFile(path: string) {
         return JSON.parse(readFileSync(path, 'utf-8'));
     }
@@ -118,4 +129,11 @@ export class DataManager {
     }
 }
 
-type JsonTypes = CommandsJson | CooltimeJson | ManagersJson | MessageCounterJson | PublicCommandsJson | SettingsJson;
+type JsonTypes =
+    | CommandsJson
+    | CooltimeJson
+    | ManagersJson
+    | MessageCounterJson
+    | PublicCommandsJson
+    | SettingsJson
+    | StreamStatusJson;
