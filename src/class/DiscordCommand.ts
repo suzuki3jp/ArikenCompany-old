@@ -19,11 +19,11 @@ export class DiscordCommand extends Base {
         super(base.twitch, base.discord, base.eventSub, base.logger);
         this.message = message;
         this.command = new CommandParser(message.content, {
-            manageCommands: super.DM.getSettings().twitch.manageCommands,
+            manageCommands: this.DM.getSettings().twitch.manageCommands,
         });
-        this._commandManager = new CommandManager(super.getMe());
-        this._cooltimeManager = new CoolTimeManager(super.getMe());
-        this._managersManager = new ManagersManager(super.getMe());
+        this._commandManager = new CommandManager(this.getMe());
+        this._cooltimeManager = new CoolTimeManager(this.getMe());
+        this._managersManager = new ManagersManager(this.getMe());
     }
 
     isCommand(): boolean {
@@ -35,7 +35,7 @@ export class DiscordCommand extends Base {
     }
 
     isManager(): boolean {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         if (this.message.member?.roles.cache.has(settings.discord.modRoleId)) return true;
         return false;
     }
@@ -88,7 +88,7 @@ export class DiscordCommand extends Base {
     }
 
     commandValue(): string | null {
-        const Commands = super.DM.getCommands();
+        const Commands = this.DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

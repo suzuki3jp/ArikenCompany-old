@@ -17,27 +17,27 @@ export class CommandManager extends Base {
     }
 
     on(): string {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         if (settings.twitch.command) return manageCommandError.alreadyOn;
         settings.twitch.command = true;
-        super.DM.setSettings(settings);
+        this.DM.setSettings(settings);
         return 'コマンドを有効にしました';
     }
 
     off(): string {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         if (!settings.twitch.command) return manageCommandError.alreadyOff;
         settings.twitch.command = false;
-        super.DM.setSettings(settings);
+        this.DM.setSettings(settings);
         return 'コマンドを無効にしました';
     }
 
     currentCommandStatus(): boolean {
-        return super.DM.getSettings().twitch.command;
+        return this.DM.getSettings().twitch.command;
     }
 
     async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
-        const commands = super.DM.getCommands();
+        const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (commands[name]) return manageCommandError.existCommandName;
 
@@ -45,13 +45,13 @@ export class CommandManager extends Base {
         if (valueResult.status !== 200) return valueResult.content;
 
         commands[name] = value;
-        super.DM.setCommands(commands);
+        this.DM.setCommands(commands);
         this.createPublicList();
         return `${name} を追加しました`;
     }
 
     async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
-        const commands = super.DM.getCommands();
+        const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
 
@@ -59,25 +59,25 @@ export class CommandManager extends Base {
         if (valueResult.status !== 200) return valueResult.content;
 
         commands[name] = value;
-        super.DM.setCommands(commands);
+        this.DM.setCommands(commands);
         this.createPublicList();
         return `${name} を ${value} に変更しました`;
     }
 
     removeCom(commandName: string): string {
-        const commands = super.DM.getCommands();
+        const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];
-        super.DM.setCommands(commands);
+        this.DM.setCommands(commands);
         this.createPublicList();
         return `${name} を削除しました`;
     }
 
     async syncCommandPanel() {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         const newPage = createCommandPanelEmbeds()[0];
-        const manageCommandChannel = super.discord.channels.cache.get(settings.discord.manageCommandChannelId);
+        const manageCommandChannel = this.discord.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof TextChannel) {
             if (!settings.discord.manageCommandPanelId) return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
@@ -94,7 +94,7 @@ export class CommandManager extends Base {
     }
 
     createPublicList(): PublicCommandsJson {
-        const commands = super.DM.getCommands();
+        const commands = this.DM.getCommands();
         let publicCommands: PublicCommandsJson = {};
         ObjectUtils.forEach(commands, (key, value) => {
             if (typeof value !== 'string' || typeof key !== 'string') return;
@@ -102,7 +102,7 @@ export class CommandManager extends Base {
             publicCommands[key] = parsedData.content;
         });
 
-        super.DM.setPublicCommands(publicCommands);
+        this.DM.setPublicCommands(publicCommands);
         return publicCommands;
     }
 }

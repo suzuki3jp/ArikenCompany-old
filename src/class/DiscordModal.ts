@@ -20,7 +20,7 @@ export class DiscordModal extends Base {
         super(base.twitch, base.discord, base.eventSub, base.logger);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
-        this._commandManager = new CommandManager(super.getMe());
+        this._commandManager = new CommandManager(this.getMe());
         this.type = this.modalType();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);
