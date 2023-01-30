@@ -32,7 +32,7 @@ export class TwitchStream extends Base {
         this._updateData(true);
         const embeds = this._createOnStreamEmbed(stream);
         if (channel instanceof TextChannel) {
-            channel.send({ embeds });
+            channel.send({ content: '@everyone', embeds });
         } else return;
     }
 
