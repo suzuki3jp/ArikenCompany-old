@@ -20,7 +20,7 @@ export class DiscordButton extends Base {
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
-        this._commandManager = new CommandManager(super.getMe());
+        this._commandManager = new CommandManager(this.getMe());
     }
 
     buttonType(): ButtonTypes {
@@ -35,7 +35,7 @@ export class DiscordButton extends Base {
     }
 
     isMod(): boolean {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
 

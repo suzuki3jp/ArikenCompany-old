@@ -13,7 +13,7 @@ export class TwitchStream extends Base {
     public userIndex: number | null;
     constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
         super(base.twitch, base.discord, base.eventSub, base.logger);
-        this.users = super.DM.getStreamStatus().users;
+        this.users = this.DM.getStreamStatus().users;
         this.user = null;
         this.userIndex = null;
         this.users.forEach((value, index) => {
@@ -26,8 +26,8 @@ export class TwitchStream extends Base {
     async turnOnline() {
         if (!this.userIndex || !this.user) return;
 
-        const channel = await super.discord.channels.fetch(this.user.notificationChannelId);
-        const stream = await super.twitch._api.streams.getStreamByUserId(this.user.id);
+        const channel = await this.discord.channels.fetch(this.user.notificationChannelId);
+        const stream = await this.twitch._api.streams.getStreamByUserId(this.user.id);
         if (!channel || !stream) return;
         this._updateData(true);
         const embeds = this._createOnStreamEmbed(stream);
@@ -46,7 +46,7 @@ export class TwitchStream extends Base {
         this.user.isStreaming = isStreaming;
         newUsers.push(this.user);
         this.users = newUsers;
-        super.DM.setStreamStatus({ users: this.users });
+        this.DM.setStreamStatus({ users: this.users });
     }
 
     _createOnStreamEmbed(stream: HelixStream): MessageEmbed[] {

@@ -17,7 +17,7 @@ export class DiscordSlashCommand extends Base {
     }
 
     isMod(): boolean {
-        const modRoleId = super.DM.getSettings().discord.modRoleId;
+        const modRoleId = this.DM.getSettings().discord.modRoleId;
         const member = this.interaction.guild?.members.resolve(this.interaction.user);
 
         if (!member) return false;
@@ -26,13 +26,13 @@ export class DiscordSlashCommand extends Base {
 
     async setupPanel() {
         pageManagerActionRow.components[0].setDisabled(true);
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         const panel = await this.interaction.channel?.send({
             embeds: [createCommandPanelEmbeds()[0]],
             components: [pageManagerActionRow, commandManagerActionRow],
         });
         settings.discord.manageCommandPanelId = panel?.id ?? null;
-        super.DM.setSettings(settings);
+        this.DM.setSettings(settings);
     }
 
     setupTemplate() {
@@ -53,13 +53,13 @@ export class DiscordSlashCommand extends Base {
         // スラコマから指定のユーザー名を抜き出し、既に登録されていないか確認する
         const name = this.interaction.options.getString('user')?.trim();
         if (!name) return ErrorMessages.isNotDefinedUserInput;
-        const users = super.DM.getStreamStatus().users;
+        const users = this.DM.getStreamStatus().users;
         const oldUsers = users.filter((value) => value.name === name);
         if (oldUsers.length !== 0) return ErrorMessages.alreadyRegisterd;
         if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
-        const user = await super.twitch._api.users.getUserByName(name);
+        const user = await this.twitch._api.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
         // 取得したユーザーから配信を取得する
@@ -75,12 +75,12 @@ export class DiscordSlashCommand extends Base {
         };
 
         // EventSubリスナーを登録する
-        subscribeOnlineEvent(super.getMe(), newUser.id);
-        subscribeOfflineEvent(super.getMe(), newUser.id);
+        subscribeOnlineEvent(this.getMe(), newUser.id);
+        subscribeOfflineEvent(this.getMe(), newUser.id);
 
         // StreamStatusJsonにプッシュする
         users.push(newUser);
-        super.DM.setStreamStatus({ users });
+        this.DM.setStreamStatus({ users });
 
         const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(
             newUser.notificationChannelId
