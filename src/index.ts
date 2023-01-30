@@ -11,6 +11,7 @@ import { api } from './api/index';
 import { Base } from './class/Base';
 import { DataManager } from './class/DataManager';
 import { events } from './events/index';
+import { eventSub } from './eventSub/index';
 import { createApiServer } from './utils/API';
 import { createClients } from './utils/Client';
 
@@ -31,4 +32,5 @@ const apiServer = createApiServer(app);
 const base = new Base(twitchClient, discordClient, clientInfo.eventSub, logger);
 
 events(base, discordToken);
+eventSub(base);
 api(app, apiServer, logger);
