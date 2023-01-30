@@ -16,6 +16,9 @@ export const commandInteraction = async (base: Base, interaction: CommandInterac
             case 'template':
                 slashCommandInteraction.setupTemplate();
                 break;
+            case 'notification':
+                slashCommandInteraction.reply(await slashCommandInteraction.setupNotification());
+                break;
             default:
                 break;
         }

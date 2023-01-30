@@ -1,8 +1,10 @@
-import { CommandInteraction, MessageActionRow } from 'discord.js';
-import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../data/Components';
-import { createCommandPanelEmbeds } from '../utils/Embed';
+import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { Base } from './Base';
+import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../data/Components';
+import { TwitchUser } from '../data/JsonTypes';
+import { createCommandPanelEmbeds } from '../utils/Embed';
+import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 
 export class DiscordSlashCommand extends Base {
     public interaction: CommandInteraction;
@@ -47,6 +49,45 @@ export class DiscordSlashCommand extends Base {
         });
     }
 
+    async setupNotification(): Promise<string> {
+        // スラコマから指定のユーザー名を抜き出し、既に登録されていないか確認する
+        const name = this.interaction.options.getString('user')?.trim();
+        if (!name) return ErrorMessages.isNotDefinedUserInput;
+        const users = super.DM.getStreamStatus().users;
+        const oldUsers = users.filter((value) => value.name === name);
+        if (oldUsers.length !== 0) return ErrorMessages.alreadyRegisterd;
+        if (!this.interaction.channel) return ErrorMessages.unknownError;
+
+        // TwitchAPIから指定のユーザーを取得する
+        const user = await super.twitch._api.users.getUserByName(name);
+        if (!user) return ErrorMessages.twitchUser404;
+
+        // 取得したユーザーから配信を取得する
+        const stream = await user.getStream();
+
+        // 取得した情報からTwitchUserを作成する
+        const newUser: TwitchUser = {
+            id: user.id,
+            name: user.name,
+            displayName: user.displayName,
+            isStreaming: stream ? true : false,
+            notificationChannelId: this.interaction.channel.id,
+        };
+
+        // EventSubリスナーを登録する
+        subscribeOnlineEvent(super.getMe(), newUser.id);
+        subscribeOfflineEvent(super.getMe(), newUser.id);
+
+        // StreamStatusJsonにプッシュする
+        users.push(newUser);
+        super.DM.setStreamStatus({ users });
+
+        const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(
+            newUser.notificationChannelId
+        )}に送信するよう設定しました。`;
+        return result;
+    }
+
     /**
      *
      * @param content
@@ -56,3 +97,10 @@ export class DiscordSlashCommand extends Base {
         this.interaction.reply({ content, ephemeral: ephemeral ?? true });
     }
 }
+
+const ErrorMessages = {
+    unknownError: '予期せぬエラーによって処理を実行できませんでした。',
+    alreadyRegisterd: 'このユーザーの通知はすでに追加されています。',
+    isNotDefinedUserInput: 'コマンドのuserに通知を登録するユーザーのTwitchIDを入力してください。',
+    twitchUser404: '指定のTwitchユーザーが見つかりませんでした。',
+};
