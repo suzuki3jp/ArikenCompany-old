@@ -25,6 +25,8 @@
     "@twurple/api": "^5.3.4",
     "@twurple/auth": "^5.3.4",
     "@twurple/chat": "^5.3.4",
-    "@twurple/eventsub-ws": "^5.3.4"
+    "@twurple/eventsub-ws": "^5.3.4",
+    "discord-api-types": "^0.37.31",
+    "discord.js": "^13.12.0"
   }
 }
