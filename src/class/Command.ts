@@ -6,7 +6,7 @@ import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.j
 // モジュールをインポート
 import { Base } from './Base';
 import { PublicCommandsJson } from '../data/JsonTypes';
-import { createCommandPanelEmbeds } from '../utils/Embed';
+import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { PubValueParser, ValueParser } from './ValueParser';
 
 export class CommandManager extends Base {
@@ -76,19 +76,20 @@ export class CommandManager extends Base {
 
     async syncCommandPanel() {
         const settings = this.DM.getSettings();
-        const newPage = createCommandPanelEmbeds()[0];
+        const pages = createCommandPanelEmbeds();
         const manageCommandChannel = this.discord.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof TextChannel) {
             if (!settings.discord.manageCommandPanelId) return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
             const components = panel.components;
+            const currentPageNum = currentPage(panel.embeds[0]);
             if (
                 components[0].components[0] instanceof MessageButton &&
                 components[0].components[1] instanceof MessageButton
             ) {
                 components[0].components[0].setDisabled(true);
                 components[0].components[1].setDisabled(false);
-                panel.edit({ embeds: [newPage], components });
+                panel.edit({ embeds: [pages[currentPageNum]], components });
             }
         } else return;
     }
