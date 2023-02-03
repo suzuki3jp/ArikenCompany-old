@@ -1,6 +1,7 @@
 // nodeモジュールをインポート
 import { Logger } from '@suzuki3jp/utils';
 import type { Express } from 'express';
+import { json as bodyToJson, urlencoded } from 'body-parser';
 import { Server as HTTP } from 'http';
 import { Server as HTTPS } from 'https';
 
@@ -19,5 +20,7 @@ export const api = (app: Express, server: HTTP | HTTPS, logger: Logger) => {
             logger.system(`API起動完了。at: https://suzuki-dev.com:${settings.api.port}`);
         }
     });
+    app.use(bodyToJson());
+    app.use(urlencoded({ extended: true }));
     app.use('/', router);
 };
