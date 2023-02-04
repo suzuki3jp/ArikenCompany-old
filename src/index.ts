@@ -1,6 +1,5 @@
 // nodeモジュールをインポート
-import { Logger } from '@suzuki3jp/utils';
-import type { LoggerOptions } from '@suzuki3jp/utils';
+import { Logger, Options } from '@suzuki3jp/logger';
 import dotenv from 'dotenv';
 import express from 'express';
 const app = express();
@@ -17,11 +16,10 @@ import { createClients } from './utils/Client';
 
 const DM = new DataManager();
 
-const loggerOptions: LoggerOptions = {
-    isSaveLogToCsv: true,
-    logFilePath: DM._paths.log,
+const loggerOptions: Options = {
+    path: DM._paths.log,
 };
-const logger = new Logger(loggerOptions);
+const logger = new Logger(true, loggerOptions);
 
 // クライアント定義
 const clientInfo = createClients(logger);

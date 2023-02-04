@@ -1,6 +1,6 @@
 // nodeモジュールをインポート
 import type { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import type { Logger } from '@suzuki3jp/utils';
+import type { Logger } from '@suzuki3jp/logger';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import type { Client as Discord } from 'discord.js';
 

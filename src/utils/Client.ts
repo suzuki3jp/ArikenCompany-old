@@ -2,7 +2,8 @@
 import type { AccessToken } from '@twurple/auth';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { TwitchClient as Twitch, AuthConfig, ClientOptions as TwitchClientOptions } from '@suzuki3jp/twitch.js';
-import { CustomError, Env, Logger } from '@suzuki3jp/utils';
+import { CustomError, Env } from '@suzuki3jp/utils';
+import { Logger } from '@suzuki3jp/logger';
 import { Client as Discord, ClientOptions as DiscordClientOptions, Intents } from 'discord.js';
 
 // モジュールをインポート
@@ -57,7 +58,7 @@ const createTwitchClientOptions = (logger: Logger): { authConfig: AuthConfig; op
             const newEnvData = Env.parseToEnv(envDataObj);
 
             DM.setEnv(newEnvData);
-            logger.info('Twitchのトークンがリフレッシュされました');
+            logger.emitLog('system', 'Twitchのトークンがリフレッシュされました');
         };
 
         const authConfig: AuthConfig = {
