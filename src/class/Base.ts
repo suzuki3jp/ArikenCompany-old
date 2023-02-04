@@ -2,7 +2,7 @@
 import type { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
 import type { Logger } from '@suzuki3jp/logger';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-import type { Client as Discord } from 'discord.js';
+import type { Client as Discord, StringMappedInteractionTypes } from 'discord.js';
 
 // モジュールをインポート
 import { DataManager } from './DataManager';
@@ -20,6 +20,10 @@ export class Base {
         this.eventSub = eventSub;
         this.logger = logger;
         this.DM = new DataManager();
+    }
+
+    emitDebug(message: string) {
+        this.logger.emitLog('debug', message);
     }
 
     getMe(): Base {

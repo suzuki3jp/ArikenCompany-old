@@ -104,7 +104,7 @@ export class DiscordModal extends Base {
 
     async removeCommand() {
         if (this.commandName) {
-            const result = this._commandManager.removeCom(this.commandName);
+            const result = await this._commandManager.removeCom(this.commandName);
             await this._commandManager.syncCommandPanel();
             return result;
         } else return '予期せぬエラーによって処理を実行できませんでした';
