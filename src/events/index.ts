@@ -4,10 +4,6 @@ import { discordInteraction, discordMessage, discordReady } from './discord/inde
 import { twitchMessage, twitchReady } from './twitch/index';
 
 export const events = (base: Base, discordToken: string) => {
-    // client login
-    base.twitch.login();
-    base.discord.login(discordToken);
-
     // discord events
     base.discord.on('ready', () => discordReady(base));
 
@@ -19,4 +15,23 @@ export const events = (base: Base, discordToken: string) => {
     base.twitch.on('ready', () => twitchReady(base));
 
     base.twitch.on('messageCreate', (message) => twitchMessage(base, message));
+
+    // logger events
+    base.logger.on('debug', (msg) => {
+        console.log(msg);
+    });
+
+    base.logger.on('system', (msg) => {
+        console.log(msg);
+        base.logger.appendToCsv(msg);
+    });
+
+    base.logger.on('info', (msg) => {
+        console.log(msg);
+        base.logger.appendToCsv(msg);
+    });
+
+    // client login
+    base.twitch.login();
+    base.discord.login(discordToken);
 };
