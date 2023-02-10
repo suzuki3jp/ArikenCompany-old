@@ -27,8 +27,8 @@ const twitchClient = clientInfo.twitch;
 const discordClient = clientInfo.discord.client;
 const discordToken = clientInfo.discord.token;
 const apiServer = createApiServer(app);
-const base = new Base(twitchClient, discordClient, clientInfo.eventSub, logger);
+const base = new Base(twitchClient, discordClient, clientInfo.eventSub, logger, app, apiServer);
 
 events(base, discordToken);
 eventSub(base);
-api(app, apiServer, logger);
+api(base);
