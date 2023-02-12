@@ -25,7 +25,9 @@ export const status = (req: Request, res: Response, base: Base) => {
             },
         },
     };
-    res.status(200).json(status);
+    res.status(200);
+    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
+    res.json(status);
 };
 
 /**
