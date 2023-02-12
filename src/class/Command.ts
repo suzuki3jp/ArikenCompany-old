@@ -12,7 +12,7 @@ import { PubValueParser, ValueParser } from './ValueParser';
 export class CommandManager extends Base {
     public valueParser: ValueParser;
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.valueParser = new ValueParser();
     }
 

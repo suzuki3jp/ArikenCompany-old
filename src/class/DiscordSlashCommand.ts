@@ -11,7 +11,7 @@ export class DiscordSlashCommand extends Base {
     public subCommand: string | null;
 
     constructor(base: Base, interaction: CommandInteraction) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = interaction;
         this.subCommand = this.interaction.options.getSubcommand();
     }

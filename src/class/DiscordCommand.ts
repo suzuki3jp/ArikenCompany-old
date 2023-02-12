@@ -16,7 +16,7 @@ export class DiscordCommand extends Base {
     public _managersManager: ManagersManager;
 
     constructor(base: Base, message: Message) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.message = message;
         this.command = new CommandParser(message.content, {
             manageCommands: this.DM.getSettings().twitch.manageCommands,

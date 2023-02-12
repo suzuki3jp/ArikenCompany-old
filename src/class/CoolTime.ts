@@ -7,7 +7,7 @@ import type { TwitchCommand } from './TwitchCommand';
 
 export class CoolTimeManager extends Base {
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
     }
 
     currentCoolTime(): number {
