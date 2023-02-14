@@ -109,7 +109,7 @@ export class ValueParser extends ValueVariables {
             // 構文的に無効な場合
             const result: ValueParseResult = {
                 status: 400,
-                content: '${}の対応関係が崩れています',
+                content: ParseErrorMessages.invalidBrackets,
             };
             return result;
         }
@@ -119,6 +119,7 @@ export class ValueParser extends ValueVariables {
         const result = await this._parseVariables(codeRaw.trim(), message);
         if (result.status === 200) return result;
         if (result.status === 403) return result;
+        if (result.status === 400) return result;
         return { status: result.status, content: ParseErrorMessages.variablesNotFound };
     }
 
@@ -132,9 +133,9 @@ export class ValueParser extends ValueVariables {
         return super.random(choices);
     }
 
-    _parseAlias(codeRaw: string): string {
+    async _parseAlias(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ValueParseResult> {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        return super.getCommandByAlias(targetCommand);
+        return await this.parse(super.getCommandByAlias(targetCommand), message);
     }
 
     async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseModResult> {
@@ -149,7 +150,7 @@ export class ValueParser extends ValueVariables {
     async _parseVariables(
         codeRaw: string,
         message: TwitchMessage | DiscordMessage
-    ): Promise<{ status: 200 | 403 | 404; content: string }> {
+    ): Promise<{ status: 200 | 400 | 403 | 404; content: string }> {
         if (codeRaw.startsWith('fetch ')) {
             return {
                 status: 200,
@@ -162,8 +163,8 @@ export class ValueParser extends ValueVariables {
             };
         } else if (codeRaw.startsWith('alias ')) {
             return {
-                status: 200,
-                content: this._parseAlias(codeRaw),
+                status: (await this._parseAlias(codeRaw, message)).status,
+                content: (await this._parseAlias(codeRaw, message)).content,
             };
         } else if (codeRaw.startsWith('channel')) {
             return {
@@ -257,12 +258,12 @@ export interface ValueParseResult {
 }
 
 export interface ParseCodeResult {
-    status: 200 | 403 | 404;
+    status: 200 | 400 | 403 | 404;
     content: string;
 }
 
 export interface ParseModResult {
-    status: 200 | 403 | 404;
+    status: 200 | 400 | 403 | 404;
     content: string;
 }
 
@@ -270,6 +271,7 @@ export type ParseStatus = 200 | 400 | 403 | 404;
 
 const ParseErrorMessages = {
     invalidDiscordChannel: 'テキストチャンネル以外でこの変数は使用できません',
+    invalidBrackets: '${}の対応関係が崩れています',
     isOnlyMods: 'モデレータ専用コマンドです',
     variablesNotFound: '変数が見つかりませんでした',
     commandNotFound: 'コマンドが見つかりませんでした',
