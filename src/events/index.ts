@@ -18,7 +18,9 @@ export const events = (base: Base, discordToken: string) => {
 
     // logger events
     base.logger.on('debug', (msg) => {
-        console.log(msg);
+        if (process.argv.includes('--debug')) {
+            console.log(msg);
+        }
     });
 
     base.logger.on('system', (msg) => {
