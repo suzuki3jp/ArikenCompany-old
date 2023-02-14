@@ -3,7 +3,7 @@ import { HelixStream } from '@twurple/api';
 import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 
 import { Base } from './Base';
-import { TwitchUser } from '../data/JsonTypes';
+import { TwitchUser } from './JsonTypes';
 import { MessageEmbed, TextChannel } from 'discord.js';
 import { APIEmbed } from 'discord-api-types/v9';
 

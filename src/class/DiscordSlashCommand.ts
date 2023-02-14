@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { Base } from './Base';
-import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from '../data/Components';
-import { TwitchUser } from '../data/JsonTypes';
+import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from './Components';
+import { TwitchUser } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 

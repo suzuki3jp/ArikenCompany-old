@@ -5,7 +5,7 @@ import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.j
 
 // モジュールをインポート
 import { Base } from './Base';
-import { PublicCommandsJson } from '../data/JsonTypes';
+import { PublicCommandsJson } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { PubValueParser, ValueParser } from './ValueParser';
 
