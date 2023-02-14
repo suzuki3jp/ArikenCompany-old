@@ -12,7 +12,7 @@ import { PubValueParser, ValueParser } from './ValueParser';
 export class CommandManager extends Base {
     public valueParser: ValueParser;
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.valueParser = new ValueParser();
     }
 
@@ -21,7 +21,9 @@ export class CommandManager extends Base {
         if (settings.twitch.command) return manageCommandError.alreadyOn;
         settings.twitch.command = true;
         this.DM.setSettings(settings);
-        return 'コマンドを有効にしました';
+        const result = 'コマンドを有効にしました';
+        this.logger.emitLog('debug', result);
+        return result;
     }
 
     off(): string {
@@ -29,10 +31,13 @@ export class CommandManager extends Base {
         if (!settings.twitch.command) return manageCommandError.alreadyOff;
         settings.twitch.command = false;
         this.DM.setSettings(settings);
-        return 'コマンドを無効にしました';
+        const result = 'コマンドを無効にしました';
+        this.logger.emitLog('debug', result);
+        return result;
     }
 
     currentCommandStatus(): boolean {
+        this.logger.emitLog('debug', '現在のコマンドのステータスを確認中');
         return this.DM.getSettings().twitch.command;
     }
 
@@ -45,8 +50,12 @@ export class CommandManager extends Base {
         if (valueResult.status !== 200) return valueResult.content;
 
         commands[name] = value;
+        this.emitDebug(`変数内のコマンドを追加 [${name}](${value})`);
         this.DM.setCommands(commands);
+        this.emitDebug(`追加したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
+        this.emitDebug(`${name} を追加`);
+        await this.syncCommandPanel();
         return `${name} を追加しました`;
     }
 
@@ -59,18 +68,26 @@ export class CommandManager extends Base {
         if (valueResult.status !== 200) return valueResult.content;
 
         commands[name] = value;
+        this.emitDebug(`変数内のコマンドを編集 [${name}](${value})`);
         this.DM.setCommands(commands);
+        this.emitDebug(`編集したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
+        this.emitDebug(`${name} を編集`);
+        await this.syncCommandPanel();
         return `${name} を ${value} に変更しました`;
     }
 
-    removeCom(commandName: string): string {
+    async removeCom(commandName: string): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
         delete commands[name];
+        this.emitDebug(`変数内のコマンドを削除 [${name}]`);
         this.DM.setCommands(commands);
+        this.emitDebug(`削除したコマンドのデータをファイルに反映 [${name}]`);
         this.createPublicList();
+        this.emitDebug(`${name} を削除`);
+        await this.syncCommandPanel();
         return `${name} を削除しました`;
     }
 
@@ -89,6 +106,7 @@ export class CommandManager extends Base {
             ) {
                 components[0].components[0].setDisabled(true);
                 components[0].components[1].setDisabled(false);
+                this.emitDebug(`コマンドパネルを同期 現在のページ: ${currentPageNum}`);
                 panel.edit({ embeds: [pages[currentPageNum]], components });
             }
         } else return;
@@ -104,6 +122,7 @@ export class CommandManager extends Base {
         });
 
         this.DM.setPublicCommands(publicCommands);
+        this.emitDebug('PublicCommandListを作成');
         return publicCommands;
     }
 }

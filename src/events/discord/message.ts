@@ -1,7 +1,5 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import type { Client as Discord, Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
+import type { Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from '../../class/Base';
@@ -30,7 +28,7 @@ export const discordMessage = async (base: Base, message: Message) => {
         } else if (manageCommandName === '!editcom') {
             reply(await discordCommand.editCom());
         } else if (manageCommandName === '!rmcom') {
-            reply(discordCommand.removeCom());
+            reply(await discordCommand.removeCom());
         } else if (manageCommandName === '!allow') {
             reply(discordCommand.allow());
         } else if (manageCommandName === '!deny') {

@@ -16,7 +16,7 @@ export class DiscordCommand extends Base {
     public _managersManager: ManagersManager;
 
     constructor(base: Base, message: Message) {
-        super(base.twitch, base.discord, base.eventSub, base.logger);
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.message = message;
         this.command = new CommandParser(message.content, {
             manageCommands: this.DM.getSettings().twitch.manageCommands,
@@ -105,7 +105,6 @@ export class DiscordCommand extends Base {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.addCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
 
@@ -113,14 +112,12 @@ export class DiscordCommand extends Base {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.editCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
 
-    removeCom(): string {
+    async removeCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
-        const result = this._commandManager.removeCom(targetCommand);
-        this._commandManager.syncCommandPanel();
+        const result = await this._commandManager.removeCom(targetCommand);
         return result;
     }
 

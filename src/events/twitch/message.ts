@@ -26,7 +26,7 @@ export const twitchMessage = async (base: Base, message: Message) => {
         } else if (manageCommandName === '!editcom') {
             reply(await twitchCommand.editCom());
         } else if (manageCommandName === '!rmcom') {
-            reply(twitchCommand.removeCom());
+            reply(await twitchCommand.removeCom());
         } else if (manageCommandName === '!allow') {
             reply(twitchCommand.allow());
         } else if (manageCommandName === '!deny') {

@@ -1,26 +1,26 @@
 // nodeモジュールをインポート
-import { Logger } from '@suzuki3jp/utils';
-import type { Express } from 'express';
 import { json as bodyToJson, urlencoded } from 'body-parser';
 import { Server as HTTP } from 'http';
-import { Server as HTTPS } from 'https';
 
 // モジュールをインポート
-import { DataManager } from '../class/DataManager';
-import { router } from './Router';
+import { Base } from '../class/Base';
+import { chatters, commands, managers, status } from './routes/index';
 
-export const api = (app: Express, server: HTTP | HTTPS, logger: Logger) => {
-    const DM = new DataManager();
-    const settings = DM.getSettings();
+export const api = (base: Base) => {
+    const settings = base.DM.getSettings();
 
-    server.listen(settings.api.port, () => {
-        if (server instanceof HTTP) {
-            logger.system(`API起動完了。at: http://localhost:${settings.api.port}/`);
+    base.api.server.listen(settings.api.port, () => {
+        if (base.api.server instanceof HTTP) {
+            base.logger.emitLog('system', `API起動完了。at: http://localhost:${settings.api.port}/`);
         } else {
-            logger.system(`API起動完了。at: https://suzuki-dev.com:${settings.api.port}`);
+            base.logger.emitLog('system', `API起動完了。at: https://suzuki-dev.com:${settings.api.port}`);
         }
     });
-    app.use(bodyToJson());
-    app.use(urlencoded({ extended: true }));
-    app.use('/', router);
+    base.api.app.use(bodyToJson());
+    base.api.app.use(urlencoded({ extended: true }));
+
+    base.api.app.get('/commands', (req, res) => commands(req, res, base));
+    base.api.app.get('/chatters', (req, res) => chatters(req, res, base));
+    base.api.app.get('/managers', (req, res) => managers(req, res, base));
+    base.api.app.get('/status', (req, res) => status(req, res, base));
 };
