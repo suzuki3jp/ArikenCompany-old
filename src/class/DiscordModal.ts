@@ -6,7 +6,7 @@ import { MessageButtonStyles } from 'discord.js/typings/enums';
 // モジュールをインポート
 import { Base } from './Base';
 import { CommandManager } from './Command';
-import { ComponentCustomIds } from '../data/Components';
+import { ComponentCustomIds } from './Components';
 
 export class DiscordModal extends Base {
     public interaction: ModalSubmitInteraction;

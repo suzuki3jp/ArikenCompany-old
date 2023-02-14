@@ -4,7 +4,7 @@ import { ButtonInteraction, GuildMember, Message, MessageButton } from 'discord.
 // モジュールをインポート
 import { Base } from './Base';
 import { CommandManager } from './Command';
-import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from '../data/Components';
+import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from './Components';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
 export class DiscordButton extends Base {

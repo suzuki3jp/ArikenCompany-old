@@ -11,7 +11,7 @@ import {
     PublicCommandsJson,
     SettingsJson,
     StreamStatusJson,
-} from '../data/JsonTypes';
+} from './JsonTypes';
 
 export class DataManager {
     public _paths: {
@@ -31,16 +31,16 @@ export class DataManager {
     constructor() {
         this._paths = {
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
-            commands: resolve(__dirname, '../data/Commands.json'),
-            cooltime: resolve(__dirname, '../data/Cooltime.json'),
+            commands: resolve(__dirname, '../../data/Commands.json'),
+            cooltime: resolve(__dirname, '../../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
-            log: resolve(__dirname, '../data/log/log.csv'),
-            managers: resolve(__dirname, '../data/Managers.json'),
-            messageCounter: resolve(__dirname, '../data/MessageCounter.json'),
-            publicCommands: resolve(__dirname, '../data/PublicCommands.json'),
-            settings: resolve(__dirname, '../data/settings.json'),
-            streamStatus: resolve(__dirname, '../data/StreamStatus.json'),
+            log: resolve(__dirname, '../../data/log/log.csv'),
+            managers: resolve(__dirname, '../../data/Managers.json'),
+            messageCounter: resolve(__dirname, '../../data/MessageCounter.json'),
+            publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
+            settings: resolve(__dirname, '../../data/settings.json'),
+            streamStatus: resolve(__dirname, '../../data/StreamStatus.json'),
         };
     }
 

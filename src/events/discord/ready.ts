@@ -1,7 +1,7 @@
 // モジュールをインポート
 import { Base } from '../../class/Base';
 import { CommandManager } from '../../class/Command';
-import { slashCommands } from '../../data/SlashCommands';
+import { slashCommands } from '../../class/SlashCommands';
 
 export const discordReady = async (base: Base) => {
     const settings = base.DM.getSettings();
