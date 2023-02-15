@@ -34,7 +34,13 @@ export class TwitchStream extends Base {
         const embeds = this._createOnStreamEmbed(stream);
         if (channel instanceof TextChannel) {
             channel.send({ content: '@everyone', embeds });
-        } else return;
+            this.logger.emitLog('info', '配信開始通知を送信');
+        } else {
+            this.logger.emitLog(
+                'debug',
+                '配信開始通知を送信しようとしたチャンネルがTextChannelではなかったため送信不可'
+            );
+        }
     }
 
     async turnOffline() {
