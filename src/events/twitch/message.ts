@@ -39,9 +39,9 @@ export const twitchMessage = async (base: Base, message: Message) => {
     } else {
         if (!twitchCommand.isOnCom()) return;
         if (!twitchCommand.isPassedCooltime()) return;
-        twitchCommand.saveCooltime();
         const commandValue = twitchCommand.commandValue();
         if (!commandValue) return;
+        twitchCommand.saveCooltime();
         const valueParser = new ValueParser();
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200) return;
