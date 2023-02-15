@@ -30,6 +30,7 @@ export class TwitchStream extends Base {
         const stream = await this.twitch._api.streams.getStreamByUserId(this.user.id);
         if (!channel || !stream) return;
         this._updateData(true);
+        this._changeDiscordActivity(true);
         const embeds = this._createOnStreamEmbed(stream);
         if (channel instanceof TextChannel) {
             channel.send({ content: '@everyone', embeds });
@@ -38,6 +39,7 @@ export class TwitchStream extends Base {
 
     async turnOffline() {
         this._updateData(false);
+        this._changeDiscordActivity(false);
     }
 
     _updateData(isStreaming: boolean) {
@@ -60,5 +62,22 @@ export class TwitchStream extends Base {
         };
         // @ts-expect-error
         return [new MessageEmbed(embed)];
+    }
+
+    _changeDiscordActivity(isStreaming: boolean) {
+        const streamingStr = 'ありけん: 配信中';
+        if (isStreaming) {
+            this.discord.user?.setPresence({
+                activities: [{ name: streamingStr, type: 'STREAMING', url: 'https://www.twitch.tv/arikendebu' }],
+                status: 'online',
+            });
+            this.logger.emitLog('info', 'discordのアクティビティを配信中に変更');
+        } else {
+            this.discord.user?.setPresence({
+                activities: undefined,
+                status: 'idle',
+            });
+            this.logger.emitLog('info', 'discordのアクティビティを配信外に変更');
+        }
     }
 }
