@@ -4,7 +4,7 @@ import os from 'node:os';
 
 import { Base } from '../../class/Base';
 
-export const status = (req: Request, res: Response, base: Base) => {
+export const getStatus = (req: Request, res: Response, base: Base) => {
     res.setHeader(`Access-Control-Allow-Origin`, `*`);
     const jstNow = JST.getDate();
     const status = {

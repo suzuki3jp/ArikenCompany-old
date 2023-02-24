@@ -5,7 +5,7 @@ import type { Request, Response } from 'express';
 import { Base } from '../../class/Base';
 import { DataManager } from '../../class/DataManager';
 
-export const commands = (req: Request, res: Response, base: Base) => {
+export const getCommands = (req: Request, res: Response, base: Base) => {
     res.setHeader(`Access-Control-Allow-Origin`, `*`);
     const commands = new DataManager().getPublicCommands();
     res.status(200);

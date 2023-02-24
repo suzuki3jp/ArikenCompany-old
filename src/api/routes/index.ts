@@ -1,5 +1,5 @@
 // モジュールをインポート
-export { commands } from './commands';
-export { chatters } from './chatters';
-export { managers } from './managers';
-export { status } from './status';
+export { getCommands } from './commands';
+export { getChatters } from './chatters';
+export { getManagers } from './managers';
+export { getStatus } from './status';

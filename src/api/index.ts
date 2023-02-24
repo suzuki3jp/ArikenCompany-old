@@ -4,7 +4,7 @@ import { Server as HTTP } from 'http';
 
 // モジュールをインポート
 import { Base } from '../class/Base';
-import { chatters, commands, managers, status } from './routes/index';
+import { getChatters, getCommands, getManagers, getStatus } from './routes/index';
 
 export const api = (base: Base) => {
     const settings = base.DM.getSettings();
@@ -19,8 +19,8 @@ export const api = (base: Base) => {
     base.api.app.use(bodyToJson());
     base.api.app.use(urlencoded({ extended: true }));
 
-    base.api.app.get('/commands', (req, res) => commands(req, res, base));
-    base.api.app.get('/chatters', (req, res) => chatters(req, res, base));
-    base.api.app.get('/managers', (req, res) => managers(req, res, base));
-    base.api.app.get('/status', (req, res) => status(req, res, base));
+    base.api.app.get('/commands', (req, res) => getCommands(req, res, base));
+    base.api.app.get('/chatters', (req, res) => getChatters(req, res, base));
+    base.api.app.get('/managers', (req, res) => getManagers(req, res, base));
+    base.api.app.get('/status', (req, res) => getStatus(req, res, base));
 };
