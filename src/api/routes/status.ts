@@ -5,6 +5,7 @@ import os from 'node:os';
 import { Base } from '../../class/Base';
 
 export const getStatus = (req: Request, res: Response, base: Base) => {
+    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
     res.setHeader(`Access-Control-Allow-Origin`, `*`);
     const jstNow = JST.getDate();
     const status = {
@@ -26,7 +27,6 @@ export const getStatus = (req: Request, res: Response, base: Base) => {
         },
     };
     res.status(200);
-    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
     res.json(status);
 };
 
