@@ -2,10 +2,11 @@ import { JST } from '@suzuki3jp/utils';
 import { Request, Response } from 'express';
 import os from 'node:os';
 
+import { saveAccessLog } from '../apiUtils';
 import { Base } from '../../class/Base';
 
 export const getStatus = (req: Request, res: Response, base: Base) => {
-    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
+    saveAccessLog(req, base);
     res.setHeader(`Access-Control-Allow-Origin`, `*`);
     const jstNow = JST.getDate();
     const status = {
