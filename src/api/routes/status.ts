@@ -2,12 +2,12 @@ import { JST } from '@suzuki3jp/utils';
 import { Request, Response } from 'express';
 import os from 'node:os';
 
-import { saveAccessLog } from '../apiUtils';
+import { saveAccessLog, setHeaderAllowOrigin } from '../apiUtils';
 import { Base } from '../../class/Base';
 
 export const getStatus = (req: Request, res: Response, base: Base) => {
     saveAccessLog(req, base);
-    res.setHeader(`Access-Control-Allow-Origin`, `*`);
+    setHeaderAllowOrigin(res);
     const jstNow = JST.getDate();
     const status = {
         system: {
