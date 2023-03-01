@@ -7,7 +7,7 @@ import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.j
 import { Base } from './Base';
 import { PublicCommandsJson } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
-import { PubValueParser, ValueParser } from './ValueParser';
+import { DummyMessage, PubValueParser, ValueParser } from './ValueParser';
 
 export class CommandManager extends Base {
     public valueParser: ValueParser;
@@ -41,7 +41,11 @@ export class CommandManager extends Base {
         return this.DM.getSettings().twitch.command;
     }
 
-    async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
+    async addCom(
+        commandName: string,
+        value: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage
+    ): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (commands[name]) return manageCommandError.existCommandName;
@@ -59,7 +63,11 @@ export class CommandManager extends Base {
         return `${name} を追加しました`;
     }
 
-    async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage): Promise<string> {
+    async editCom(
+        commandName: string,
+        value: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage
+    ): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!commands[name]) return manageCommandError.notExistCommandName;
