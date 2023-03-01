@@ -5,7 +5,22 @@ export class ApiAuthManager extends Base {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
     }
 
-    _generateToken(): string {
+    getKey(): string {
+        return this.DM.getSettings().api.key;
+    }
+
+    compareKey(key: string): boolean {
+        return this.getKey() === key;
+    }
+
+    refreshKey() {
+        const newKey = this._generateKey();
+        const settingsData = this.DM.getSettings();
+        settingsData.api.key = newKey;
+        this.DM.setSettings(settingsData);
+    }
+
+    _generateKey(): string {
         const API_KEY_LENGTH = 30;
         const CHARS_LENGTH = API_KEY_CHARS.length;
         let generatingKeys: string[] = [];

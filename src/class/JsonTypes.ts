@@ -79,6 +79,11 @@ export interface SettingsJson {
          * HTTPSを使用するかどうか
          */
         isSecure: boolean;
+
+        /**
+         * 現在有効なAPIキー
+         */
+        key: string;
     };
 }
 
