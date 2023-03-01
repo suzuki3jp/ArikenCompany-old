@@ -4,7 +4,17 @@ import { Server as HTTP } from 'http';
 
 // モジュールをインポート
 import { Base } from '../class/Base';
-import { getChatters, getCommands, getManagers, getStatus } from './routes/index';
+import {
+    addCommands,
+    editCommands,
+    getChatters,
+    getCommands,
+    getManagers,
+    getStatus,
+    offCommands,
+    onCommands,
+    removeCommands,
+} from './routes/index';
 
 export const api = (base: Base) => {
     const settings = base.DM.getSettings();
@@ -19,8 +29,37 @@ export const api = (base: Base) => {
     base.api.app.use(bodyToJson());
     base.api.app.use(urlencoded({ extended: true }));
 
-    base.api.app.get('/commands', (req, res) => getCommands(req, res, base));
-    base.api.app.get('/chatters', (req, res) => getChatters(req, res, base));
-    base.api.app.get('/managers', (req, res) => getManagers(req, res, base));
-    base.api.app.get('/status', (req, res) => getStatus(req, res, base));
+    base.api.app.get(API_ENDPOINTS.chatters, (req, res) => getChatters(req, res, base));
+    base.api.app.get(API_ENDPOINTS.managers.get, (req, res) => getManagers(req, res, base));
+    base.api.app.get(API_ENDPOINTS.status, (req, res) => getStatus(req, res, base));
+
+    // コマンド関係のエンドポイント
+    base.api.app.get(API_ENDPOINTS.commands.get, (req, res) => getCommands(req, res, base));
+    base.api.app.post(API_ENDPOINTS.commands.on, (req, res) => onCommands(req, res, base));
+    base.api.app.post(API_ENDPOINTS.commands.off, (req, res) => offCommands(req, res, base));
+    base.api.app.post(API_ENDPOINTS.commands.add, (req, res) => addCommands(req, res, base));
+    base.api.app.post(API_ENDPOINTS.commands.edit, (req, res) => editCommands(req, res, base));
+    base.api.app.post(API_ENDPOINTS.commands.remove, (req, res) => removeCommands(req, res, base));
+};
+
+const API_ENDPOINTS = {
+    chatters: '/chatters',
+    status: '/status',
+    commands: {
+        get: '/commands',
+        on: '/commands/on',
+        off: '/commands/off',
+        add: '/commands/add',
+        edit: '/commands/edit',
+        remove: '/commands/remove',
+    },
+    cooltime: {
+        get: '/cooltime',
+        set: '/cooltime/set',
+    },
+    managers: {
+        get: '/managers',
+        allow: '/managers/allow',
+        deny: '/managers/deny',
+    },
 };
