@@ -3,3 +3,4 @@ export { getCommands, onCommands, offCommands, addCommands, editCommands, remove
 export { getChatters } from './chatters';
 export { getManagers } from './managers';
 export { getStatus } from './status';
+export { getCooltime, setCooltime } from './cooltime';

@@ -9,11 +9,13 @@ import {
     editCommands,
     getChatters,
     getCommands,
+    getCooltime,
     getManagers,
     getStatus,
     offCommands,
     onCommands,
     removeCommands,
+    setCooltime,
 } from './routes/index';
 
 export const api = (base: Base) => {
@@ -40,6 +42,10 @@ export const api = (base: Base) => {
     base.api.app.post(API_ENDPOINTS.commands.add, (req, res) => addCommands(req, res, base));
     base.api.app.post(API_ENDPOINTS.commands.edit, (req, res) => editCommands(req, res, base));
     base.api.app.post(API_ENDPOINTS.commands.remove, (req, res) => removeCommands(req, res, base));
+
+    // クールタイム関係のエンドポイント
+    base.api.app.get(API_ENDPOINTS.cooltime.get, (req, res) => getCooltime(req, res, base));
+    base.api.app.post(API_ENDPOINTS.cooltime.set, (req, res) => setCooltime(req, res, base));
 };
 
 const API_ENDPOINTS = {
