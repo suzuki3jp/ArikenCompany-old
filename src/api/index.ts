@@ -6,6 +6,8 @@ import { Server as HTTP } from 'http';
 import { Base } from '../class/Base';
 import {
     addCommands,
+    allowManagers,
+    denyManagers,
     editCommands,
     getChatters,
     getCommands,
@@ -32,7 +34,6 @@ export const api = (base: Base) => {
     base.api.app.use(urlencoded({ extended: true }));
 
     base.api.app.get(API_ENDPOINTS.chatters, (req, res) => getChatters(req, res, base));
-    base.api.app.get(API_ENDPOINTS.managers.get, (req, res) => getManagers(req, res, base));
     base.api.app.get(API_ENDPOINTS.status, (req, res) => getStatus(req, res, base));
 
     // コマンド関係のエンドポイント
@@ -46,6 +47,11 @@ export const api = (base: Base) => {
     // クールタイム関係のエンドポイント
     base.api.app.get(API_ENDPOINTS.cooltime.get, (req, res) => getCooltime(req, res, base));
     base.api.app.post(API_ENDPOINTS.cooltime.set, (req, res) => setCooltime(req, res, base));
+
+    // マネージャー関係のエンドポイント
+    base.api.app.get(API_ENDPOINTS.managers.get, (req, res) => getManagers(req, res, base));
+    base.api.app.post(API_ENDPOINTS.managers.allow, (req, res) => allowManagers(req, res, base));
+    base.api.app.post(API_ENDPOINTS.managers.deny, (req, res) => denyManagers(req, res, base));
 };
 
 const API_ENDPOINTS = {
