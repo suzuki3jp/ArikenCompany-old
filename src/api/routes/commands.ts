@@ -5,13 +5,12 @@ import type { Request, Response } from 'express';
 import { saveAccessLog, setHeaderAllowOrigin, verifyAuth } from '../apiUtils';
 import { Base } from '../../class/Base';
 import { CommandManager } from '../../class/Command';
-import { DataManager } from '../../class/DataManager';
 import { DummyMessage } from '../../class/ValueParser';
 
 export const getCommands = (req: Request, res: Response, base: Base) => {
     saveAccessLog(req, base);
     setHeaderAllowOrigin(res);
-    const commands = new DataManager().getPublicCommands();
+    const commands = base.DM.getPublicCommands();
     res.status(200);
     res.json(commands);
 };
