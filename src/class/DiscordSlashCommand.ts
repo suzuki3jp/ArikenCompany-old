@@ -1,5 +1,6 @@
 import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
+import { ApiAuthManager } from './ApiAuth';
 import { Base } from './Base';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from './Components';
 import { TwitchUser } from './JsonTypes';
@@ -8,11 +9,13 @@ import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 
 export class DiscordSlashCommand extends Base {
     public interaction: CommandInteraction;
+    public command: string;
     public subCommand: string | null;
 
     constructor(base: Base, interaction: CommandInteraction) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = interaction;
+        this.command = this.interaction.commandName;
         this.subCommand = this.interaction.options.getSubcommand();
     }
 
@@ -86,6 +89,18 @@ export class DiscordSlashCommand extends Base {
             newUser.notificationChannelId
         )}に送信するよう設定しました。`;
         return result;
+    }
+
+    getApiKey(): string {
+        const apiAuthManager = new ApiAuthManager(this);
+        return apiAuthManager.getKey();
+    }
+
+    refreshApiKey(): string {
+        const apiAuthManager = new ApiAuthManager(this);
+        apiAuthManager.refreshKey();
+        const newApiKey = apiAuthManager.getKey();
+        return `APIキーを変更しました。 新APIキー: ${newApiKey}`;
     }
 
     /**
