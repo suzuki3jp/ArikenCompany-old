@@ -21,17 +21,21 @@ class ValueVariables {
         return JST.getDateString();
     }
 
-    getChannel(message: TwitchMessage | DiscordMessage): string {
+    getChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) {
             return message.channel.name;
         } else if (message.channel instanceof TextChannel) {
             return message.channel.name;
+        } else if (message instanceof DummyMessage) {
+            return message.channel.name;
         } else return ParseErrorMessages.invalidDiscordChannel;
     }
 
-    getUser(message: TwitchMessage | DiscordMessage): string {
+    getUser(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) {
             return message.member.name;
+        } else if (message instanceof DummyMessage) {
+            return message.user.name;
         } else {
             return message.author.tag;
         }
@@ -50,13 +54,13 @@ class ValueVariables {
         return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
     }
 
-    isMod(message: TwitchMessage | DiscordMessage): boolean {
+    isMod(message: TwitchMessage | DiscordMessage | DummyMessage): boolean {
         if (message instanceof TwitchMessage) {
             return message.member.isMod;
-        } else {
+        } else if (message instanceof DiscordMessage) {
             const settings = DM.getSettings();
             return message.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
-        }
+        } else return message.user.isMod;
     }
 }
 
@@ -70,7 +74,7 @@ export class ValueParser extends ValueVariables {
         };
     }
 
-    async parse(value: string, message: TwitchMessage | DiscordMessage): Promise<ValueParseResult> {
+    async parse(value: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ValueParseResult> {
         const startBracketLength = StringUtils.countBy(value, '{');
         const endBracketLength = StringUtils.countBy(value, '}');
 
@@ -115,7 +119,10 @@ export class ValueParser extends ValueVariables {
         }
     }
 
-    async _parseCode(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseCodeResult> {
+    async _parseCode(
+        codeRaw: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage
+    ): Promise<ParseCodeResult> {
         const result = await this._parseVariables(codeRaw.trim(), message);
         if (result.status === 200) return result;
         if (result.status === 403) return result;
@@ -133,12 +140,15 @@ export class ValueParser extends ValueVariables {
         return super.random(choices);
     }
 
-    async _parseAlias(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ValueParseResult> {
+    async _parseAlias(
+        codeRaw: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage
+    ): Promise<ValueParseResult> {
         const targetCommand = codeRaw.slice(6).toLowerCase();
         return await this.parse(super.getCommandByAlias(targetCommand), message);
     }
 
-    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseModResult> {
+    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ParseModResult> {
         const newCodeRaw = codeRaw.slice(4);
         if (super.isMod(message)) {
             const result = await this._parseVariables(newCodeRaw, message);
@@ -149,7 +159,7 @@ export class ValueParser extends ValueVariables {
 
     async _parseVariables(
         codeRaw: string,
-        message: TwitchMessage | DiscordMessage
+        message: TwitchMessage | DiscordMessage | DummyMessage
     ): Promise<{ status: 200 | 400 | 403 | 404; content: string }> {
         if (codeRaw.startsWith('fetch ')) {
             return {
@@ -276,6 +286,20 @@ const ParseErrorMessages = {
     variablesNotFound: '変数が見つかりませんでした',
     commandNotFound: 'コマンドが見つかりませんでした',
 };
+
+export class DummyMessage {
+    channel: { name: 'DummyChannelName' };
+    user: { name: 'DummyUserName'; isMod: true };
+    constructor() {
+        this.channel = {
+            name: 'DummyChannelName',
+        };
+        this.user = {
+            name: 'DummyUserName',
+            isMod: true,
+        };
+    }
+}
 
 // ${fetch https://example.com}hoge
 // ${random huge huge huge}

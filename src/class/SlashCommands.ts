@@ -53,4 +53,20 @@ export const slashCommands: ApplicationCommandDataResolvable[] = [
             },
         ],
     },
+    {
+        name: 'key',
+        description: 'Manage API key.',
+        options: [
+            {
+                type: optionTypes.SubCommand,
+                name: 'get',
+                description: 'Get API key.',
+            },
+            {
+                type: optionTypes.SubCommand,
+                name: 'refresh',
+                description: 'Refresh API key.',
+            },
+        ],
+    },
 ];

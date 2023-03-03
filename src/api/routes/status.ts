@@ -2,10 +2,12 @@ import { JST } from '@suzuki3jp/utils';
 import { Request, Response } from 'express';
 import os from 'node:os';
 
+import { saveAccessLog, setHeaderAllowOrigin } from '../apiUtils';
 import { Base } from '../../class/Base';
 
-export const status = (req: Request, res: Response, base: Base) => {
-    res.setHeader(`Access-Control-Allow-Origin`, `*`);
+export const getStatus = (req: Request, res: Response, base: Base) => {
+    saveAccessLog(req, base);
+    setHeaderAllowOrigin(res);
     const jstNow = JST.getDate();
     const status = {
         system: {
@@ -26,7 +28,6 @@ export const status = (req: Request, res: Response, base: Base) => {
         },
     };
     res.status(200);
-    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
     res.json(status);
 };
 
