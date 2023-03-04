@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.twitchMessage = void 0;
+const TwitchCommand_1 = require("../../class/TwitchCommand");
 const ValueParser_1 = require("../../class/ValueParser");
-const twitchMessage = async (twitchCommand, message) => {
+const twitchMessage = async (base, message) => {
+    const twitchCommand = new TwitchCommand_1.TwitchCommand(base, message);
     const reply = (content) => {
         message.reply(content);
     };
@@ -26,7 +28,7 @@ const twitchMessage = async (twitchCommand, message) => {
             reply(await twitchCommand.editCom());
         }
         else if (manageCommandName === '!rmcom') {
-            reply(twitchCommand.removeCom());
+            reply(await twitchCommand.removeCom());
         }
         else if (manageCommandName === '!allow') {
             reply(twitchCommand.allow());
@@ -46,10 +48,10 @@ const twitchMessage = async (twitchCommand, message) => {
             return;
         if (!twitchCommand.isPassedCooltime())
             return;
-        twitchCommand.saveCooltime();
         const commandValue = twitchCommand.commandValue();
         if (!commandValue)
             return;
+        twitchCommand.saveCooltime();
         const valueParser = new ValueParser_1.ValueParser();
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200)

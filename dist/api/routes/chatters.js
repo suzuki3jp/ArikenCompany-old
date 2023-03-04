@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatters = void 0;
+exports.getChatters = void 0;
 // モジュールをインポート
-const DataManager_1 = require("../../class/DataManager");
-const chatters = (req, res) => {
-    const chatters = new DataManager_1.DataManager().getMessageCounter();
+const apiUtils_1 = require("../apiUtils");
+const getChatters = (req, res, base) => {
+    (0, apiUtils_1.saveAccessLog)(req, base);
+    (0, apiUtils_1.setHeaderAllowOrigin)(res);
+    const chatters = base.DM.getMessageCounter();
     res.status(200);
-    res.setHeader(`Access-Control-Allow-Origin`, `*`);
     res.json(chatters);
 };
-exports.chatters = chatters;
+exports.getChatters = getChatters;

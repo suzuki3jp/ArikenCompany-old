@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordButton = void 0;
+// nodeモジュールをインポート
 const discord_js_1 = require("discord.js");
 // モジュールをインポート
 const Base_1 = require("./Base");
 const Command_1 = require("./Command");
-const Components_1 = require("../data/Components");
+const Components_1 = require("./Components");
 const Embed_1 = require("../utils/Embed");
 class DiscordButton extends Base_1.Base {
     interaction;
@@ -13,13 +14,13 @@ class DiscordButton extends Base_1.Base {
     type;
     customId;
     _commandManager;
-    constructor(twitchClient, discordClient, logger, interaction) {
-        super(twitchClient, discordClient, logger);
+    constructor(base, interaction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
-        this._commandManager = new Command_1.CommandManager(super.twitch, super.discord, super.logger);
+        this._commandManager = new Command_1.CommandManager(this.getMe());
     }
     buttonType() {
         if (this.customId === Components_1.ComponentCustomIds.button.add)
@@ -39,7 +40,7 @@ class DiscordButton extends Base_1.Base {
         return 'site';
     }
     isMod() {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
     next() {

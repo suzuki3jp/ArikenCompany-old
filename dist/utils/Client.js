@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createClients = void 0;
+const eventsub_ws_1 = require("@twurple/eventsub-ws");
 const twitch_js_1 = require("@suzuki3jp/twitch.js");
 const utils_1 = require("@suzuki3jp/utils");
 const discord_js_1 = require("discord.js");
@@ -16,7 +17,12 @@ const discordToken = process.env.DISCORD_TOKEN;
 const createClients = (logger) => {
     if (!discordToken)
         throw new utils_1.CustomError('ENV_ERROR', '.env content is invalid.');
-    return { twitch: createTwitchClient(logger), discord: { client: createDiscordClient(), token: discordToken } };
+    const twitch = createTwitchClient(logger);
+    return {
+        twitch,
+        eventSub: createEventSubClient(twitch),
+        discord: { client: createDiscordClient(), token: discordToken },
+    };
 };
 exports.createClients = createClients;
 const createTwitchClient = (logger) => {
@@ -25,6 +31,9 @@ const createTwitchClient = (logger) => {
 };
 const createDiscordClient = () => {
     return new discord_js_1.Client(createDiscordClientOptions());
+};
+const createEventSubClient = (twitchClient) => {
+    return new eventsub_ws_1.EventSubWsListener({ apiClient: twitchClient._api });
 };
 const createTwitchClientOptions = (logger) => {
     if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken && discordToken) {
@@ -40,7 +49,7 @@ const createTwitchClientOptions = (logger) => {
             };
             const newEnvData = utils_1.Env.parseToEnv(envDataObj);
             DM.setEnv(newEnvData);
-            logger.info('Twitchのトークンがリフレッシュされました');
+            logger.emitLog('system', 'Twitchのトークンがリフレッシュされました');
         };
         const authConfig = {
             accessToken: twitchToken,

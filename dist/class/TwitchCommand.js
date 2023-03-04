@@ -14,15 +14,15 @@ class TwitchCommand extends Base_1.Base {
     _commandManager;
     _managersManager;
     _cooltimeManager;
-    constructor(twitchClient, discordClient, message, logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base, message) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.command = new twitch_js_1.CommandParser(message.content, {
-            manageCommands: super.DM.getSettings().twitch.manageCommands,
+            manageCommands: this.DM.getSettings().twitch.manageCommands,
         });
         this.message = message;
-        this._commandManager = new Command_1.CommandManager(twitchClient, discordClient, logger);
-        this._managersManager = new Managers_1.ManagersManager(twitchClient, discordClient, logger);
-        this._cooltimeManager = new CoolTime_1.CoolTimeManager(twitchClient, discordClient, logger);
+        this._commandManager = new Command_1.CommandManager(this.getMe());
+        this._managersManager = new Managers_1.ManagersManager(this.getMe());
+        this._cooltimeManager = new CoolTime_1.CoolTimeManager(this.getMe());
     }
     isCommand() {
         return this.command.isCommand();
@@ -31,7 +31,7 @@ class TwitchCommand extends Base_1.Base {
         return this.command.isManageCommand();
     }
     isManager() {
-        const managersData = super.DM.getManagers();
+        const managersData = this.DM.getManagers();
         if (this.message.member.isMod)
             return true;
         if (this.message.member.isBroadCaster)
@@ -41,7 +41,7 @@ class TwitchCommand extends Base_1.Base {
         return false;
     }
     isVip() {
-        const managersData = super.DM.getManagers();
+        const managersData = this.DM.getManagers();
         if (this.message.member.isVip)
             return true;
         if (this.message.member.isBroadCaster)
@@ -53,14 +53,14 @@ class TwitchCommand extends Base_1.Base {
         return false;
     }
     countMessage() {
-        const MessageCounter = super.DM.getMessageCounter();
+        const MessageCounter = this.DM.getMessageCounter();
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
-            super.DM.setMessageCounter(MessageCounter);
+            this.DM.setMessageCounter(MessageCounter);
         }
         else {
             MessageCounter[this.message.member.name] = 1;
-            super.DM.setMessageCounter(MessageCounter);
+            this.DM.setMessageCounter(MessageCounter);
         }
     }
     manageCommandName() {
@@ -107,24 +107,21 @@ class TwitchCommand extends Base_1.Base {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.addCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
     async editCom() {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.editCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
-    removeCom() {
+    async removeCom() {
         const targetCommand = this.command.commandsArg[0];
-        const result = this._commandManager.removeCom(targetCommand);
-        this._commandManager.syncCommandPanel();
+        const result = await this._commandManager.removeCom(targetCommand);
         return result;
     }
     commandValue() {
-        const Commands = super.DM.getCommands();
+        const Commands = this.DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }
