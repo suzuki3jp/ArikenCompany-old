@@ -127,7 +127,7 @@ export class CommandManager extends Base {
 }
 
 const manageCommandError = {
-    existCommandName: '存在するコマンド名です',
+    existCommandName: 'すでに存在するコマンド名です',
     notExistCommandName: '存在しないコマンド名です',
     alreadyOn: 'すでにコマンドは有効です',
     alreadyOff: 'すでにコマンドは無効です',
