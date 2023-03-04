@@ -60,7 +60,11 @@ export const addCommands = async (req: Request, res: Response, base: Base) => {
     const commandValue = req.body.value;
 
     if (isAuthorized.status === 200) {
-        if (isValidBodyForManageCommands(req) && typeof commandName === 'string' && typeof commandValue === 'string') {
+        if (
+            isValidBodyForManageCommands(req, false) &&
+            typeof commandName === 'string' &&
+            typeof commandValue === 'string'
+        ) {
             const dummyMessage = new DummyMessage();
             const result = await commandManager.addCom(commandName, commandValue, dummyMessage);
             res.status(200);
@@ -90,7 +94,11 @@ export const editCommands = async (req: Request, res: Response, base: Base) => {
     const commandValue = req.body.value;
 
     if (isAuthorized.status === 200) {
-        if (isValidBodyForManageCommands(req) && typeof commandName === 'string' && typeof commandValue === 'string') {
+        if (
+            isValidBodyForManageCommands(req, false) &&
+            typeof commandName === 'string' &&
+            typeof commandValue === 'string'
+        ) {
             const dummyMessage = new DummyMessage();
             const result = await commandManager.editCom(commandName, commandValue, dummyMessage);
             res.status(200);
@@ -111,7 +119,7 @@ export const editCommands = async (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const removeCommands = (req: Request, res: Response, base: Base) => {
+export const removeCommands = async (req: Request, res: Response, base: Base) => {
     saveAccessLog(req, base);
     setHeaderAllowOrigin(res);
     const isAuthorized = verifyAuth(req, base);
@@ -119,8 +127,8 @@ export const removeCommands = (req: Request, res: Response, base: Base) => {
     const commandName = req.body.name;
 
     if (isAuthorized.status === 200) {
-        if (isValidBodyForManageCommands(req) && typeof commandName === 'string') {
-            const result = commandManager.removeCom(commandName);
+        if (isValidBodyForManageCommands(req, true) && typeof commandName === 'string') {
+            const result = await commandManager.removeCom(commandName);
             res.status(200);
             res.json({
                 status: 200,
@@ -139,11 +147,11 @@ export const removeCommands = (req: Request, res: Response, base: Base) => {
     }
 };
 
-const isValidBodyForManageCommands = (req: Request): boolean => {
+const isValidBodyForManageCommands = (req: Request, isRemove: boolean): boolean => {
     const reqBody = req.body;
     if (typeof reqBody === 'object') {
         if (typeof reqBody.name !== 'string') return false;
-        if (typeof reqBody.value !== 'string') return false;
+        if (typeof reqBody.value !== 'string' && !isRemove) return false;
         return true;
     } else return false;
 };
