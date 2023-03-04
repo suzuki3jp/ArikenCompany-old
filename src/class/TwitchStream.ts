@@ -50,10 +50,9 @@ export class TwitchStream extends Base {
 
     _updateData(isStreaming: boolean) {
         if (!this.userIndex || !this.user) return;
-        const newUsers = this.users.splice(this.userIndex);
+        this.users.splice(this.userIndex, 1);
         this.user.isStreaming = isStreaming;
-        newUsers.push(this.user);
-        this.users = newUsers;
+        this.users.push(this.user);
         this.DM.setStreamStatus({ users: this.users });
     }
 
