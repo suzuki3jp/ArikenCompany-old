@@ -58,7 +58,6 @@ export class CommandManager extends Base {
         this.DM.setCommands(commands);
         this.emitDebug(`追加したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
-        this.emitDebug(`${name} を追加`);
         await this.syncCommandPanel();
         return `${name} を追加しました`;
     }
@@ -80,7 +79,6 @@ export class CommandManager extends Base {
         this.DM.setCommands(commands);
         this.emitDebug(`編集したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
-        this.emitDebug(`${name} を編集`);
         await this.syncCommandPanel();
         return `${name} を ${value} に変更しました`;
     }
@@ -94,7 +92,6 @@ export class CommandManager extends Base {
         this.DM.setCommands(commands);
         this.emitDebug(`削除したコマンドのデータをファイルに反映 [${name}]`);
         this.createPublicList();
-        this.emitDebug(`${name} を削除`);
         await this.syncCommandPanel();
         return `${name} を削除しました`;
     }
@@ -108,15 +105,9 @@ export class CommandManager extends Base {
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
             const components = panel.components;
             const currentPageNum = currentPage(panel.embeds[0]);
-            if (
-                components[0].components[0] instanceof MessageButton &&
-                components[0].components[1] instanceof MessageButton
-            ) {
-                components[0].components[0].setDisabled(true);
-                components[0].components[1].setDisabled(false);
-                this.emitDebug(`コマンドパネルを同期 現在のページ: ${currentPageNum}`);
-                panel.edit({ embeds: [pages[currentPageNum]], components });
-            }
+            const currentPageIndex = currentPageNum - 1;
+            this.emitDebug(`コマンドパネルを同期 現在のページ: ${currentPageNum}`);
+            panel.edit({ embeds: [pages[currentPageIndex]], components });
         } else return;
     }
 
