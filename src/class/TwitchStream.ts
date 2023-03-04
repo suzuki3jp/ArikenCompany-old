@@ -60,7 +60,7 @@ export class TwitchStream extends Base {
         const embed: APIEmbed = {
             title: `${stream.userDisplayName}が配信を開始しました`,
             url: `https://www.twitch.tv/${stream.userName}`,
-            description: `タイトル: ${stream.title} ゲーム: ${stream.gameName}`,
+            description: `**タイトル**: ${stream.title}, **ゲーム**: ${stream.gameName}`,
             footer: {
                 text: JST.getDateString(),
             },
