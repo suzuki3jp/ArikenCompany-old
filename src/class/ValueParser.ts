@@ -270,7 +270,7 @@ export class PubValueParser {
         } else {
             return {
                 status: 200,
-                content: codeRaw,
+                content: `\$\{${codeRaw}\}`,
             };
         }
     }
