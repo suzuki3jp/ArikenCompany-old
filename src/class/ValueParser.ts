@@ -74,7 +74,11 @@ export class ValueParser extends ValueVariables {
         };
     }
 
-    async parse(value: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ValueParseResult> {
+    async parse(
+        value: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
+    ): Promise<ValueParseResult> {
         const startBracketLength = StringUtils.countBy(value, '{');
         const endBracketLength = StringUtils.countBy(value, '}');
 
@@ -93,7 +97,7 @@ export class ValueParser extends ValueVariables {
                     const endIndex = value.indexOf('}', startIndex);
                     index = index + endIndex;
                     const codeRaw = value.slice(startIndex, endIndex);
-                    const parsedCode = await this._parseCode(codeRaw, message);
+                    const parsedCode = await this._parseCode(codeRaw, message, aliased);
                     if (parsedCode.status === 200) {
                         result.status = parsedCode.status;
                         result.content = result.content + parsedCode.content;
@@ -121,9 +125,10 @@ export class ValueParser extends ValueVariables {
 
     async _parseCode(
         codeRaw: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
     ): Promise<ParseCodeResult> {
-        const result = await this._parseVariables(codeRaw.trim(), message);
+        const result = await this._parseVariables(codeRaw.trim(), message, aliased);
         if (result.status === 200) return result;
         if (result.status === 403) return result;
         if (result.status === 400) return result;
@@ -145,7 +150,7 @@ export class ValueParser extends ValueVariables {
         message: TwitchMessage | DiscordMessage | DummyMessage
     ): Promise<ValueParseResult> {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        return await this.parse(super.getCommandByAlias(targetCommand), message);
+        return await this.parse(super.getCommandByAlias(targetCommand), message, true);
     }
 
     async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ParseModResult> {
@@ -159,7 +164,8 @@ export class ValueParser extends ValueVariables {
 
     async _parseVariables(
         codeRaw: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
     ): Promise<{ status: 200 | 400 | 403 | 404; content: string }> {
         if (codeRaw.startsWith('fetch ')) {
             return {
@@ -172,10 +178,18 @@ export class ValueParser extends ValueVariables {
                 content: this._parseRandom(codeRaw),
             };
         } else if (codeRaw.startsWith('alias ')) {
-            return {
-                status: (await this._parseAlias(codeRaw, message)).status,
-                content: (await this._parseAlias(codeRaw, message)).content,
-            };
+            if (aliased) {
+                return {
+                    status: 400,
+                    content:
+                        'alias先のコマンドの内容でalias関数を使用することはできません。これは無限ループを防ぐためです。',
+                };
+            } else {
+                return {
+                    status: (await this._parseAlias(codeRaw, message)).status,
+                    content: (await this._parseAlias(codeRaw, message)).content,
+                };
+            }
         } else if (codeRaw.startsWith('channel')) {
             return {
                 status: 200,
