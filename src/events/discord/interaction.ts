@@ -1,20 +1,14 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import type { Client as Discord, Interaction } from 'discord.js';
+import type { Interaction } from 'discord.js';
 
 // モジュールをインポート
+import { Base } from '../../class/Base';
 import { commandInteraction } from './commandInteraction';
 import { buttonInteraction } from './buttonInteraction';
 import { modalInteraction } from './modalInteraction';
 
-export const discordInteraction = (
-    twitchClient: Twitch,
-    discordClient: Discord,
-    logger: Logger,
-    interaction: Interaction
-) => {
-    if (interaction.isButton()) return buttonInteraction(twitchClient, discordClient, logger, interaction);
-    if (interaction.isCommand()) return commandInteraction(discordClient, interaction);
-    if (interaction.isModalSubmit()) return modalInteraction(twitchClient, discordClient, logger, interaction);
+export const discordInteraction = (base: Base, interaction: Interaction) => {
+    if (interaction.isButton()) return buttonInteraction(base, interaction);
+    if (interaction.isCommand()) return commandInteraction(base, interaction);
+    if (interaction.isModalSubmit()) return modalInteraction(base, interaction);
 };

@@ -1,8 +1,6 @@
 // nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
-import type { TwitchClient as Twitch, Message as TwitchMessage } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import type { Client as Discord } from 'discord.js';
+import type { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -17,15 +15,15 @@ export class TwitchCommand extends Base {
     public _managersManager: ManagersManager;
     public _cooltimeManager: CoolTimeManager;
 
-    constructor(twitchClient: Twitch, discordClient: Discord, message: TwitchMessage, logger: Logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, message: TwitchMessage) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.command = new CommandParser(message.content, {
-            manageCommands: super.DM.getSettings().twitch.manageCommands,
+            manageCommands: this.DM.getSettings().twitch.manageCommands,
         });
         this.message = message;
-        this._commandManager = new CommandManager(twitchClient, discordClient, logger);
-        this._managersManager = new ManagersManager(twitchClient, discordClient, logger);
-        this._cooltimeManager = new CoolTimeManager(twitchClient, discordClient, logger);
+        this._commandManager = new CommandManager(this.getMe());
+        this._managersManager = new ManagersManager(this.getMe());
+        this._cooltimeManager = new CoolTimeManager(this.getMe());
     }
 
     isCommand(): boolean {
@@ -37,7 +35,7 @@ export class TwitchCommand extends Base {
     }
 
     isManager(): boolean {
-        const managersData = super.DM.getManagers();
+        const managersData = this.DM.getManagers();
         if (this.message.member.isMod) return true;
         if (this.message.member.isBroadCaster) return true;
         if (managersData.managers.includes(this.message.member.name)) return true;
@@ -45,7 +43,7 @@ export class TwitchCommand extends Base {
     }
 
     isVip(): boolean {
-        const managersData = super.DM.getManagers();
+        const managersData = this.DM.getManagers();
         if (this.message.member.isVip) return true;
         if (this.message.member.isBroadCaster) return true;
         if (this.message.member.isMod) return true;
@@ -54,13 +52,13 @@ export class TwitchCommand extends Base {
     }
 
     countMessage(): void {
-        const MessageCounter = super.DM.getMessageCounter();
+        const MessageCounter = this.DM.getMessageCounter();
         if (MessageCounter[this.message.member.name]) {
             MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
-            super.DM.setMessageCounter(MessageCounter);
+            this.DM.setMessageCounter(MessageCounter);
         } else {
             MessageCounter[this.message.member.name] = 1;
-            super.DM.setMessageCounter(MessageCounter);
+            this.DM.setMessageCounter(MessageCounter);
         }
     }
 
@@ -123,7 +121,6 @@ export class TwitchCommand extends Base {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.addCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
 
@@ -131,19 +128,17 @@ export class TwitchCommand extends Base {
         const targetCommand = this.command.commandsArg[0];
         const value = this.command.commandsArg.slice(1).join(' ');
         const result = await this._commandManager.editCom(targetCommand, value, this.message);
-        await this._commandManager.syncCommandPanel();
         return result;
     }
 
-    removeCom(): string {
+    async removeCom(): Promise<string> {
         const targetCommand = this.command.commandsArg[0];
-        const result = this._commandManager.removeCom(targetCommand);
-        this._commandManager.syncCommandPanel();
+        const result = await this._commandManager.removeCom(targetCommand);
         return result;
     }
 
     commandValue(): string | null {
-        const Commands = super.DM.getCommands();
+        const Commands = this.DM.getCommands();
         const result = Commands[this.command.commandName];
         return result ?? null;
     }

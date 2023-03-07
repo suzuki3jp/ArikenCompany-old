@@ -9,15 +9,16 @@ class DataManager {
     constructor() {
         this._paths = {
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
-            commands: (0, path_1.resolve)(__dirname, '../data/Commands.json'),
-            cooltime: (0, path_1.resolve)(__dirname, '../data/Cooltime.json'),
+            commands: (0, path_1.resolve)(__dirname, '../../data/Commands.json'),
+            cooltime: (0, path_1.resolve)(__dirname, '../../data/Cooltime.json'),
             env: (0, path_1.resolve)(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
-            log: (0, path_1.resolve)(__dirname, '../data/log/log.csv'),
-            managers: (0, path_1.resolve)(__dirname, '../data/Managers.json'),
-            messageCounter: (0, path_1.resolve)(__dirname, '../data/MessageCounter.json'),
-            publicCommands: (0, path_1.resolve)(__dirname, '../data/PublicCommands.json'),
-            settings: (0, path_1.resolve)(__dirname, '../data/settings.json'),
+            log: (0, path_1.resolve)(__dirname, '../../data/log/log.csv'),
+            managers: (0, path_1.resolve)(__dirname, '../../data/Managers.json'),
+            messageCounter: (0, path_1.resolve)(__dirname, '../../data/MessageCounter.json'),
+            publicCommands: (0, path_1.resolve)(__dirname, '../../data/PublicCommands.json'),
+            settings: (0, path_1.resolve)(__dirname, '../../data/settings.json'),
+            streamStatus: (0, path_1.resolve)(__dirname, '../../data/StreamStatus.json'),
         };
     }
     getCert() {
@@ -64,6 +65,12 @@ class DataManager {
     }
     setSettings(data) {
         this._writeFile(this._paths.settings, data);
+    }
+    getStreamStatus() {
+        return this._readFile(this._paths.streamStatus);
+    }
+    setStreamStatus(data) {
+        this._writeFile(this._paths.streamStatus, data);
     }
     _readFile(path) {
         return JSON.parse((0, fs_1.readFileSync)(path, 'utf-8'));

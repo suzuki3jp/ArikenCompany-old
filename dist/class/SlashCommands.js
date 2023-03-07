@@ -37,6 +37,35 @@ exports.slashCommands = [
                     },
                 ],
             },
+            {
+                type: optionTypes.SubCommand,
+                name: 'notification',
+                description: 'setup notification of onStream',
+                options: [
+                    {
+                        type: optionTypes.String,
+                        name: 'user',
+                        description: 'tracking user name',
+                        required: true,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        name: 'key',
+        description: 'Manage API key.',
+        options: [
+            {
+                type: optionTypes.SubCommand,
+                name: 'get',
+                description: 'Get API key.',
+            },
+            {
+                type: optionTypes.SubCommand,
+                name: 'refresh',
+                description: 'Refresh API key.',
+            },
         ],
     },
 ];

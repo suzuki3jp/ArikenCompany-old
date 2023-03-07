@@ -1,7 +1,6 @@
-// nodeモジュールをインポート
-import type { TwitchClient } from '@suzuki3jp/twitch.js';
-import type { Logger } from '@suzuki3jp/utils';
+import { Base } from '../../class/Base';
 
-export const twitchReady = (client: TwitchClient, logger: Logger) => {
-    logger.system('twitch client is ready.');
+export const twitchReady = (base: Base) => {
+    base.logger.emitLog('info', base.DM.getSettings().twitch.channels.join(', ') + ' のチャットに接続');
+    base.logger.emitLog('system', 'twitch client is ready.');
 };

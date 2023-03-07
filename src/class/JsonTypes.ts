@@ -79,5 +79,22 @@ export interface SettingsJson {
          * HTTPSを使用するかどうか
          */
         isSecure: boolean;
+
+        /**
+         * 現在有効なAPIキー
+         */
+        key: string;
     };
+}
+
+export interface StreamStatusJson {
+    users: TwitchUser[];
+}
+
+export interface TwitchUser {
+    id: string;
+    name: string;
+    displayName: string;
+    isStreaming: boolean;
+    notificationChannelId: string;
 }

@@ -1,12 +1,10 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import { ButtonInteraction, Client as Discord, GuildMember, Message, MessageButton } from 'discord.js';
+import { ButtonInteraction, GuildMember, Message, MessageButton } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';
 import { CommandManager } from './Command';
-import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from '../data/Components';
+import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from './Components';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
 export class DiscordButton extends Base {
@@ -16,13 +14,13 @@ export class DiscordButton extends Base {
     public customId: string;
     public _commandManager: CommandManager;
 
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger, interaction: ButtonInteraction) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, interaction: ButtonInteraction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
-        this._commandManager = new CommandManager(super.twitch, super.discord, super.logger);
+        this._commandManager = new CommandManager(this.getMe());
     }
 
     buttonType(): ButtonTypes {
@@ -37,7 +35,7 @@ export class DiscordButton extends Base {
     }
 
     isMod(): boolean {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         return this.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
     }
 

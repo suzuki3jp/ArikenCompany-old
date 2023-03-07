@@ -1,16 +1,10 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
-import type { ButtonInteraction, Client as Discord } from 'discord.js';
+import type { ButtonInteraction } from 'discord.js';
+import { Base } from '../../class/Base';
 import { DiscordButton } from '../../class/DiscordButton';
 
-export const buttonInteraction = (
-    twitchClient: Twitch,
-    discordClient: Discord,
-    logger: Logger,
-    interaction: ButtonInteraction
-) => {
-    const button = new DiscordButton(twitchClient, discordClient, logger, interaction);
+export const buttonInteraction = (base: Base, interaction: ButtonInteraction) => {
+    const button = new DiscordButton(base, interaction);
 
     // コマンドパネルページネーション
     switch (button.type) {

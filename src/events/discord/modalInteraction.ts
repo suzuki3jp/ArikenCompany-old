@@ -5,15 +5,11 @@ import { Message } from 'discord.js';
 import type { Client as Discord, ModalSubmitInteraction } from 'discord.js';
 
 // モジュールをインポート
+import { Base } from '../../class/Base';
 import { DiscordModal } from '../../class/DiscordModal';
 
-export const modalInteraction = async (
-    twitchClient: Twitch,
-    discordClient: Discord,
-    logger: Logger,
-    interaction: ModalSubmitInteraction
-) => {
-    const modal = new DiscordModal(twitchClient, discordClient, logger, interaction);
+export const modalInteraction = async (base: Base, interaction: ModalSubmitInteraction) => {
+    const modal = new DiscordModal(base, interaction);
 
     if (interaction.message instanceof Message) {
         switch (modal.type) {

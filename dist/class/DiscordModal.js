@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordModal = void 0;
+// nodeモジュールをインポート
 const crypto_1 = require("crypto");
 const discord_js_1 = require("discord.js");
 // モジュールをインポート
 const Base_1 = require("./Base");
 const Command_1 = require("./Command");
-const Components_1 = require("../data/Components");
+const Components_1 = require("./Components");
 class DiscordModal extends Base_1.Base {
     interaction;
     customId;
@@ -14,11 +15,11 @@ class DiscordModal extends Base_1.Base {
     commandName;
     value;
     _commandManager;
-    constructor(twitchClient, discordClient, logger, modalInteraction) {
-        super(twitchClient, discordClient, logger);
+    constructor(base, modalInteraction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
-        this._commandManager = new Command_1.CommandManager(super.twitch, super.discord, super.logger);
+        this._commandManager = new Command_1.CommandManager(this.getMe());
         this.type = this.modalType();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(Components_1.ComponentCustomIds.text.commandName);
@@ -110,7 +111,7 @@ class DiscordModal extends Base_1.Base {
     }
     async removeCommand() {
         if (this.commandName) {
-            const result = this._commandManager.removeCom(this.commandName);
+            const result = await this._commandManager.removeCom(this.commandName);
             await this._commandManager.syncCommandPanel();
             return result;
         }

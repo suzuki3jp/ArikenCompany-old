@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.discordMessage = void 0;
-// モジュールをインポート
 const DiscordCommand_1 = require("../../class/DiscordCommand");
 const ValueParser_1 = require("../../class/ValueParser");
-const discordMessage = async (twitchClient, discordClient, logger, message) => {
+const discordMessage = async (base, message) => {
     if (message.author.bot)
         return;
-    const discordCommand = new DiscordCommand_1.DiscordCommand(twitchClient, discordClient, logger, message);
+    const discordCommand = new DiscordCommand_1.DiscordCommand(base, message);
     const reply = (options) => {
         message.reply(options);
     };
+    setTimeout(() => { }, 0);
     if (!discordCommand.isCommand())
         return;
     if (discordCommand.isManageCommands()) {
@@ -28,7 +28,7 @@ const discordMessage = async (twitchClient, discordClient, logger, message) => {
             reply(await discordCommand.editCom());
         }
         else if (manageCommandName === '!rmcom') {
-            reply(discordCommand.removeCom());
+            reply(await discordCommand.removeCom());
         }
         else if (manageCommandName === '!allow') {
             reply(discordCommand.allow());

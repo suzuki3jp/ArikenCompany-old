@@ -1,10 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.managers = exports.chatters = exports.commands = void 0;
+exports.setCooltime = exports.getCooltime = exports.getStatus = exports.denyManagers = exports.allowManagers = exports.getManagers = exports.getChatters = exports.removeCommands = exports.editCommands = exports.addCommands = exports.offCommands = exports.onCommands = exports.getCommands = void 0;
 // モジュールをインポート
 var commands_1 = require("./commands");
-Object.defineProperty(exports, "commands", { enumerable: true, get: function () { return commands_1.commands; } });
+Object.defineProperty(exports, "getCommands", { enumerable: true, get: function () { return commands_1.getCommands; } });
+Object.defineProperty(exports, "onCommands", { enumerable: true, get: function () { return commands_1.onCommands; } });
+Object.defineProperty(exports, "offCommands", { enumerable: true, get: function () { return commands_1.offCommands; } });
+Object.defineProperty(exports, "addCommands", { enumerable: true, get: function () { return commands_1.addCommands; } });
+Object.defineProperty(exports, "editCommands", { enumerable: true, get: function () { return commands_1.editCommands; } });
+Object.defineProperty(exports, "removeCommands", { enumerable: true, get: function () { return commands_1.removeCommands; } });
 var chatters_1 = require("./chatters");
-Object.defineProperty(exports, "chatters", { enumerable: true, get: function () { return chatters_1.chatters; } });
+Object.defineProperty(exports, "getChatters", { enumerable: true, get: function () { return chatters_1.getChatters; } });
 var managers_1 = require("./managers");
-Object.defineProperty(exports, "managers", { enumerable: true, get: function () { return managers_1.managers; } });
+Object.defineProperty(exports, "getManagers", { enumerable: true, get: function () { return managers_1.getManagers; } });
+Object.defineProperty(exports, "allowManagers", { enumerable: true, get: function () { return managers_1.allowManagers; } });
+Object.defineProperty(exports, "denyManagers", { enumerable: true, get: function () { return managers_1.denyManagers; } });
+var status_1 = require("./status");
+Object.defineProperty(exports, "getStatus", { enumerable: true, get: function () { return status_1.getStatus; } });
+var cooltime_1 = require("./cooltime");
+Object.defineProperty(exports, "getCooltime", { enumerable: true, get: function () { return cooltime_1.getCooltime; } });
+Object.defineProperty(exports, "setCooltime", { enumerable: true, get: function () { return cooltime_1.setCooltime; } });

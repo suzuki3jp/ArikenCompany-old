@@ -2,10 +2,12 @@
 import { Message } from '@suzuki3jp/twitch.js';
 
 // モジュールをインポート
+import { Base } from '../../class/Base';
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
 
-export const twitchMessage = async (twitchCommand: TwitchCommand, message: Message) => {
+export const twitchMessage = async (base: Base, message: Message) => {
+    const twitchCommand = new TwitchCommand(base, message);
     const reply = (content: string) => {
         message.reply(content);
     };
@@ -24,7 +26,7 @@ export const twitchMessage = async (twitchCommand: TwitchCommand, message: Messa
         } else if (manageCommandName === '!editcom') {
             reply(await twitchCommand.editCom());
         } else if (manageCommandName === '!rmcom') {
-            reply(twitchCommand.removeCom());
+            reply(await twitchCommand.removeCom());
         } else if (manageCommandName === '!allow') {
             reply(twitchCommand.allow());
         } else if (manageCommandName === '!deny') {
@@ -37,9 +39,9 @@ export const twitchMessage = async (twitchCommand: TwitchCommand, message: Messa
     } else {
         if (!twitchCommand.isOnCom()) return;
         if (!twitchCommand.isPassedCooltime()) return;
-        twitchCommand.saveCooltime();
         const commandValue = twitchCommand.commandValue();
         if (!commandValue) return;
+        twitchCommand.saveCooltime();
         const valueParser = new ValueParser();
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200) return;

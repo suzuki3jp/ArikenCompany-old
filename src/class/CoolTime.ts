@@ -1,42 +1,40 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { JST, Logger } from '@suzuki3jp/utils';
-import { Client as Discord } from 'discord.js';
+import { JST } from '@suzuki3jp/utils';
 
 // モジュールをインポート
 import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
 
 export class CoolTimeManager extends Base {
-    constructor(twitchClient: Twitch, discordClient: Discord, logger: Logger) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
     }
 
     currentCoolTime(): number {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         return settings.twitch.cooltime;
     }
 
     changeCoolTime(newCoolTime: string | number): string {
-        const settings = super.DM.getSettings();
+        const settings = this.DM.getSettings();
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
-        super.DM.setSettings(settings);
+        this.DM.setSettings(settings);
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
 
     save(twitchCommand: TwitchCommand) {
         if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes = super.DM.getCooltime();
+        const cooltimes = this.DM.getCooltime();
 
         cooltimes[commandName] = JST.getDate().getTime();
-        super.DM.setCooltime(cooltimes);
+        this.DM.setCooltime(cooltimes);
     }
 
     isPassedCoolTime(twitchCommand: TwitchCommand): boolean {
         if (twitchCommand.isVip()) return true;
-        const cooltimes = super.DM.getCooltime();
+        const cooltimes = this.DM.getCooltime();
         if (!cooltimes[twitchCommand.command.commandName]) return true;
 
         const currentCooltime = this.currentCoolTime() * 1000;

@@ -10,7 +10,8 @@ import {
     MessageCounterJson,
     PublicCommandsJson,
     SettingsJson,
-} from '../data/JsonTypes';
+    StreamStatusJson,
+} from './JsonTypes';
 
 export class DataManager {
     public _paths: {
@@ -24,20 +25,22 @@ export class DataManager {
         messageCounter: string;
         publicCommands: string;
         settings: string;
+        streamStatus: string;
     };
 
     constructor() {
         this._paths = {
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
-            commands: resolve(__dirname, '../data/Commands.json'),
-            cooltime: resolve(__dirname, '../data/Cooltime.json'),
+            commands: resolve(__dirname, '../../data/Commands.json'),
+            cooltime: resolve(__dirname, '../../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
-            log: resolve(__dirname, '../data/log/log.csv'),
-            managers: resolve(__dirname, '../data/Managers.json'),
-            messageCounter: resolve(__dirname, '../data/MessageCounter.json'),
-            publicCommands: resolve(__dirname, '../data/PublicCommands.json'),
-            settings: resolve(__dirname, '../data/settings.json'),
+            log: resolve(__dirname, '../../data/log/log.csv'),
+            managers: resolve(__dirname, '../../data/Managers.json'),
+            messageCounter: resolve(__dirname, '../../data/MessageCounter.json'),
+            publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
+            settings: resolve(__dirname, '../../data/settings.json'),
+            streamStatus: resolve(__dirname, '../../data/StreamStatus.json'),
         };
     }
 
@@ -101,6 +104,14 @@ export class DataManager {
         this._writeFile(this._paths.settings, data);
     }
 
+    getStreamStatus(): StreamStatusJson {
+        return this._readFile(this._paths.streamStatus);
+    }
+
+    setStreamStatus(data: string | StreamStatusJson) {
+        this._writeFile(this._paths.streamStatus, data);
+    }
+
     _readFile(path: string) {
         return JSON.parse(readFileSync(path, 'utf-8'));
     }
@@ -118,4 +129,11 @@ export class DataManager {
     }
 }
 
-type JsonTypes = CommandsJson | CooltimeJson | ManagersJson | MessageCounterJson | PublicCommandsJson | SettingsJson;
+type JsonTypes =
+    | CommandsJson
+    | CooltimeJson
+    | ManagersJson
+    | MessageCounterJson
+    | PublicCommandsJson
+    | SettingsJson
+    | StreamStatusJson;

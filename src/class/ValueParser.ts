@@ -21,17 +21,21 @@ class ValueVariables {
         return JST.getDateString();
     }
 
-    getChannel(message: TwitchMessage | DiscordMessage): string {
+    getChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) {
             return message.channel.name;
         } else if (message.channel instanceof TextChannel) {
             return message.channel.name;
+        } else if (message instanceof DummyMessage) {
+            return message.channel.name;
         } else return ParseErrorMessages.invalidDiscordChannel;
     }
 
-    getUser(message: TwitchMessage | DiscordMessage): string {
+    getUser(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) {
             return message.member.name;
+        } else if (message instanceof DummyMessage) {
+            return message.user.name;
         } else {
             return message.author.tag;
         }
@@ -50,13 +54,13 @@ class ValueVariables {
         return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
     }
 
-    isMod(message: TwitchMessage | DiscordMessage): boolean {
+    isMod(message: TwitchMessage | DiscordMessage | DummyMessage): boolean {
         if (message instanceof TwitchMessage) {
             return message.member.isMod;
-        } else {
+        } else if (message instanceof DiscordMessage) {
             const settings = DM.getSettings();
             return message.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
-        }
+        } else return message.user.isMod;
     }
 }
 
@@ -70,7 +74,11 @@ export class ValueParser extends ValueVariables {
         };
     }
 
-    async parse(value: string, message: TwitchMessage | DiscordMessage): Promise<ValueParseResult> {
+    async parse(
+        value: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
+    ): Promise<ValueParseResult> {
         const startBracketLength = StringUtils.countBy(value, '{');
         const endBracketLength = StringUtils.countBy(value, '}');
 
@@ -89,7 +97,7 @@ export class ValueParser extends ValueVariables {
                     const endIndex = value.indexOf('}', startIndex);
                     index = index + endIndex;
                     const codeRaw = value.slice(startIndex, endIndex);
-                    const parsedCode = await this._parseCode(codeRaw, message);
+                    const parsedCode = await this._parseCode(codeRaw, message, aliased);
                     if (parsedCode.status === 200) {
                         result.status = parsedCode.status;
                         result.content = result.content + parsedCode.content;
@@ -109,16 +117,21 @@ export class ValueParser extends ValueVariables {
             // 構文的に無効な場合
             const result: ValueParseResult = {
                 status: 400,
-                content: '${}の対応関係が崩れています',
+                content: ParseErrorMessages.invalidBrackets,
             };
             return result;
         }
     }
 
-    async _parseCode(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseCodeResult> {
-        const result = await this._parseVariables(codeRaw.trim(), message);
+    async _parseCode(
+        codeRaw: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
+    ): Promise<ParseCodeResult> {
+        const result = await this._parseVariables(codeRaw.trim(), message, aliased);
         if (result.status === 200) return result;
         if (result.status === 403) return result;
+        if (result.status === 400) return result;
         return { status: result.status, content: ParseErrorMessages.variablesNotFound };
     }
 
@@ -132,12 +145,15 @@ export class ValueParser extends ValueVariables {
         return super.random(choices);
     }
 
-    _parseAlias(codeRaw: string): string {
+    async _parseAlias(
+        codeRaw: string,
+        message: TwitchMessage | DiscordMessage | DummyMessage
+    ): Promise<ValueParseResult> {
         const targetCommand = codeRaw.slice(6).toLowerCase();
-        return super.getCommandByAlias(targetCommand);
+        return await this.parse(super.getCommandByAlias(targetCommand), message, true);
     }
 
-    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage): Promise<ParseModResult> {
+    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ParseModResult> {
         const newCodeRaw = codeRaw.slice(4);
         if (super.isMod(message)) {
             const result = await this._parseVariables(newCodeRaw, message);
@@ -148,8 +164,9 @@ export class ValueParser extends ValueVariables {
 
     async _parseVariables(
         codeRaw: string,
-        message: TwitchMessage | DiscordMessage
-    ): Promise<{ status: 200 | 403 | 404; content: string }> {
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean
+    ): Promise<{ status: 200 | 400 | 403 | 404; content: string }> {
         if (codeRaw.startsWith('fetch ')) {
             return {
                 status: 200,
@@ -161,10 +178,18 @@ export class ValueParser extends ValueVariables {
                 content: this._parseRandom(codeRaw),
             };
         } else if (codeRaw.startsWith('alias ')) {
-            return {
-                status: 200,
-                content: this._parseAlias(codeRaw),
-            };
+            if (aliased) {
+                return {
+                    status: 400,
+                    content:
+                        'alias先のコマンドの内容でalias関数を使用することはできません。これは無限ループを防ぐためです。',
+                };
+            } else {
+                return {
+                    status: (await this._parseAlias(codeRaw, message)).status,
+                    content: (await this._parseAlias(codeRaw, message)).content,
+                };
+            }
         } else if (codeRaw.startsWith('channel')) {
             return {
                 status: 200,
@@ -245,7 +270,7 @@ export class PubValueParser {
         } else {
             return {
                 status: 200,
-                content: codeRaw,
+                content: `\$\{${codeRaw}\}`,
             };
         }
     }
@@ -257,12 +282,12 @@ export interface ValueParseResult {
 }
 
 export interface ParseCodeResult {
-    status: 200 | 403 | 404;
+    status: 200 | 400 | 403 | 404;
     content: string;
 }
 
 export interface ParseModResult {
-    status: 200 | 403 | 404;
+    status: 200 | 400 | 403 | 404;
     content: string;
 }
 
@@ -270,10 +295,25 @@ export type ParseStatus = 200 | 400 | 403 | 404;
 
 const ParseErrorMessages = {
     invalidDiscordChannel: 'テキストチャンネル以外でこの変数は使用できません',
+    invalidBrackets: '${}の対応関係が崩れています',
     isOnlyMods: 'モデレータ専用コマンドです',
     variablesNotFound: '変数が見つかりませんでした',
     commandNotFound: 'コマンドが見つかりませんでした',
 };
+
+export class DummyMessage {
+    channel: { name: 'DummyChannelName' };
+    user: { name: 'DummyUserName'; isMod: true };
+    constructor() {
+        this.channel = {
+            name: 'DummyChannelName',
+        };
+        this.user = {
+            name: 'DummyUserName',
+            isMod: true,
+        };
+    }
+}
 
 // ${fetch https://example.com}hoge
 // ${random huge huge huge}

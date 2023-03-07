@@ -1,14 +1,12 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
 import { randomUUID } from 'crypto';
-import { Client as Discord, Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
+import { Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from 'discord.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
 // モジュールをインポート
 import { Base } from './Base';
 import { CommandManager } from './Command';
-import { ComponentCustomIds } from '../data/Components';
+import { ComponentCustomIds } from './Components';
 
 export class DiscordModal extends Base {
     public interaction: ModalSubmitInteraction;
@@ -18,16 +16,11 @@ export class DiscordModal extends Base {
     public value: string | null;
     public _commandManager: CommandManager;
 
-    constructor(
-        twitchClient: Twitch,
-        discordClient: Discord,
-        logger: Logger,
-        modalInteraction: ModalSubmitInteraction
-    ) {
-        super(twitchClient, discordClient, logger);
+    constructor(base: Base, modalInteraction: ModalSubmitInteraction) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
-        this._commandManager = new CommandManager(super.twitch, super.discord, super.logger);
+        this._commandManager = new CommandManager(this.getMe());
         this.type = this.modalType();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);
@@ -111,7 +104,7 @@ export class DiscordModal extends Base {
 
     async removeCommand() {
         if (this.commandName) {
-            const result = this._commandManager.removeCom(this.commandName);
+            const result = await this._commandManager.removeCom(this.commandName);
             await this._commandManager.syncCommandPanel();
             return result;
         } else return '予期せぬエラーによって処理を実行できませんでした';

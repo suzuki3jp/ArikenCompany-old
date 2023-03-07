@@ -1,24 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.events = void 0;
-// モジュールをインポート
-const DataManager_1 = require("../class/DataManager");
-const TwitchCommand_1 = require("../class/TwitchCommand");
 const index_1 = require("./discord/index");
 const index_2 = require("./twitch/index");
-// JSON Data Manager
-const DM = new DataManager_1.DataManager();
-const settings = DM.getSettings();
-const events = (twitchClient, discordClient, discordToken, logger) => {
-    // client login
-    twitchClient.login();
-    discordClient.login(discordToken);
+const events = (base, discordToken) => {
     // discord events
-    discordClient.on('ready', () => (0, index_1.discordReady)(twitchClient, discordClient, logger));
-    discordClient.on('messageCreate', (message) => (0, index_1.discordMessage)(twitchClient, discordClient, logger, message));
-    discordClient.on('interactionCreate', (interaction) => (0, index_1.discordInteraction)(twitchClient, discordClient, logger, interaction));
+    base.discord.on('ready', () => (0, index_1.discordReady)(base));
+    base.discord.on('messageCreate', (message) => (0, index_1.discordMessage)(base, message));
+    base.discord.on('interactionCreate', (interaction) => (0, index_1.discordInteraction)(base, interaction));
     // twitch events
-    twitchClient.on('ready', () => (0, index_2.twitchReady)(twitchClient, logger));
-    twitchClient.on('messageCreate', (message) => (0, index_2.twitchMessage)(new TwitchCommand_1.TwitchCommand(twitchClient, discordClient, message, logger), message));
+    base.twitch.on('ready', () => (0, index_2.twitchReady)(base));
+    base.twitch.on('messageCreate', (message) => (0, index_2.twitchMessage)(base, message));
+    // logger events
+    base.logger.on('debug', (msg) => {
+        if (process.argv.includes('--debug')) {
+            console.log(msg);
+        }
+    });
+    base.logger.on('system', (msg) => {
+        console.log(msg);
+        base.logger.appendToCsv(msg);
+    });
+    base.logger.on('info', (msg) => {
+        console.log(msg);
+        base.logger.appendToCsv(msg);
+    });
+    // client login
+    base.twitch.login();
+    base.discord.login(discordToken);
 };
 exports.events = events;
