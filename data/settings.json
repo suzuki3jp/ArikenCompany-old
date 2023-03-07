@@ -3,11 +3,11 @@
         "modRoleId": "996289686479851590",
         "guildId": "996289385765032017",
         "manageCommandChannelId": "996328940018868294",
-        "manageCommandPanelId": "1063542974807539722"
+        "manageCommandPanelId": "1063550339007135774"
     },
     "twitch": {
-        "channelName": "ariken_company",
-        "channels": ["suzuki3_jp", "ariken_company", "arikendebu"],
+        "channelName": "suzuki3_jp",
+        "channels": ["suzuki3_jp"],
         "manageCommands": [
             "!addcom",
             "!editcom",
