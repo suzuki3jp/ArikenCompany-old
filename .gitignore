@@ -1,15 +1,13 @@
-# nodeModule
-node_modules/
-
-# temp
+# general
 temp/
+.env
 
-# test packages
+# test
 test/package.json
 test/package-lock.json
 
-# env
-.env
+# node.js
+node_modules/
 
-# workspace
-twitch.js.code-workspace
+# svelte
+.svelte-kit/
