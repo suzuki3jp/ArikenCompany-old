@@ -59,9 +59,7 @@
 		</SideNavItems>
 	</SideNav>
 
-	<main>
-		<slot />
-	</main>
+	<slot />
 
 	<footer>
 		<div class="text-center" style="margin-bottom: 1%;">
