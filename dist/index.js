@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // nodeモジュールをインポート
 const logger_1 = require("@suzuki3jp/logger");
+const node_cron_1 = __importDefault(require("node-cron"));
+const child_process_1 = require("child_process");
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
@@ -32,3 +34,7 @@ const base = new Base_1.Base(twitchClient, discordClient, clientInfo.eventSub, l
 (0, index_2.events)(base, discordToken);
 (0, index_3.eventSub)(base);
 (0, index_1.api)(base);
+node_cron_1.default.schedule('59 59 23 * * *', () => {
+    const processRestartCommand = 'pm2 restart ArikenCompmany';
+    (0, child_process_1.execSync)(processRestartCommand);
+});
