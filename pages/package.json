@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@vercel/analytics": "^0.1.11",
 		"carbon-components-svelte": "^0.73.3"
 	}
 }
