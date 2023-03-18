@@ -35,6 +35,7 @@
 			name: key,
 			value: sortedChatters[key]
 		};
+		// @ts-ignore
 		rows.push(newRow);
 	});
 
