@@ -7,12 +7,12 @@
 	<meta name="description" content="ArikenCompany" />
 </svelte:head>
 
-<Content class="text-center">
-	<h1 class="font-weight-bold ArikenCompany-font" style="display: inline-block; margin-top: 8%">
-		ArikenCompany
-	</h1>
-	<div class="font-weight-middle main" style="margin-top: 10%;">
-		<div>
+<Content class="text-center" style="margin-bottom: auto;">
+	<div class="font-weight-middle main">
+		<h1 class="font-weight-bold ArikenCompany-font" style="display: inline-block; margin-top: 2%">
+			ArikenCompany
+		</h1>
+		<div style="margin-top: 10%;">
 			ArikenCompanyは
 			<a href="https://www.twitch.tv/arikendebu">ありけんのTwitch</a>
 			チャンネルのチャットでコマンド機能をサポートしています。
@@ -33,7 +33,14 @@
 		line-height: 40px;
 	}
 
-	@media (max-width: 700px) {
+	@media (max-width: 550px) {
+		.main {
+			font-size: 20px;
+			width: 480px;
+		}
+	}
+
+	@media (min-width: 551px) and (max-width: 700px) {
 		.main {
 			font-size: 20px;
 		}

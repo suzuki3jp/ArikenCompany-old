@@ -16,7 +16,6 @@
 	import HOME_ICON from '$lib/components/home.svelte';
 	import CHATTERS_ICON from '$lib/components/chatters.svelte';
 	import COMMANDS_ICON from '$lib/components/commands.svelte';
-	import DASHBOARD_ICON from '$lib/components/dashboard.svelte';
 	import GITHUB_ICON from '$lib/images/github.svg';
 
 	let isSideNavOpen = true;
@@ -31,7 +30,6 @@
 		<HeaderNav>
 			<HeaderNavItem href="/commands" text="Commands" />
 			<HeaderNavItem href="/chatters" text="Chatters" />
-			<HeaderNavItem href="/dashboard" text="Dashboard" />
 		</HeaderNav>
 	</Header>
 
@@ -50,12 +48,6 @@
 				href="/chatters"
 				isSelected={$page.url.pathname === '/chatters'}
 			/>
-			<SideNavLink
-				text="DashBoard"
-				icon={DASHBOARD_ICON}
-				href="/dashboard"
-				isSelected={$page.url.pathname === '/dashboard'}
-			/>
 		</SideNavItems>
 	</SideNav>
 
@@ -73,17 +65,6 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
 	}
 
 	footer {
