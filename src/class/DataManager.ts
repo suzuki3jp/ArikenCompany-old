@@ -30,7 +30,7 @@ export class DataManager {
 
     constructor() {
         this._paths = {
-            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
+            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
             cooltime: resolve(__dirname, '../../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
