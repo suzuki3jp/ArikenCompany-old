@@ -5,7 +5,7 @@ const config = {
 	plugins: [sveltekit()],
 	build: {
 		rollupOptions: {
-			external: ['@suzuki3jp/utils']
+			external: ['@suzuki3jp/utils', /node_modules/]
 		}
 	}
 };
