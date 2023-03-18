@@ -25,6 +25,11 @@
 	let page = 1;
 </script>
 
+<svelte:head>
+	<title>Commands</title>
+	<meta name="description" content="ArikenCompany - Commands" />
+</svelte:head>
+
 <div class="commands-table inline-center" style="margin-bottom: auto">
 	<DataTable
 		title="Commands"
