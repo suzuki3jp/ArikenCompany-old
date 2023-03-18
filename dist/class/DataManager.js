@@ -8,7 +8,7 @@ class DataManager {
     _paths;
     constructor() {
         this._paths = {
-            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/cert.pem',
+            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: (0, path_1.resolve)(__dirname, '../../data/Commands.json'),
             cooltime: (0, path_1.resolve)(__dirname, '../../data/Cooltime.json'),
             env: (0, path_1.resolve)(__dirname, '../../.env'),
