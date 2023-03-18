@@ -10,13 +10,16 @@
 	} from 'carbon-components-svelte';
 	import 'carbon-components-svelte/css/g80.css';
 	import './common.css';
+	import { inject } from '@vercel/analytics';
 
 	import { page } from '$app/stores';
+	import { dev } from '$app/environment';
 	import HOME_ICON from '$lib/components/home.svelte';
 	import CHATTERS_ICON from '$lib/components/chatters.svelte';
 	import COMMANDS_ICON from '$lib/components/commands.svelte';
 	import GITHUB_ICON from '$lib/images/github.png';
 
+	inject({ mode: dev ? 'development' : 'production' });
 	let isSideNavOpen = true;
 </script>
 
