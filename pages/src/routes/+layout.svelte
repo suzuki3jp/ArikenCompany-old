@@ -1,6 +1,5 @@
 <script>
 	import {
-		Content,
 		Header,
 		HeaderNav,
 		HeaderNavItem,
