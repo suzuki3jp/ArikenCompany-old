@@ -6,7 +6,6 @@
 		ToolbarContent,
 		ToolbarSearch
 	} from 'carbon-components-svelte';
-	import { missing_component } from 'svelte/internal';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
