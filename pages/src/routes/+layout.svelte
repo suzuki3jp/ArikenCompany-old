@@ -20,7 +20,7 @@
 	import GITHUB_ICON from '$lib/images/github.png';
 
 	inject({ mode: dev ? 'development' : 'production' });
-	let isSideNavOpen = true;
+	let isSideNavOpen = false;
 </script>
 
 <div class="app">
