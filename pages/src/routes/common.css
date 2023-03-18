@@ -1,0 +1,20 @@
+.ArikenCompany-font {
+	font-family: 'Comic Sans MS';
+}
+
+.font-weight-bold {
+	font-weight: bold;
+}
+
+.font-weight-middle {
+	font-weight: 800;
+}
+
+.inline-center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.text-center {
+	text-align: center;
+}

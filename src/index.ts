@@ -1,5 +1,7 @@
 // nodeモジュールをインポート
 import { Logger, Options } from '@suzuki3jp/logger';
+import cron from 'node-cron';
+import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 import express from 'express';
 const app = express();
@@ -32,3 +34,8 @@ const base = new Base(twitchClient, discordClient, clientInfo.eventSub, logger, 
 events(base, discordToken);
 eventSub(base);
 api(base);
+
+cron.schedule('59 59 23 * * *', () => {
+    const processRestartCommand = 'pm2 restart ArikenCompmany';
+    execSync(processRestartCommand);
+});
