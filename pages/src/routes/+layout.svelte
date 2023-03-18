@@ -16,7 +16,7 @@
 	import HOME_ICON from '$lib/components/home.svelte';
 	import CHATTERS_ICON from '$lib/components/chatters.svelte';
 	import COMMANDS_ICON from '$lib/components/commands.svelte';
-	import GITHUB_ICON from '$lib/images/github.svg';
+	import GITHUB_ICON from '$lib/images/github.png';
 
 	let isSideNavOpen = true;
 </script>
@@ -27,10 +27,14 @@
 			<SkipToContent />
 		</svelte:fragment>
 
-		<HeaderNav>
+		<HeaderNav style="margin-right: auto;">
 			<HeaderNavItem href="/commands" text="Commands" />
 			<HeaderNavItem href="/chatters" text="Chatters" />
 		</HeaderNav>
+
+		<a href="https://github.com/suzuki3jp/arikencompany">
+			<img src={GITHUB_ICON} alt="github icon" style="width: 25px; margin-right: 15px;" />
+		</a>
 	</Header>
 
 	<SideNav bind:isOpen={isSideNavOpen}>
