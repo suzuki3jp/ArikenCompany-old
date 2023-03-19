@@ -1,7 +1,7 @@
 // nodeモジュールをインポート
 import { Logger, Options } from '@suzuki3jp/logger';
 import cron from 'node-cron';
-import { execSync } from 'child_process';
+import pm2 from 'pm2';
 import dotenv from 'dotenv';
 import express from 'express';
 const app = express();
@@ -35,7 +35,29 @@ events(base, discordToken);
 eventSub(base);
 api(base);
 
-cron.schedule('59 59 23 * * *', () => {
-    const processRestartCommand = 'pm2 restart ArikenCompmany';
-    execSync(processRestartCommand);
+cron.schedule('59 59 11,23 * * *', () => {
+    base.logger.emitLog('info', 'プロセスの定期再起動を実行中');
+    pm2.connect((e) => {
+        if (e) {
+            console.error(e);
+        } else {
+            const processName = 'ArikenCompany';
+            pm2.list((e, list) => {
+                if (e) {
+                    console.error(e);
+                } else {
+                    pm2.restart(processName, (e, proc) => {
+                        if (e) {
+                            base.logger.emitLog('info', '再起動中にエラーが発生');
+                            console.error(e);
+                            pm2.disconnect();
+                        } else {
+                            base.logger.emitLog('info', 'プロセスを正常に再起動しました');
+                            pm2.disconnect();
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
