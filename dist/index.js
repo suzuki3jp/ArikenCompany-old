@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // nodeモジュールをインポート
 const logger_1 = require("@suzuki3jp/logger");
 const node_cron_1 = __importDefault(require("node-cron"));
-const child_process_1 = require("child_process");
+const pm2_1 = __importDefault(require("pm2"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
@@ -34,7 +34,32 @@ const base = new Base_1.Base(twitchClient, discordClient, clientInfo.eventSub, l
 (0, index_2.events)(base, discordToken);
 (0, index_3.eventSub)(base);
 (0, index_1.api)(base);
-node_cron_1.default.schedule('59 59 23 * * *', () => {
-    const processRestartCommand = 'pm2 restart ArikenCompmany';
-    (0, child_process_1.execSync)(processRestartCommand);
+node_cron_1.default.schedule('59 59 11,23 * * *', () => {
+    base.logger.emitLog('info', 'プロセスの定期再起動を実行中');
+    pm2_1.default.connect((e) => {
+        if (e) {
+            console.error(e);
+        }
+        else {
+            const processName = 'ArikenCompany';
+            pm2_1.default.list((e, list) => {
+                if (e) {
+                    console.error(e);
+                }
+                else {
+                    pm2_1.default.restart(processName, (e, proc) => {
+                        if (e) {
+                            base.logger.emitLog('info', '再起動中にエラーが発生');
+                            console.error(e);
+                            pm2_1.default.disconnect();
+                        }
+                        else {
+                            base.logger.emitLog('info', 'プロセスを正常に再起動しました');
+                            pm2_1.default.disconnect();
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
