@@ -35,8 +35,9 @@
 
 	@media (max-width: 550px) {
 		.main {
-			font-size: 20px;
-			width: 480px;
+			font-size: 15px;
+			line-height: 30px;
+			width: 100%;
 		}
 	}
 

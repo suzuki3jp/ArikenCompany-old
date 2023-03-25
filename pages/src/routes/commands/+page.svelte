@@ -50,7 +50,6 @@
 			</ToolbarContent>
 		</Toolbar>
 	</DataTable>
-
 	<Pagination
 		class="inline-center"
 		bind:pageSize
@@ -71,36 +70,14 @@
 		height: 100%;
 	}
 
-	@media (max-width: 540px) {
-		.commands-table {
-			width: 540px;
-			margin-top: 15%;
-		}
-		:global(footer) {
-			width: 540px;
-			margin-top: 130px;
-		}
-		:global(.bx--data-table-container) {
-			overflow: scroll;
-		}
+	:global(.commands-table td) {
+		word-wrap: break-word;
 	}
 
-	@media (min-width: 541px) and (max-width: 600px) {
+	@media (max-width: 850px) {
 		.commands-table {
-			width: 100%;
-			margin-top: 15%;
-		}
-	}
-
-	@media (min-width: 601px) and (max-width: 800px) {
-		.commands-table {
+			margin-top: 60px;
 			width: 90%;
-		}
-	}
-
-	@media (min-width: 601px) and (max-width: 1100px) {
-		.commands-table {
-			margin-top: 10%;
 		}
 	}
 </style>

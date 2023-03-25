@@ -22,9 +22,9 @@
 	});
 	const sortedChatters = Object.fromEntries(filteredArray);
 	const headers = [
-		{ key: 'place', value: '順位', width: '10%' },
-		{ key: 'name', value: '名前(ID)', width: '30%' },
-		{ key: 'value', value: 'コメント数' }
+		{ key: 'place', value: '順位', width: '25%' },
+		{ key: 'name', value: '名前(ID)', width: '50%' },
+		{ key: 'value', value: 'コメント数', width: '25%' }
 	];
 	let rows: { id: string; place: string; name: string; value: string }[] = [];
 	const chatterNames = Object.keys(sortedChatters);
@@ -48,7 +48,7 @@
 	<meta name="description" content="ArikenCompany - Chatters" />
 </svelte:head>
 
-<div class="commands-table inline-center" style="margin-bottom: auto">
+<div class="chatters-table inline-center" style="margin-bottom: auto">
 	<DataTable
 		title="Chatters"
 		description="コメント数ランキング。これはリアルタイムで更新されます。(2022/11/18より取得開始)"
@@ -84,42 +84,20 @@
 </div>
 
 <style>
-	.commands-table {
+	.chatters-table {
 		margin-top: 5%;
 		width: 70%;
 		height: 100%;
 	}
 
-	@media (max-width: 540px) {
-		.commands-table {
-			width: 540px;
-			margin-top: 15%;
-		}
-		:global(footer) {
-			width: 540px;
-			margin-top: 130px;
-		}
-		:global(.bx--data-table-container) {
-			overflow: scroll;
-		}
+	:global(.chatters-table td) {
+		word-wrap: break-word;
 	}
 
-	@media (min-width: 541px) and (max-width: 600px) {
-		.commands-table {
-			width: 100%;
-			margin-top: 15%;
-		}
-	}
-
-	@media (min-width: 601px) and (max-width: 800px) {
-		.commands-table {
+	@media (max-width: 850px) {
+		.chatters-table {
+			margin-top: 60px;
 			width: 90%;
-		}
-	}
-
-	@media (min-width: 601px) and (max-width: 1100px) {
-		.commands-table {
-			margin-top: 10%;
 		}
 	}
 </style>
