@@ -1,11 +1,11 @@
 // nodeモジュールをインポート
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import { ObjectUtils } from '@suzuki3jp/utils';
-import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
+import { Message as DiscordMessage, TextChannel } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';
-import { PublicCommandsJson } from './JsonTypes';
+import { PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser } from './ValueParser';
 
@@ -14,6 +14,13 @@ export class CommandManager extends Base {
     constructor(base: Base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this.valueParser = new ValueParser();
+    }
+
+    getCommandByName(name: string): TwitchCommand | null {
+        const { commands } = this.DM.getCommands();
+        let result = commands.filter((command) => command.name === name);
+        if (result.length === 0) return null;
+        return result[0];
     }
 
     on(): string {
@@ -48,7 +55,7 @@ export class CommandManager extends Base {
     ): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
-        if (commands[name]) return manageCommandError.existCommandName;
+        if (this.getCommandByName(name)) return manageCommandError.existCommandName;
 
         const valueResult = await this.valueParser.parse(value, message);
         if (valueResult.status !== 200) return valueResult.content;
@@ -69,7 +76,7 @@ export class CommandManager extends Base {
     ): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
-        if (!commands[name]) return manageCommandError.notExistCommandName;
+        if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
 
         const valueResult = await this.valueParser.parse(value, message);
         if (valueResult.status !== 200) return valueResult.content;
@@ -86,7 +93,7 @@ export class CommandManager extends Base {
     async removeCom(commandName: string): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
-        if (!commands[name]) return manageCommandError.notExistCommandName;
+        if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
         delete commands[name];
         this.emitDebug(`変数内のコマンドを削除 [${name}]`);
         this.DM.setCommands(commands);

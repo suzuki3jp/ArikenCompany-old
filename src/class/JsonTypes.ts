@@ -1,5 +1,3 @@
-export type CommandsJson = Record<string, string>;
-
 export type CooltimeJson = Record<string, number>;
 
 export interface ManagersJson {
@@ -97,4 +95,16 @@ export interface TwitchStreamer {
     displayName: string;
     isStreaming: boolean;
     notificationChannelId: string;
+}
+
+export type CommandsJson = {
+    commands: TwitchCommand[];
+};
+
+export interface TwitchCommand {
+    _id: string;
+    name: string;
+    message: string;
+    created_at: string;
+    updated_at: string;
 }
