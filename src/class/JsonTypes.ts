@@ -4,8 +4,6 @@ export interface ManagersJson {
     managers: string[];
 }
 
-export type MessageCounterJson = Record<string, number>;
-
 export type PublicCommandsJson = Record<string, string>;
 
 export interface SettingsJson {
@@ -107,4 +105,15 @@ export interface TwitchCommand {
     message: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface ChattersJson {
+    chatters: TwitchChatter[];
+}
+
+export interface TwitchChatter {
+    _id: string;
+    name: string;
+    displayName: string;
+    messageCount: number;
 }
