@@ -1,5 +1,5 @@
 import { Base } from '../class/Base';
-import { TwitchUser } from '../class/JsonTypes';
+import { TwitchStreamer } from '../class/JsonTypes';
 
 export const syncStreamStatusJson = async (base: Base) => {
     const { users } = base.DM.getStreamStatus();
@@ -7,7 +7,7 @@ export const syncStreamStatusJson = async (base: Base) => {
         const currentUserStatus = await base.twitch._api.channels.getChannelInfoById(user.id);
         if (currentUserStatus) {
             const stream = await base.twitch._api.streams.getStreamByUserId(currentUserStatus.id);
-            const newTwitchUser: TwitchUser = {
+            const newTwitchStreamer: TwitchStreamer = {
                 id: currentUserStatus.id,
                 name: currentUserStatus.name,
                 displayName: currentUserStatus.displayName,
@@ -15,7 +15,7 @@ export const syncStreamStatusJson = async (base: Base) => {
                 notificationChannelId: user.notificationChannelId,
             };
             users.splice(index, 1);
-            users.splice(index, 0, newTwitchUser);
+            users.splice(index, 0, newTwitchStreamer);
             base.DM.setStreamStatus({ users });
         } else return;
     });
