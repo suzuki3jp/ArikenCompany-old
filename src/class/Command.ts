@@ -1,11 +1,13 @@
 // nodeモジュールをインポート
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import { ObjectUtils } from '@suzuki3jp/utils';
+import dayjs from 'dayjs';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
+import uniqueString from 'unique-string';
 
 // モジュールをインポート
 import { Base } from './Base';
-import { PublicCommandsJson, TwitchCommand } from './JsonTypes';
+import { CommandsJson, PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser } from './ValueParser';
 
@@ -18,7 +20,14 @@ export class CommandManager extends Base {
 
     getCommandByName(name: string): TwitchCommand | null {
         const { commands } = this.DM.getCommands();
-        let result = commands.filter((command) => command.name === name);
+        const result = commands.filter((command) => command.name === name);
+        if (result.length === 0) return null;
+        return result[0];
+    }
+
+    getCommandById(id: string): TwitchCommand | null {
+        const { commands } = this.DM.getCommands();
+        const result = commands.filter((command) => command._id === id);
         if (result.length === 0) return null;
         return result[0];
     }
@@ -59,9 +68,15 @@ export class CommandManager extends Base {
 
         const valueResult = await this.valueParser.parse(value, message);
         if (valueResult.status !== 200) return valueResult.content;
+        const newCommand: TwitchCommand = {
+            _id: uniqueString(),
+            name,
+            message: value,
+            created_at: dayjs().toISOString(),
+            updated_at: dayjs().toISOString(),
+        };
 
-        commands[name] = value;
-        this.emitDebug(`変数内のコマンドを追加 [${name}](${value})`);
+        commands.commands.push(newCommand);
         this.DM.setCommands(commands);
         this.emitDebug(`追加したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
@@ -80,10 +95,20 @@ export class CommandManager extends Base {
 
         const valueResult = await this.valueParser.parse(value, message);
         if (valueResult.status !== 200) return valueResult.content;
+        let newCommands: CommandsJson = { commands: [] };
+        commands.commands.forEach((command) => {
+            if (command.name !== name) return newCommands.commands.push(command);
+            const newCommand: TwitchCommand = {
+                name,
+                _id: command._id,
+                message: value,
+                updated_at: dayjs().toISOString(),
+                created_at: command.created_at,
+            };
+            return newCommands.commands.push(newCommand);
+        });
 
-        commands[name] = value;
-        this.emitDebug(`変数内のコマンドを編集 [${name}](${value})`);
-        this.DM.setCommands(commands);
+        this.DM.setCommands(newCommands);
         this.emitDebug(`編集したコマンドのデータをファイルに反映 [${name}](${value})`);
         this.createPublicList();
         await this.syncCommandPanel();
@@ -94,9 +119,15 @@ export class CommandManager extends Base {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
-        delete commands[name];
-        this.emitDebug(`変数内のコマンドを削除 [${name}]`);
-        this.DM.setCommands(commands);
+        let newCommands: CommandsJson = {
+            commands: [],
+        };
+        commands.commands.forEach((command) => {
+            if (command.name !== name) return newCommands.commands.push(command);
+            return;
+        });
+
+        this.DM.setCommands(newCommands);
         this.emitDebug(`削除したコマンドのデータをファイルに反映 [${name}]`);
         this.createPublicList();
         await this.syncCommandPanel();
@@ -119,12 +150,11 @@ export class CommandManager extends Base {
     }
 
     createPublicList(): PublicCommandsJson {
-        const commands = this.DM.getCommands();
+        const { commands } = this.DM.getCommands();
         let publicCommands: PublicCommandsJson = {};
-        ObjectUtils.forEach(commands, (key, value) => {
-            if (typeof value !== 'string' || typeof key !== 'string') return;
-            const parsedData = new PubValueParser().parse(value);
-            publicCommands[key] = parsedData.content;
+        commands.forEach((command) => {
+            const parsedData = new PubValueParser().parse(command.message);
+            publicCommands[command.name] = parsedData.content;
         });
 
         this.DM.setPublicCommands(publicCommands);

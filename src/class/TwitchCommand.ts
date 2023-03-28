@@ -138,9 +138,9 @@ export class TwitchCommand extends Base {
     }
 
     commandValue(): string | null {
-        const Commands = this.DM.getCommands();
-        const result = Commands[this.command.commandName];
-        return result ?? null;
+        const command = this._commandManager.getCommandByName(this.command.commandName);
+        if (!command) return null;
+        return command.message;
     }
 
     coolTime(): string {

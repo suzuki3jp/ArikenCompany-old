@@ -51,7 +51,10 @@ class ValueVariables {
     }
 
     getCommandByAlias(commandName: string): string {
-        return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
+        const { commands } = DM.getCommands();
+        const result = commands.filter((command) => command.name === commandName);
+        if (result.length === 0) return ParseErrorMessages.commandNotFound;
+        return result[0].message;
     }
 
     isMod(message: TwitchMessage | DiscordMessage | DummyMessage): boolean {

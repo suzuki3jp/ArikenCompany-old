@@ -9,15 +9,21 @@ import { DataManager } from '../class/DataManager';
 const DM = new DataManager();
 
 export const createCommandPanelEmbeds = (): MessageEmbed[] => {
-    const commands = DM.getCommands();
-    const commandsArr = Object.entries(commands);
-    const pagesLength = Math.floor(commandsArr.length / 10) + 1;
+    const { commands } = DM.getCommands();
+    const pagesLength = Math.floor(commands.length / 10) + 1;
     let index = 0;
     const embeds: MessageEmbed[] = [];
     while (index < pagesLength) {
         if (pagesLength - 1 !== index) {
-            const pageElements = commandsArr.splice(0, 10);
-            const pageContent = '**' + pageElements.join('\n**').split(',').join('** ');
+            const pageElements = commands.splice(0, 10);
+            let pageContent = '';
+            pageElements.forEach((command) => {
+                if (pageContent.length === 0) {
+                    pageContent = `**${command.name}** ${command.message}`;
+                } else {
+                    pageContent = `${pageContent}\n**${command.name}** ${command.message}`;
+                }
+            });
 
             const embed: MessageEmbed = new MessageEmbed({
                 title: 'コマンド一覧',
@@ -34,8 +40,15 @@ export const createCommandPanelEmbeds = (): MessageEmbed[] => {
             });
             embeds.push(embed);
         } else {
-            const pageElements = commandsArr.splice(0);
-            const pageContent = '**' + pageElements.join('\n**').split(',').join('** ');
+            const pageElements = commands.splice(0);
+            let pageContent = '';
+            pageElements.forEach((command) => {
+                if (pageContent.length === 0) {
+                    pageContent = `**${command.name}** ${command.message}`;
+                } else {
+                    pageContent = `${pageContent}\n**${command.name}** ${command.message}`;
+                }
+            });
 
             const embed: MessageEmbed = new MessageEmbed({
                 title: 'コマンド一覧',
