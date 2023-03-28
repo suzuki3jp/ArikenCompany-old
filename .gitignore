@@ -11,3 +11,6 @@ node_modules/
 
 # svelte
 .svelte-kit/
+
+# mac os
+.DS_Store
