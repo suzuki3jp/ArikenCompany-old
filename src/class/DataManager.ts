@@ -5,7 +5,6 @@ import { resolve } from 'path';
 // モジュールをインポート
 import {
     CommandsJson,
-    CooltimeJson,
     ManagersJson,
     ChattersJson,
     PublicCommandsJson,
@@ -18,7 +17,6 @@ export class DataManager {
         chatters: string;
         cert: string;
         commands: string;
-        cooltime: string;
         env: string;
         key: string;
         log: string;
@@ -33,7 +31,6 @@ export class DataManager {
             chatters: resolve(__dirname, '../../data/MessageCounter.json'),
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
-            cooltime: resolve(__dirname, '../../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
             log: resolve(__dirname, '../../data/log/log.csv'),
@@ -62,14 +59,6 @@ export class DataManager {
 
     setCommands(data: string | CommandsJson) {
         this._writeFile(this._paths.commands, data);
-    }
-
-    getCooltime(): CooltimeJson {
-        return this._readFile(this._paths.cooltime);
-    }
-
-    setCooltime(data: string | CooltimeJson) {
-        this._writeFile(this._paths.cooltime, data);
     }
 
     setEnv(data: string) {
@@ -129,11 +118,4 @@ export class DataManager {
     }
 }
 
-type JsonTypes =
-    | CommandsJson
-    | CooltimeJson
-    | ManagersJson
-    | ChattersJson
-    | PublicCommandsJson
-    | SettingsJson
-    | StreamStatusJson;
+type JsonTypes = CommandsJson | ManagersJson | ChattersJson | PublicCommandsJson | SettingsJson | StreamStatusJson;

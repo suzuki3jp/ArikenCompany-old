@@ -74,6 +74,7 @@ export class CommandManager extends Base {
             message: value,
             created_at: dayjs().toISOString(),
             updated_at: dayjs().toISOString(),
+            last_used_at: dayjs().toISOString(),
         };
 
         commands.commands.push(newCommand);
@@ -104,6 +105,7 @@ export class CommandManager extends Base {
                 message: value,
                 updated_at: dayjs().toISOString(),
                 created_at: command.created_at,
+                last_used_at: command.last_used_at,
             };
             return newCommands.commands.push(newCommand);
         });
@@ -132,6 +134,26 @@ export class CommandManager extends Base {
         this.createPublicList();
         await this.syncCommandPanel();
         return `${name} を削除しました`;
+    }
+
+    updateLastUsedAt(name: string) {
+        const commands = this.DM.getCommands();
+        name = name.toLowerCase();
+        if (!this.getCommandByName(name)) return;
+
+        let newCommands: CommandsJson = { commands: [] };
+        commands.commands.forEach((command) => {
+            if (command.name === name) return newCommands.commands.push(command);
+            return newCommands.commands.push({
+                _id: command._id,
+                name: command.name,
+                message: command.message,
+                created_at: command.created_at,
+                updated_at: command.updated_at,
+                last_used_at: dayjs().toISOString(),
+            });
+        });
+        return;
     }
 
     async syncCommandPanel() {
