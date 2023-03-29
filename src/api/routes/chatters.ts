@@ -8,7 +8,7 @@ import { Base } from '../../class/Base';
 export const getChatters = (req: Request, res: Response, base: Base) => {
     saveAccessLog(req, base);
     setHeaderAllowOrigin(res);
-    const chatters = base.DM.getMessageCounter();
+    const chatters = base.DM.getChatters();
     res.status(200);
     res.json(chatters);
 };

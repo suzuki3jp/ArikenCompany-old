@@ -7,6 +7,7 @@ import { Base } from './Base';
 import { CommandManager } from './Command';
 import { CoolTimeManager } from './CoolTime';
 import { ManagersManager } from './Managers';
+import { TwitchChatter } from './JsonTypes';
 
 export class TwitchCommand extends Base {
     public command: CommandParser;
@@ -52,13 +53,33 @@ export class TwitchCommand extends Base {
     }
 
     countMessage(): void {
-        const MessageCounter = this.DM.getMessageCounter();
-        if (MessageCounter[this.message.member.name]) {
-            MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
-            this.DM.setMessageCounter(MessageCounter);
+        const { chatters } = this.DM.getChatters();
+        const chatter = chatters.filter((c) => c._id === this.message.member.id);
+
+        if (chatter.length === 0) {
+            const newChatter: TwitchChatter = {
+                _id: this.message.member.id,
+                name: this.message.member.name,
+                displayName: this.message.member.displayName,
+                messageCount: 0,
+            };
+            chatters.push(newChatter);
+            this.DM.setChatters({ chatters });
         } else {
-            MessageCounter[this.message.member.name] = 1;
-            this.DM.setMessageCounter(MessageCounter);
+            let newChatters: TwitchChatter[] = [];
+            chatters.forEach((c) => {
+                if (c._id !== this.message.member.id) {
+                    newChatters.push(c);
+                } else {
+                    newChatters.push({
+                        _id: this.message.member.id,
+                        name: this.message.member.name,
+                        displayName: this.message.member.displayName,
+                        messageCount: c.messageCount + 1,
+                    });
+                }
+            });
+            this.DM.setChatters({ chatters: newChatters });
         }
     }
 
@@ -138,9 +159,9 @@ export class TwitchCommand extends Base {
     }
 
     commandValue(): string | null {
-        const Commands = this.DM.getCommands();
-        const result = Commands[this.command.commandName];
-        return result ?? null;
+        const command = this._commandManager.getCommandByName(this.command.commandName);
+        if (!command) return null;
+        return command.message;
     }
 
     coolTime(): string {

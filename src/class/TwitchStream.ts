@@ -3,13 +3,13 @@ import { HelixStream } from '@twurple/api';
 import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 
 import { Base } from './Base';
-import { TwitchUser } from './JsonTypes';
+import { TwitchStreamer } from './JsonTypes';
 import { MessageEmbed, TextChannel } from 'discord.js';
 import { APIEmbed } from 'discord-api-types/v9';
 
 export class TwitchStream extends Base {
-    public users: TwitchUser[];
-    public user: TwitchUser | null;
+    public users: TwitchStreamer[];
+    public user: TwitchStreamer | null;
     public userIndex: number | null;
     constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);

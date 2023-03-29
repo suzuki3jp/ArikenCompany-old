@@ -4,10 +4,15 @@ import { JST } from '@suzuki3jp/utils';
 // モジュールをインポート
 import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
+import { CommandManager } from './Command';
+import dayjs from 'dayjs';
 
 export class CoolTimeManager extends Base {
+    public _commandManager: CommandManager;
+
     constructor(base: Base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        this._commandManager = new CommandManager(this);
     }
 
     currentCoolTime(): number {
@@ -26,21 +31,20 @@ export class CoolTimeManager extends Base {
     save(twitchCommand: TwitchCommand) {
         if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes = this.DM.getCooltime();
-
-        cooltimes[commandName] = JST.getDate().getTime();
-        this.DM.setCooltime(cooltimes);
+        this._commandManager.updateLastUsedAt(commandName);
     }
 
     isPassedCoolTime(twitchCommand: TwitchCommand): boolean {
         if (twitchCommand.isVip()) return true;
-        const cooltimes = this.DM.getCooltime();
-        if (!cooltimes[twitchCommand.command.commandName]) return true;
+        const { commandName } = twitchCommand.command;
+        const command = this._commandManager.getCommandByName(commandName);
+        if (!command) return true;
 
         const currentCooltime = this.currentCoolTime() * 1000;
-        const currentTime = JST.getDate().getTime();
-        const diffTime = currentTime - cooltimes[twitchCommand.command.commandName];
-        if (currentCooltime < diffTime) return true;
+        const currentDate = dayjs();
+        const lastUsedDate = dayjs(command.last_used_at);
+        const diffMilliSeconds = currentDate.diff(lastUsedDate);
+        if (currentCooltime < diffMilliSeconds) return true;
         return false;
     }
 }

@@ -5,9 +5,8 @@ import { resolve } from 'path';
 // モジュールをインポート
 import {
     CommandsJson,
-    CooltimeJson,
     ManagersJson,
-    MessageCounterJson,
+    ChattersJson,
     PublicCommandsJson,
     SettingsJson,
     StreamStatusJson,
@@ -15,14 +14,13 @@ import {
 
 export class DataManager {
     public _paths: {
+        chatters: string;
         cert: string;
         commands: string;
-        cooltime: string;
         env: string;
         key: string;
         log: string;
         managers: string;
-        messageCounter: string;
         publicCommands: string;
         settings: string;
         streamStatus: string;
@@ -30,18 +28,25 @@ export class DataManager {
 
     constructor() {
         this._paths = {
+            chatters: resolve(__dirname, '../../data/MessageCounter.json'),
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
-            cooltime: resolve(__dirname, '../../data/Cooltime.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
             log: resolve(__dirname, '../../data/log/log.csv'),
             managers: resolve(__dirname, '../../data/Managers.json'),
-            messageCounter: resolve(__dirname, '../../data/MessageCounter.json'),
             publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
             settings: resolve(__dirname, '../../data/settings.json'),
             streamStatus: resolve(__dirname, '../../data/StreamStatus.json'),
         };
+    }
+
+    getChatters(): ChattersJson {
+        return this._readFile(this._paths.chatters);
+    }
+
+    setChatters(data: string | ChattersJson) {
+        this._writeFile(this._paths.chatters, data);
     }
 
     getCert(): string {
@@ -54,14 +59,6 @@ export class DataManager {
 
     setCommands(data: string | CommandsJson) {
         this._writeFile(this._paths.commands, data);
-    }
-
-    getCooltime(): CooltimeJson {
-        return this._readFile(this._paths.cooltime);
-    }
-
-    setCooltime(data: string | CooltimeJson) {
-        this._writeFile(this._paths.cooltime, data);
     }
 
     setEnv(data: string) {
@@ -78,14 +75,6 @@ export class DataManager {
 
     setManagers(data: string | ManagersJson) {
         this._writeFile(this._paths.managers, data);
-    }
-
-    getMessageCounter(): MessageCounterJson {
-        return this._readFile(this._paths.messageCounter);
-    }
-
-    setMessageCounter(data: string | MessageCounterJson) {
-        this._writeFile(this._paths.messageCounter, data);
     }
 
     getPublicCommands(): PublicCommandsJson {
@@ -129,11 +118,4 @@ export class DataManager {
     }
 }
 
-type JsonTypes =
-    | CommandsJson
-    | CooltimeJson
-    | ManagersJson
-    | MessageCounterJson
-    | PublicCommandsJson
-    | SettingsJson
-    | StreamStatusJson;
+type JsonTypes = CommandsJson | ManagersJson | ChattersJson | PublicCommandsJson | SettingsJson | StreamStatusJson;
