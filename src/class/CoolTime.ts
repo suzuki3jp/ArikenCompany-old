@@ -1,11 +1,10 @@
 // nodeモジュールをインポート
-import { JST } from '@suzuki3jp/utils';
+import dayjs from 'dayjs';
 
 // モジュールをインポート
 import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
 import { CommandManager } from './Command';
-import dayjs from 'dayjs';
 
 export class CoolTimeManager extends Base {
     public _commandManager: CommandManager;
@@ -25,6 +24,7 @@ export class CoolTimeManager extends Base {
         if (!String(newCoolTime).match(/^\d+$/)) return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
         this.DM.setSettings(settings);
+        this.logger.info(`Cooltime has been changed ${newCoolTime} seconds.`);
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
 

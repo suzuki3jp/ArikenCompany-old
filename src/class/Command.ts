@@ -1,6 +1,5 @@
 // nodeモジュールをインポート
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
-import { ObjectUtils } from '@suzuki3jp/utils';
 import dayjs from 'dayjs';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import uniqueString from 'unique-string';
