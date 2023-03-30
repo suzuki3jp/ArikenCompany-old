@@ -38,7 +38,7 @@ export class CommandManager extends Base {
         settings.twitch.command = true;
         this.DM.setSettings(settings);
         const result = 'コマンドを有効にしました';
-        this.logger.emitLog('debug', result);
+        this.logger.info('Command has been enabled.');
         return result;
     }
 
@@ -48,12 +48,12 @@ export class CommandManager extends Base {
         settings.twitch.command = false;
         this.DM.setSettings(settings);
         const result = 'コマンドを無効にしました';
-        this.logger.emitLog('debug', result);
+        this.logger.info('Command has been disabled.');
         return result;
     }
 
     currentCommandStatus(): boolean {
-        this.logger.emitLog('debug', '現在のコマンドのステータスを確認中');
+        this.logger.debug('Checking current status of command...');
         return this.DM.getSettings().twitch.command;
     }
 
@@ -80,7 +80,7 @@ export class CommandManager extends Base {
 
         commands.commands.push(newCommand);
         this.DM.setCommands(commands);
-        this.emitDebug(`追加したコマンドのデータをファイルに反映 [${name}](${value})`);
+        this.logger.info(`Added command. [${name}](${value})`);
         this.createPublicList();
         await this.syncCommandPanel();
         return `${name} を追加しました`;
@@ -113,7 +113,7 @@ export class CommandManager extends Base {
         });
 
         this.DM.setCommands(newCommands);
-        this.emitDebug(`編集したコマンドのデータをファイルに反映 [${name}](${value})`);
+        this.logger.info(`Edited command. [${name}](${value})`);
         this.createPublicList();
         await this.syncCommandPanel();
         return `${name} を ${value} に変更しました`;
@@ -132,7 +132,7 @@ export class CommandManager extends Base {
         });
 
         this.DM.setCommands(newCommands);
-        this.emitDebug(`削除したコマンドのデータをファイルに反映 [${name}]`);
+        this.logger.info(`Removed command. [${name}]`);
         this.createPublicList();
         await this.syncCommandPanel();
         return `${name} を削除しました`;
@@ -156,6 +156,7 @@ export class CommandManager extends Base {
                 count: command.count + 1,
             });
         });
+        this.logger.debug(`Updated last_used_at. [${name}]`);
         return;
     }
 
@@ -169,7 +170,7 @@ export class CommandManager extends Base {
             const components = panel.components;
             const currentPageNum = currentPage(panel.embeds[0]);
             const currentPageIndex = currentPageNum - 1;
-            this.emitDebug(`コマンドパネルを同期 現在のページ: ${currentPageNum}`);
+            this.logger.debug(`Synchronized command panel. current page: ${currentPageNum}`);
             panel.edit({ embeds: [pages[currentPageIndex]], components });
         } else return;
     }
@@ -183,7 +184,7 @@ export class CommandManager extends Base {
         });
 
         this.DM.setPublicCommands(publicCommands);
-        this.emitDebug('PublicCommandListを作成');
+        this.logger.debug('Created public command list.');
         return publicCommands;
     }
 }

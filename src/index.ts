@@ -30,23 +30,22 @@ eventSub(base);
 api(base);
 
 cron.schedule('59 59 11,23 * * *', () => {
-    base.logger.emitLog('info', 'プロセスの定期再起動を実行中');
+    base.logger.system(`Periodic process restart in progress...`);
     pm2.connect((e) => {
         if (e) {
-            console.error(e);
+            base.logger.err(`Failed to connect to pm2.`);
         } else {
             const processName = 'ArikenCompany';
             pm2.list((e, list) => {
                 if (e) {
-                    console.error(e);
+                    base.logger.err('Failed to get list of pm2 processes.');
                 } else {
                     pm2.restart(processName, (e, proc) => {
                         if (e) {
-                            base.logger.emitLog('info', '再起動中にエラーが発生');
-                            console.error(e);
+                            base.logger.err('Failed to restart pm2 process.');
                             pm2.disconnect();
                         } else {
-                            base.logger.emitLog('info', 'プロセスを正常に再起動しました');
+                            base.logger.system('Sucess to restart pm2 process.');
                             pm2.disconnect();
                         }
                     });

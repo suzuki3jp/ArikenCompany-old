@@ -37,10 +37,6 @@ export class Base {
         this.DM = new DataManager();
     }
 
-    emitDebug(message: string) {
-        this.logger.emitLog('debug', message);
-    }
-
     getMe(): Base {
         return this;
     }

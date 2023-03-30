@@ -4,7 +4,7 @@ import { ApiAuthManager } from '../class/ApiAuth';
 import { Base } from '../class/Base';
 
 export const saveAccessLog = (req: Request, base: Base) => {
-    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
+    base.logger.info(`api request to ${req.url} from ${req.ip}`);
 };
 
 export const setHeaderAllowOrigin = (res: Response) => {

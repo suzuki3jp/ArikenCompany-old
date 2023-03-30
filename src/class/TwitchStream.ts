@@ -33,19 +33,17 @@ export class TwitchStream extends Base {
         this._changeDiscordActivity();
         const embeds = this._createOnStreamEmbed(stream);
         if (channel instanceof TextChannel) {
-            channel.send({ content: '@everyone', embeds });
-            this.logger.emitLog('info', '配信開始通知を送信');
+            await channel.send({ content: '@everyone', embeds });
+            this.logger.info(`Sent stream notification. [${stream.userDisplayName}](${stream.userId})`);
         } else {
-            this.logger.emitLog(
-                'debug',
-                '配信開始通知を送信しようとしたチャンネルがTextChannelではなかったため送信不可'
-            );
+            this.logger.debug(`Failed to send stream notification. The channel is not TextChannel.`);
         }
     }
 
     async turnOffline() {
         this._updateData(false);
         this._changeDiscordActivity();
+        this.logger.info(`Stream has been offline. [${this.user?.displayName}](${this.user?.id})`);
     }
 
     _updateData(isStreaming: boolean) {
@@ -54,6 +52,7 @@ export class TwitchStream extends Base {
         this.user.isStreaming = isStreaming;
         this.users.push(this.user);
         this.DM.setStreamStatus({ users: this.users });
+        this.logger.debug(`Update isStreaming to ${isStreaming}. [${this.user.displayName}](${this.user.id})`);
     }
 
     _createOnStreamEmbed(stream: HelixStream): MessageEmbed[] {
@@ -86,11 +85,11 @@ export const changeArikenActivity = (isStreaming: boolean, base: Base) => {
             activities: [{ name: streamingStr, type: 'STREAMING', url: 'https://www.twitch.tv/arikendebu' }],
             status: 'online',
         });
-        base.logger.emitLog('info', 'discordのアクティビティを配信中に変更');
+        base.logger.info(`Discord activity changed to streaming.`);
     } else {
         base.discord.user?.setPresence({
             status: 'idle',
         });
-        base.logger.emitLog('info', 'discordのアクティビティを配信外に変更');
+        base.logger.info(`Discord activity changed to not-streming.`);
     }
 };
