@@ -10,18 +10,12 @@ dotenv.config();
 // モジュールをインポート
 import { api } from './api/index';
 import { Base } from './class/Base';
-import { DataManager } from './class/DataManager';
 import { events } from './events/index';
 import { eventSub } from './eventSub/index';
 import { createApiServer } from './utils/API';
 import { createClients } from './utils/Client';
 
-const DM = new DataManager();
-
-const loggerOptions: Options = {
-    path: DM._paths.log,
-};
-const logger = new Logger(true, loggerOptions);
+const logger = new Logger(false);
 
 // クライアント定義
 const clientInfo = createClients(logger);
