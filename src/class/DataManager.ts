@@ -19,7 +19,6 @@ export class DataManager {
         commands: string;
         env: string;
         key: string;
-        log: string;
         managers: string;
         publicCommands: string;
         settings: string;
@@ -33,7 +32,6 @@ export class DataManager {
             commands: resolve(__dirname, '../../data/Commands.json'),
             env: resolve(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
-            log: resolve(__dirname, '../../data/log/log.csv'),
             managers: resolve(__dirname, '../../data/Managers.json'),
             publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
             settings: resolve(__dirname, '../../data/settings.json'),
