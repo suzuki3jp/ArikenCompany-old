@@ -75,6 +75,7 @@ export class CommandManager extends Base {
             created_at: dayjs().toISOString(),
             updated_at: dayjs().toISOString(),
             last_used_at: dayjs().toISOString(),
+            count: 0,
         };
 
         commands.commands.push(newCommand);
@@ -106,6 +107,7 @@ export class CommandManager extends Base {
                 updated_at: dayjs().toISOString(),
                 created_at: command.created_at,
                 last_used_at: command.last_used_at,
+                count: command.count,
             };
             return newCommands.commands.push(newCommand);
         });
@@ -151,6 +153,7 @@ export class CommandManager extends Base {
                 created_at: command.created_at,
                 updated_at: command.updated_at,
                 last_used_at: dayjs().toISOString(),
+                count: command.count + 1,
             });
         });
         return;
