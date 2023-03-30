@@ -236,6 +236,16 @@ export class ValueParser extends Base {
                 status: (await this._parseMod(codeRaw, message)).status,
                 content: (await this._parseMod(codeRaw, message)).content,
             };
+        } else if (codeRaw.startsWith('title')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getTitle(message),
+            };
+        } else if (codeRaw.startsWith('game')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getGame(message),
+            };
         } else {
             return {
                 status: 404,
