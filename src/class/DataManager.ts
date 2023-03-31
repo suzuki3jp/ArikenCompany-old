@@ -27,7 +27,7 @@ export class DataManager {
 
     constructor() {
         this._paths = {
-            chatters: resolve(__dirname, '../../data/MessageCounter.json'),
+            chatters: resolve(__dirname, '../../data/Chatters.json'),
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
             env: resolve(__dirname, '../../.env'),
