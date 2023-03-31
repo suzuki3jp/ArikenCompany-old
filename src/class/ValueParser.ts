@@ -26,7 +26,7 @@ class ValueVariables extends Base {
     async getTitle(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         if (message instanceof TwitchMessage) {
             const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
-            if (!stream) return '配信タイトルを取得できませんでした。';
+            if (!stream) return '配信がオフラインの時はタイトルを取得できません。';
             return `${stream.title}`;
         } else return 'このプラットフォームでは`title`変数は使用できません';
     }
@@ -34,7 +34,7 @@ class ValueVariables extends Base {
     async getGame(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         if (message instanceof TwitchMessage) {
             const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
-            if (!stream) return '配信ゲームを取得できませんでした。';
+            if (!stream) return '配信がオフラインの時はゲームを取得できません。';
             return `${stream.gameName}`;
         } else return 'このプラットフォームでは`game`変数は使用できません';
     }
