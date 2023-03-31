@@ -26,7 +26,7 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
-import uniqueString from 'unique-string';
+import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
 import { fileURLToPath } from 'url';
 
@@ -41,7 +41,7 @@ const convertCommands = () => {
     let newCommands = { commands: [] };
     commandEntries.forEach((c) => {
         newCommands.commands.push({
-            _id: uniqueString(),
+            _id: randomUUID(),
             name: c[0],
             message: c[1],
             created_at: dayjs().toISOString(),
