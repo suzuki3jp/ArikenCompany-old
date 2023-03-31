@@ -1,4 +1,8 @@
 // [#52](https://github.com/suzuki3jp/ArikenCompany/issues/52)でのChattersデータ構造の変更に伴い、従来のデータから新データに変換するためのscript
+/**
+ * とりあえず動けばいいやマインドで書いたからだいぶゴミコード
+ * 使い捨てコードだしヨシ！
+ */
 
 /**
  * ```ts
