@@ -29,7 +29,6 @@ export class CoolTimeManager extends Base {
     }
 
     save(twitchCommand: TwitchCommand) {
-        if (twitchCommand.isVip()) return;
         const commandName = twitchCommand.command.commandName;
         this._commandManager.updateLastUsedAt(commandName);
     }
