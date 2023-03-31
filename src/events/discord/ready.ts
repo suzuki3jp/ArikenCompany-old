@@ -8,5 +8,5 @@ export const discordReady = async (base: Base) => {
     new CommandManager(base).syncCommandPanel();
 
     await base.discord.application?.commands.set(slashCommands, settings.discord.guildId);
-    base.logger.emitLog('system', 'discord client is ready.');
+    base.logger.system('discord client is ready.');
 };

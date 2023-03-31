@@ -3,7 +3,7 @@ import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 import { ApiAuthManager } from './ApiAuth';
 import { Base } from './Base';
 import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from './Components';
-import { TwitchUser } from './JsonTypes';
+import { TwitchStreamer } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 
@@ -68,8 +68,8 @@ export class DiscordSlashCommand extends Base {
         // 取得したユーザーから配信を取得する
         const stream = await user.getStream();
 
-        // 取得した情報からTwitchUserを作成する
-        const newUser: TwitchUser = {
+        // 取得した情報からTwitchStreamerを作成する
+        const newUser: TwitchStreamer = {
             id: user.id,
             name: user.name,
             displayName: user.displayName,

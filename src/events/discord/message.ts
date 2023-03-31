@@ -42,7 +42,7 @@ export const discordMessage = async (base: Base, message: Message) => {
         if (!discordCommand.isOnCom()) return;
         const commandValue = discordCommand.commandValue();
         if (!commandValue) return;
-        const valueParser = new ValueParser();
+        const valueParser = new ValueParser(base);
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200) return;
         reply(valueParseResult.content);

@@ -25,11 +25,9 @@ export const onCommands = (req: Request, res: Response, base: Base) => {
         const result = commandManager.on();
         res.status(200);
         res.json({ status: 200, message: result });
-        base.emitDebug(result);
     } else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 
@@ -43,11 +41,9 @@ export const offCommands = (req: Request, res: Response, base: Base) => {
         const result = commandManager.off();
         res.status(200);
         res.json({ status: 200, message: result });
-        base.emitDebug(result);
     } else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 

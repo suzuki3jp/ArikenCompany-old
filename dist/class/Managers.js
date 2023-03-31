@@ -16,6 +16,7 @@ class ManagersManager extends Base_1.Base {
         const managers = this.DM.getManagers();
         managers.managers.push(target);
         this.DM.setManagers(managers);
+        this.logger.info(`Added manager. ${target}`);
         return `${target} に管理者権限を付与しました`;
     }
     deny(target) {
@@ -25,6 +26,7 @@ class ManagersManager extends Base_1.Base {
         const targetIndex = managers.managers.findIndex((value, index) => value === target);
         managers.managers.splice(targetIndex, 1);
         this.DM.setManagers(managers);
+        this.logger.info(`Removed manager. ${target}`);
         return `${target} から管理者権限を剥奪しました`;
     }
 }

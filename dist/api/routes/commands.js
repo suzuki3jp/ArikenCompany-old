@@ -22,12 +22,10 @@ const onCommands = (req, res, base) => {
         const result = commandManager.on();
         res.status(200);
         res.json({ status: 200, message: result });
-        base.emitDebug(result);
     }
     else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 exports.onCommands = onCommands;
@@ -40,12 +38,10 @@ const offCommands = (req, res, base) => {
         const result = commandManager.off();
         res.status(200);
         res.json({ status: 200, message: result });
-        base.emitDebug(result);
     }
     else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 exports.offCommands = offCommands;

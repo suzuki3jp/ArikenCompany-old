@@ -53,14 +53,34 @@ class TwitchCommand extends Base_1.Base {
         return false;
     }
     countMessage() {
-        const MessageCounter = this.DM.getMessageCounter();
-        if (MessageCounter[this.message.member.name]) {
-            MessageCounter[this.message.member.name] = MessageCounter[this.message.member.name] + 1;
-            this.DM.setMessageCounter(MessageCounter);
+        const { chatters } = this.DM.getChatters();
+        const chatter = chatters.filter((c) => c._id === this.message.member.id);
+        if (chatter.length === 0) {
+            const newChatter = {
+                _id: this.message.member.id,
+                name: this.message.member.name,
+                displayName: this.message.member.displayName,
+                messageCount: 0,
+            };
+            chatters.push(newChatter);
+            this.DM.setChatters({ chatters });
         }
         else {
-            MessageCounter[this.message.member.name] = 1;
-            this.DM.setMessageCounter(MessageCounter);
+            let newChatters = [];
+            chatters.forEach((c) => {
+                if (c._id !== this.message.member.id) {
+                    newChatters.push(c);
+                }
+                else {
+                    newChatters.push({
+                        _id: this.message.member.id,
+                        name: this.message.member.name,
+                        displayName: this.message.member.displayName,
+                        messageCount: c.messageCount + 1,
+                    });
+                }
+            });
+            this.DM.setChatters({ chatters: newChatters });
         }
     }
     manageCommandName() {
@@ -121,9 +141,10 @@ class TwitchCommand extends Base_1.Base {
         return result;
     }
     commandValue() {
-        const Commands = this.DM.getCommands();
-        const result = Commands[this.command.commandName];
-        return result ?? null;
+        const command = this._commandManager.getCommandByName(this.command.commandName);
+        if (!command)
+            return null;
+        return command.message;
     }
     coolTime() {
         return this._cooltimeManager.currentCoolTime().toString();

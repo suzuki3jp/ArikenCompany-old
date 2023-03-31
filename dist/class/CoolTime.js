@@ -1,13 +1,19 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoolTimeManager = void 0;
 // nodeモジュールをインポート
-const utils_1 = require("@suzuki3jp/utils");
+const dayjs_1 = __importDefault(require("dayjs"));
 // モジュールをインポート
 const Base_1 = require("./Base");
+const Command_1 = require("./Command");
 class CoolTimeManager extends Base_1.Base {
+    _commandManager;
     constructor(base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        this._commandManager = new Command_1.CommandManager(this);
     }
     currentCoolTime() {
         const settings = this.DM.getSettings();
@@ -19,26 +25,25 @@ class CoolTimeManager extends Base_1.Base {
             return CoolTimeError.invalidCoolTime;
         settings.twitch.cooltime = Number(newCoolTime);
         this.DM.setSettings(settings);
+        this.logger.info(`Cooltime has been changed ${newCoolTime} seconds.`);
         return `クールタイムを${newCoolTime}秒に変更しました`;
     }
     save(twitchCommand) {
-        if (twitchCommand.isVip())
-            return;
         const commandName = twitchCommand.command.commandName;
-        const cooltimes = this.DM.getCooltime();
-        cooltimes[commandName] = utils_1.JST.getDate().getTime();
-        this.DM.setCooltime(cooltimes);
+        this._commandManager.updateLastUsedAt(commandName);
     }
     isPassedCoolTime(twitchCommand) {
         if (twitchCommand.isVip())
             return true;
-        const cooltimes = this.DM.getCooltime();
-        if (!cooltimes[twitchCommand.command.commandName])
+        const { commandName } = twitchCommand.command;
+        const command = this._commandManager.getCommandByName(commandName);
+        if (!command)
             return true;
         const currentCooltime = this.currentCoolTime() * 1000;
-        const currentTime = utils_1.JST.getDate().getTime();
-        const diffTime = currentTime - cooltimes[twitchCommand.command.commandName];
-        if (currentCooltime < diffTime)
+        const currentDate = (0, dayjs_1.default)();
+        const lastUsedDate = (0, dayjs_1.default)(command.last_used_at);
+        const diffMilliSeconds = currentDate.diff(lastUsedDate);
+        if (currentCooltime < diffMilliSeconds)
             return true;
         return false;
     }

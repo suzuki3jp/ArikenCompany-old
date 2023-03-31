@@ -42,7 +42,7 @@ export const twitchMessage = async (base: Base, message: Message) => {
         const commandValue = twitchCommand.commandValue();
         if (!commandValue) return;
         twitchCommand.saveCooltime();
-        const valueParser = new ValueParser();
+        const valueParser = new ValueParser(base);
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200) return;
         message.channel.send(valueParseResult.content);

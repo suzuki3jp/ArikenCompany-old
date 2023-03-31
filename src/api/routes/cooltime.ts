@@ -23,16 +23,13 @@ export const setCooltime = (req: Request, res: Response, base: Base) => {
             const result = cooltimemanager.changeCoolTime(newCooltime);
             res.status(200);
             res.json({ status: 200, message: result });
-            base.emitDebug(result);
         } else {
             res.status(400);
             res.json({ status: 400, message: 'Bad Request. Invalid request body and query.' });
-            base.emitDebug('Bad Request: リクエストのボディかクエリにクールタイムが含まれていなかった');
         }
     } else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 

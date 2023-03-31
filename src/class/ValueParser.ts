@@ -6,19 +6,37 @@ import { Agent } from 'https';
 
 // モジュールをインポート
 import { DataManager } from './DataManager';
+import { Base } from './Base';
 
 // JSON Data Manager
 const DM = new DataManager();
 
-class ValueVariables {
+class ValueVariables extends Base {
     _req: RequestClient;
 
-    constructor() {
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this._req = new RequestClient();
     }
 
     getTime(): string {
         return JST.getDateString();
+    }
+
+    async getTitle(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
+        if (message instanceof TwitchMessage) {
+            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
+            if (!stream) return '配信がオフラインの時はタイトルを取得できません。';
+            return `${stream.title}`;
+        } else return 'このプラットフォームでは`title`変数は使用できません';
+    }
+
+    async getGame(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
+        if (message instanceof TwitchMessage) {
+            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
+            if (!stream) return '配信がオフラインの時はゲームを取得できません。';
+            return `${stream.gameName}`;
+        } else return 'このプラットフォームでは`game`変数は使用できません';
     }
 
     getChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
@@ -51,7 +69,10 @@ class ValueVariables {
     }
 
     getCommandByAlias(commandName: string): string {
-        return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
+        const { commands } = DM.getCommands();
+        const result = commands.filter((command) => command.name === commandName);
+        if (result.length === 0) return ParseErrorMessages.commandNotFound;
+        return result[0].message;
     }
 
     isMod(message: TwitchMessage | DiscordMessage | DummyMessage): boolean {
@@ -64,13 +85,18 @@ class ValueVariables {
     }
 }
 
-export class ValueParser extends ValueVariables {
-    public variablesLength: { fetch: number; random: number };
-    constructor() {
-        super();
+export class ValueParser extends Base {
+    public variablesLength: { alias: number; fetch: number; random: number; mod: number };
+    public variablesManager: ValueVariables;
+
+    constructor(base: Base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        this.variablesManager = new ValueVariables(this);
         this.variablesLength = {
+            alias: 6,
             fetch: 6,
             random: 7,
+            mod: 4,
         };
     }
 
@@ -137,25 +163,25 @@ export class ValueParser extends ValueVariables {
 
     async _parseFetch(codeRaw: string): Promise<string> {
         const url = codeRaw.slice(this.variablesLength.fetch);
-        return await super.fetch(url);
+        return await this.variablesManager.fetch(url);
     }
 
     _parseRandom(codeRaw: string): string {
         const choices = codeRaw.slice(this.variablesLength.random).split(' ');
-        return super.random(choices);
+        return this.variablesManager.random(choices);
     }
 
     async _parseAlias(
         codeRaw: string,
         message: TwitchMessage | DiscordMessage | DummyMessage
     ): Promise<ValueParseResult> {
-        const targetCommand = codeRaw.slice(6).toLowerCase();
-        return await this.parse(super.getCommandByAlias(targetCommand), message, true);
+        const targetCommand = codeRaw.slice(this.variablesLength.alias).toLowerCase();
+        return await this.parse(this.variablesManager.getCommandByAlias(targetCommand), message, true);
     }
 
     async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ParseModResult> {
-        const newCodeRaw = codeRaw.slice(4);
-        if (super.isMod(message)) {
+        const newCodeRaw = codeRaw.slice(this.variablesLength.mod);
+        if (this.variablesManager.isMod(message)) {
             const result = await this._parseVariables(newCodeRaw, message);
             if (result.status === 200) return result;
             return { status: 200, content: result.content };
@@ -193,22 +219,32 @@ export class ValueParser extends ValueVariables {
         } else if (codeRaw.startsWith('channel')) {
             return {
                 status: 200,
-                content: super.getChannel(message),
+                content: this.variablesManager.getChannel(message),
             };
         } else if (codeRaw.startsWith('user')) {
             return {
                 status: 200,
-                content: super.getUser(message),
+                content: this.variablesManager.getUser(message),
             };
         } else if (codeRaw.startsWith('time')) {
             return {
                 status: 200,
-                content: super.getTime(),
+                content: this.variablesManager.getTime(),
             };
         } else if (codeRaw.startsWith('mod ')) {
             return {
                 status: (await this._parseMod(codeRaw, message)).status,
                 content: (await this._parseMod(codeRaw, message)).content,
+            };
+        } else if (codeRaw.startsWith('title')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getTitle(message),
+            };
+        } else if (codeRaw.startsWith('game')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getGame(message),
             };
         } else {
             return {

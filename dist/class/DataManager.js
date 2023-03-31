@@ -8,18 +8,22 @@ class DataManager {
     _paths;
     constructor() {
         this._paths = {
+            chatters: (0, path_1.resolve)(__dirname, '../../data/Chatters.json'),
             cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
             commands: (0, path_1.resolve)(__dirname, '../../data/Commands.json'),
-            cooltime: (0, path_1.resolve)(__dirname, '../../data/Cooltime.json'),
             env: (0, path_1.resolve)(__dirname, '../../.env'),
             key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
-            log: (0, path_1.resolve)(__dirname, '../../data/log/log.csv'),
             managers: (0, path_1.resolve)(__dirname, '../../data/Managers.json'),
-            messageCounter: (0, path_1.resolve)(__dirname, '../../data/MessageCounter.json'),
             publicCommands: (0, path_1.resolve)(__dirname, '../../data/PublicCommands.json'),
             settings: (0, path_1.resolve)(__dirname, '../../data/settings.json'),
             streamStatus: (0, path_1.resolve)(__dirname, '../../data/StreamStatus.json'),
         };
+    }
+    getChatters() {
+        return this._readFile(this._paths.chatters);
+    }
+    setChatters(data) {
+        this._writeFile(this._paths.chatters, data);
     }
     getCert() {
         return (0, fs_1.readFileSync)(this._paths.cert, 'utf-8');
@@ -29,12 +33,6 @@ class DataManager {
     }
     setCommands(data) {
         this._writeFile(this._paths.commands, data);
-    }
-    getCooltime() {
-        return this._readFile(this._paths.cooltime);
-    }
-    setCooltime(data) {
-        this._writeFile(this._paths.cooltime, data);
     }
     setEnv(data) {
         this._writeFile(this._paths.env, data);
@@ -47,12 +45,6 @@ class DataManager {
     }
     setManagers(data) {
         this._writeFile(this._paths.managers, data);
-    }
-    getMessageCounter() {
-        return this._readFile(this._paths.messageCounter);
-    }
-    setMessageCounter(data) {
-        this._writeFile(this._paths.messageCounter, data);
     }
     getPublicCommands() {
         return this._readFile(this._paths.publicCommands);

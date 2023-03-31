@@ -15,4 +15,5 @@ export const eventSub = async (base: Base) => {
     });
 
     base.eventSub.start();
+    base.logger.system(`Twitch event-sub client is ready.`);
 };

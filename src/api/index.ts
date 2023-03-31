@@ -25,9 +25,9 @@ export const api = (base: Base) => {
 
     base.api.server.listen(settings.api.port, () => {
         if (base.api.server instanceof HTTP) {
-            base.logger.emitLog('system', `API起動完了。at: http://localhost:${settings.api.port}/`);
+            base.logger.system(`API is ready. listening at http://localhost:${settings.api.port}`);
         } else {
-            base.logger.emitLog('system', `API起動完了。at: https://suzuki-dev.com:${settings.api.port}`);
+            base.logger.system(`API is ready. listening at https://suzuki-dev.com:${settings.api.port}`);
         }
     });
     base.api.app.use(bodyToJson());

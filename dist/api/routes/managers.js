@@ -23,18 +23,15 @@ const allowManagers = (req, res, base) => {
             const result = managersManager.allow(userName);
             res.status(200);
             res.json({ status: 200, message: result });
-            base.emitDebug(result);
         }
         else {
             res.status(400);
             res.json({ status: 400, message: 'Bad Request. Invalid Request body.' });
-            base.emitDebug('Bad Request: 無効なRequest body');
         }
     }
     else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 exports.allowManagers = allowManagers;
@@ -49,18 +46,15 @@ const denyManagers = (req, res, base) => {
             const result = managersManager.deny(userName);
             res.status(200);
             res.json({ status: 200, message: result });
-            base.emitDebug(result);
         }
         else {
             res.status(400);
             res.json({ status: 400, message: 'Bad Request. Invalid Request body.' });
-            base.emitDebug('Bad Request: 無効なRequest body');
         }
     }
     else {
         res.status(isAuthorized.status);
         res.json(isAuthorized);
-        base.emitDebug(isAuthorized.message);
     }
 };
 exports.denyManagers = denyManagers;
