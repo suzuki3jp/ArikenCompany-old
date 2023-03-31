@@ -67,25 +67,34 @@ const convertChatters = async () => {
     const consoleUpdater = new ConsoleUpdater();
 
     let newChatters = { chatters: [] };
-    chatterEntries.forEach((c, i, a) => {
-        // レートリミットを回避するために100msタイムアウトする
-        // twitch api のレートリミットは 800req/m
-        // https://dev.twitch.tv/docs/api/guide/#rate-limits
-        setTimeout(async () => {
-            const user = await api.users.getUserByName(c[0]);
-            if (!user) return;
-            consoleUpdater.update(user.name, i, a.length - 1);
-            newChatters.chatters.push({
-                _id: user.id,
-                name: user.name,
-                displayName: user.displayName,
-                messageCount: 0,
-            });
-        }, 80);
-    });
+    for (let i = 0; i < chatterEntries.length; i++) {
+        const u = await fetch(chatterEntries[i], i, chatterEntries, api, consoleUpdater);
+        if (u) {
+            newChatters.chatters.push(u);
+        }
+    }
 
     const data = JSON.stringify(newChatters, null, '\t');
     writeFileSync(chattersPath, data, 'utf-8');
 };
+
+function fetch(c, i, a, api, cu) {
+    // レートリミットを回避するために100msタイムアウトする
+    // twitch api のレートリミットは 800req/m
+    // https://dev.twitch.tv/docs/api/guide/#rate-limits
+    return new Promise((resolve) => {
+        setTimeout(async () => {
+            const user = await api.users.getUserByName(c[0]);
+            if (!user) return resolve(null);
+            cu.update(user.name, i + 1, a.length);
+            resolve({
+                _id: user.id,
+                name: user.name,
+                displayName: user.displayName,
+                messageCount: c[1],
+            });
+        }, 80);
+    });
+}
 
 convertChatters();
