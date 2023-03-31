@@ -21,9 +21,6 @@ class Base {
         this.logger = logger;
         this.DM = new DataManager_1.DataManager();
     }
-    emitDebug(message) {
-        this.logger.emitLog('debug', message);
-    }
     getMe() {
         return this;
     }

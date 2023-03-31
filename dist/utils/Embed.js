@@ -8,15 +8,22 @@ const DataManager_1 = require("../class/DataManager");
 // JSON Data Manager
 const DM = new DataManager_1.DataManager();
 const createCommandPanelEmbeds = () => {
-    const commands = DM.getCommands();
-    const commandsArr = Object.entries(commands);
-    const pagesLength = Math.floor(commandsArr.length / 10) + 1;
+    const { commands } = DM.getCommands();
+    const pagesLength = Math.floor(commands.length / 10) + 1;
     let index = 0;
     const embeds = [];
     while (index < pagesLength) {
         if (pagesLength - 1 !== index) {
-            const pageElements = commandsArr.splice(0, 10);
-            const pageContent = '**' + pageElements.join('\n**').split(',').join('** ');
+            const pageElements = commands.splice(0, 10);
+            let pageContent = '';
+            pageElements.forEach((command) => {
+                if (pageContent.length === 0) {
+                    pageContent = `**${command.name}** ${command.message}`;
+                }
+                else {
+                    pageContent = `${pageContent}\n**${command.name}** ${command.message}`;
+                }
+            });
             const embed = new discord_js_1.MessageEmbed({
                 title: 'コマンド一覧',
                 description: 'ボタンを押して変更する内容を入力',
@@ -33,8 +40,16 @@ const createCommandPanelEmbeds = () => {
             embeds.push(embed);
         }
         else {
-            const pageElements = commandsArr.splice(0);
-            const pageContent = '**' + pageElements.join('\n**').split(',').join('** ');
+            const pageElements = commands.splice(0);
+            let pageContent = '';
+            pageElements.forEach((command) => {
+                if (pageContent.length === 0) {
+                    pageContent = `**${command.name}** ${command.message}`;
+                }
+                else {
+                    pageContent = `${pageContent}\n**${command.name}** ${command.message}`;
+                }
+            });
             const embed = new discord_js_1.MessageEmbed({
                 title: 'コマンド一覧',
                 description: 'ボタンを押して変更する内容を入力',

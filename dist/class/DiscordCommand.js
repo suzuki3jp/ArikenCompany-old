@@ -71,9 +71,10 @@ class DiscordCommand extends Base_1.Base {
         return this._commandManager.currentCommandStatus();
     }
     commandValue() {
-        const Commands = this.DM.getCommands();
-        const result = Commands[this.command.commandName];
-        return result ?? null;
+        const command = this._commandManager.getCommandByName(this.command.commandName);
+        if (!command)
+            return null;
+        return command.message;
     }
     onCom() {
         return this._commandManager.on();

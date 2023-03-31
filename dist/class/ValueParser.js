@@ -8,15 +8,37 @@ const discord_js_1 = require("discord.js");
 const https_1 = require("https");
 // モジュールをインポート
 const DataManager_1 = require("./DataManager");
+const Base_1 = require("./Base");
 // JSON Data Manager
 const DM = new DataManager_1.DataManager();
-class ValueVariables {
+class ValueVariables extends Base_1.Base {
     _req;
-    constructor() {
+    constructor(base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
         this._req = new utils_1.RequestClient();
     }
     getTime() {
         return utils_1.JST.getDateString();
+    }
+    async getTitle(message) {
+        if (message instanceof twitch_js_1.Message) {
+            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
+            if (!stream)
+                return '配信がオフラインの時はタイトルを取得できません。';
+            return `${stream.title}`;
+        }
+        else
+            return 'このプラットフォームでは`title`変数は使用できません';
+    }
+    async getGame(message) {
+        if (message instanceof twitch_js_1.Message) {
+            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
+            if (!stream)
+                return '配信がオフラインの時はゲームを取得できません。';
+            return `${stream.gameName}`;
+        }
+        else
+            return 'このプラットフォームでは`game`変数は使用できません';
     }
     getChannel(message) {
         if (message instanceof twitch_js_1.Message) {
@@ -50,7 +72,11 @@ class ValueVariables {
         return utils_1.ArrayUtils.random(choices);
     }
     getCommandByAlias(commandName) {
-        return DM.getCommands()[commandName] ?? ParseErrorMessages.commandNotFound;
+        const { commands } = DM.getCommands();
+        const result = commands.filter((command) => command.name === commandName);
+        if (result.length === 0)
+            return ParseErrorMessages.commandNotFound;
+        return result[0].message;
     }
     isMod(message) {
         if (message instanceof twitch_js_1.Message) {
@@ -64,13 +90,17 @@ class ValueVariables {
             return message.user.isMod;
     }
 }
-class ValueParser extends ValueVariables {
+class ValueParser extends Base_1.Base {
     variablesLength;
-    constructor() {
-        super();
+    variablesManager;
+    constructor(base) {
+        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        this.variablesManager = new ValueVariables(this);
         this.variablesLength = {
+            alias: 6,
             fetch: 6,
             random: 7,
+            mod: 4,
         };
     }
     async parse(value, message, aliased) {
@@ -129,19 +159,19 @@ class ValueParser extends ValueVariables {
     }
     async _parseFetch(codeRaw) {
         const url = codeRaw.slice(this.variablesLength.fetch);
-        return await super.fetch(url);
+        return await this.variablesManager.fetch(url);
     }
     _parseRandom(codeRaw) {
         const choices = codeRaw.slice(this.variablesLength.random).split(' ');
-        return super.random(choices);
+        return this.variablesManager.random(choices);
     }
     async _parseAlias(codeRaw, message) {
-        const targetCommand = codeRaw.slice(6).toLowerCase();
-        return await this.parse(super.getCommandByAlias(targetCommand), message, true);
+        const targetCommand = codeRaw.slice(this.variablesLength.alias).toLowerCase();
+        return await this.parse(this.variablesManager.getCommandByAlias(targetCommand), message, true);
     }
     async _parseMod(codeRaw, message) {
-        const newCodeRaw = codeRaw.slice(4);
-        if (super.isMod(message)) {
+        const newCodeRaw = codeRaw.slice(this.variablesLength.mod);
+        if (this.variablesManager.isMod(message)) {
             const result = await this._parseVariables(newCodeRaw, message);
             if (result.status === 200)
                 return result;
@@ -180,25 +210,37 @@ class ValueParser extends ValueVariables {
         else if (codeRaw.startsWith('channel')) {
             return {
                 status: 200,
-                content: super.getChannel(message),
+                content: this.variablesManager.getChannel(message),
             };
         }
         else if (codeRaw.startsWith('user')) {
             return {
                 status: 200,
-                content: super.getUser(message),
+                content: this.variablesManager.getUser(message),
             };
         }
         else if (codeRaw.startsWith('time')) {
             return {
                 status: 200,
-                content: super.getTime(),
+                content: this.variablesManager.getTime(),
             };
         }
         else if (codeRaw.startsWith('mod ')) {
             return {
                 status: (await this._parseMod(codeRaw, message)).status,
                 content: (await this._parseMod(codeRaw, message)).content,
+            };
+        }
+        else if (codeRaw.startsWith('title')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getTitle(message),
+            };
+        }
+        else if (codeRaw.startsWith('game')) {
+            return {
+                status: 200,
+                content: await this.variablesManager.getGame(message),
             };
         }
         else {

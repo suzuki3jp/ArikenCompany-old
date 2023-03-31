@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyAuth = exports.setHeaderAllowOrigin = exports.saveAccessLog = void 0;
 const ApiAuth_1 = require("../class/ApiAuth");
 const saveAccessLog = (req, base) => {
-    base.logger.emitLog('info', `[${req.ip}]からAPI[${req.url}]にアクセス`);
+    base.logger.info(`api request to ${req.url} from ${req.ip}`);
 };
 exports.saveAccessLog = saveAccessLog;
 const setHeaderAllowOrigin = (res) => {

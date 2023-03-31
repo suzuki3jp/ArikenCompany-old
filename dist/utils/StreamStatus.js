@@ -7,7 +7,7 @@ const syncStreamStatusJson = async (base) => {
         const currentUserStatus = await base.twitch._api.channels.getChannelInfoById(user.id);
         if (currentUserStatus) {
             const stream = await base.twitch._api.streams.getStreamByUserId(currentUserStatus.id);
-            const newTwitchUser = {
+            const newTwitchStreamer = {
                 id: currentUserStatus.id,
                 name: currentUserStatus.name,
                 displayName: currentUserStatus.displayName,
@@ -15,7 +15,7 @@ const syncStreamStatusJson = async (base) => {
                 notificationChannelId: user.notificationChannelId,
             };
             users.splice(index, 1);
-            users.splice(index, 0, newTwitchUser);
+            users.splice(index, 0, newTwitchStreamer);
             base.DM.setStreamStatus({ users });
         }
         else

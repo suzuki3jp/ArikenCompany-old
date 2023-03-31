@@ -14,16 +14,11 @@ dotenv_1.default.config();
 // モジュールをインポート
 const index_1 = require("./api/index");
 const Base_1 = require("./class/Base");
-const DataManager_1 = require("./class/DataManager");
 const index_2 = require("./events/index");
 const index_3 = require("./eventSub/index");
 const API_1 = require("./utils/API");
 const Client_1 = require("./utils/Client");
-const DM = new DataManager_1.DataManager();
-const loggerOptions = {
-    path: DM._paths.log,
-};
-const logger = new logger_1.Logger(true, loggerOptions);
+const logger = new logger_1.Logger(false);
 // クライアント定義
 const clientInfo = (0, Client_1.createClients)(logger);
 const twitchClient = clientInfo.twitch;
@@ -35,26 +30,25 @@ const base = new Base_1.Base(twitchClient, discordClient, clientInfo.eventSub, l
 (0, index_3.eventSub)(base);
 (0, index_1.api)(base);
 node_cron_1.default.schedule('59 59 11,23 * * *', () => {
-    base.logger.emitLog('info', 'プロセスの定期再起動を実行中');
+    base.logger.system(`Periodic process restart in progress...`);
     pm2_1.default.connect((e) => {
         if (e) {
-            console.error(e);
+            base.logger.err(`Failed to connect to pm2.`);
         }
         else {
             const processName = 'ArikenCompany';
             pm2_1.default.list((e, list) => {
                 if (e) {
-                    console.error(e);
+                    base.logger.err('Failed to get list of pm2 processes.');
                 }
                 else {
                     pm2_1.default.restart(processName, (e, proc) => {
                         if (e) {
-                            base.logger.emitLog('info', '再起動中にエラーが発生');
-                            console.error(e);
+                            base.logger.err('Failed to restart pm2 process.');
                             pm2_1.default.disconnect();
                         }
                         else {
-                            base.logger.emitLog('info', 'プロセスを正常に再起動しました');
+                            base.logger.system('Sucess to restart pm2 process.');
                             pm2_1.default.disconnect();
                         }
                     });

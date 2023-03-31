@@ -65,7 +65,7 @@ class DiscordSlashCommand extends Base_1.Base {
             return ErrorMessages.twitchUser404;
         // 取得したユーザーから配信を取得する
         const stream = await user.getStream();
-        // 取得した情報からTwitchUserを作成する
+        // 取得した情報からTwitchStreamerを作成する
         const newUser = {
             id: user.id,
             name: user.name,

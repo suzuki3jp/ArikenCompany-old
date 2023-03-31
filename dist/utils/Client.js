@@ -49,7 +49,7 @@ const createTwitchClientOptions = (logger) => {
             };
             const newEnvData = utils_1.Env.parseToEnv(envDataObj);
             DM.setEnv(newEnvData);
-            logger.emitLog('system', 'Twitchのトークンがリフレッシュされました');
+            logger.info(`Twitch token has been refreshed.`);
         };
         const authConfig = {
             accessToken: twitchToken,

@@ -52,7 +52,7 @@ const twitchMessage = async (base, message) => {
         if (!commandValue)
             return;
         twitchCommand.saveCooltime();
-        const valueParser = new ValueParser_1.ValueParser();
+        const valueParser = new ValueParser_1.ValueParser(base);
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (valueParseResult.status !== 200)
             return;
