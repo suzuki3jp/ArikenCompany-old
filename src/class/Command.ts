@@ -2,7 +2,7 @@
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
-import uniqueString from 'unique-string';
+import { randomUUID } from 'crypto';
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -68,7 +68,7 @@ export class CommandManager extends Base {
         const valueResult = await this.valueParser.parse(value, message);
         if (valueResult.status !== 200) return valueResult.content;
         const newCommand: TwitchCommand = {
-            _id: uniqueString(),
+            _id: randomUUID(),
             name,
             message: value,
             created_at: dayjs().toISOString(),
@@ -144,17 +144,21 @@ export class CommandManager extends Base {
 
         let newCommands: CommandsJson = { commands: [] };
         commands.commands.forEach((command) => {
-            if (command.name === name) return newCommands.commands.push(command);
-            return newCommands.commands.push({
-                _id: command._id,
-                name: command.name,
-                message: command.message,
-                created_at: command.created_at,
-                updated_at: command.updated_at,
-                last_used_at: dayjs().toISOString(),
-                count: command.count + 1,
-            });
+            if (command.name === name) {
+                newCommands.commands.push({
+                    _id: command._id,
+                    name: command.name,
+                    message: command.message,
+                    created_at: command.created_at,
+                    updated_at: command.updated_at,
+                    last_used_at: dayjs().toISOString(),
+                    count: command.count + 1,
+                });
+            } else {
+                newCommands.commands.push(command);
+            }
         });
+        this.DM.setCommands(newCommands);
         this.logger.debug(`Updated last_used_at. [${name}]`);
         return;
     }
