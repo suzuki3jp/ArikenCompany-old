@@ -61,7 +61,7 @@ export class TwitchCommand extends Base {
                 _id: this.message.member.id,
                 name: this.message.member.name,
                 displayName: this.message.member.displayName,
-                messageCount: 0,
+                messageCount: 1,
             };
             chatters.push(newChatter);
             this.DM.setChatters({ chatters });
