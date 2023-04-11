@@ -6,7 +6,11 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node ./dist/index.js",
-    "test": "npx ts-node ./src/index.ts"
+    "dev": "npx ts-node ./src/index.ts",
+    "pm2:start": "pm2 start pm2.config.js",
+    "pm2:stop": "pm2 stop pm2.config.js",
+    "pm2:restart": "pm2 restart pm2.config.js",
+    "pm2:kill": "pm2 delete pm2.config.js"
   },
   "repository": {
     "type": "git",
