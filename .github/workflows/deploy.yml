@@ -11,6 +11,8 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == true
+        environment:
+            name: Production
         steps:
             - uses: actions/checkout@v3
             - name: Connect to Server
