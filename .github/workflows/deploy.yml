@@ -1,0 +1,25 @@
+name: Deploy to production server
+
+on:
+    pull_request:
+        branches:
+            - master
+        types: [closed]
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+        steps:
+            - uses: actions/checkout@v3
+            - name: Connect to Server
+              uses: appleboy/ssh-action@v0.1.9
+              with:
+                  host: ${{secrets.HOST_NAME}}
+                  username: ${{secrets.USER_NAME}}
+                  port: ${{secrets.HOST_PORT}}
+                  key: ${{secrets.PRIVATE_KEY}}
+                  script: |
+                      cd ${{secrets.DIR_PATH}}
+                      ls
