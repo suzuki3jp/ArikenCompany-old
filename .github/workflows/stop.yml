@@ -1,0 +1,22 @@
+name: Stop pm2 process
+
+on:
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment:
+            name: Production
+        steps:
+            - uses: actions/checkout@v3
+            - name: Connect to Server
+              uses: appleboy/ssh-action@v0.1.9
+              with:
+                  host: ${{secrets.HOST_NAME}}
+                  username: ${{secrets.USER_NAME}}
+                  port: ${{secrets.HOST_PORT}}
+                  key: ${{secrets.PRIVATE_KEY}}
+                  script: |
+                      cd ${{secrets.DIR_PATH}}
+                      npm run pm2:stop
