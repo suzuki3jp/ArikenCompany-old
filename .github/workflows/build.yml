@@ -21,6 +21,9 @@ jobs:
               run: npm run build
 
     svelte-build:
+        defaults:
+            run:
+                working-directory: pages
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -29,8 +32,6 @@ jobs:
               with:
                   node-version: '16.x'
                   cache: npm
-            - name: Change directory
-              run: cd ./pages
             - name: Install deps
               run: npm i
             - name: Build
