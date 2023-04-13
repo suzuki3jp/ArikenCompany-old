@@ -23,6 +23,13 @@
 			<a href="https://github.com/suzuki3jp/arikencompany">GitHub</a>
 			にて公開されています。
 		</div>
+		<div style="margin-top: 20px;">
+			機能リクエスト、バグ報告、その他連絡がある場合は
+			<a href="https://www.twitter.com/messages/compose?recipient_id=1538905179311185922">
+				TwitterのDM
+			</a>
+			へお願いします。
+		</div>
 	</div>
 </Content>
 
