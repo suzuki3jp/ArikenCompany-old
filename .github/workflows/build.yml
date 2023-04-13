@@ -1,4 +1,4 @@
-name: TypeScript Build Test
+name: Build Test
 
 on:
     pull_request:
@@ -6,7 +6,24 @@ on:
     workflow_dispatch:
 
 jobs:
-    build:
+    ts-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup nodejs
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '16.x'
+                  cache: npm
+            - name: Install deps
+              run: npm i
+            - name: Build
+              run: npm run build
+
+    svelte-build:
+        defaults:
+            run:
+                working-directory: pages
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
