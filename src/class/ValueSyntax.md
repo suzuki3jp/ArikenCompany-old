@@ -5,10 +5,10 @@
 
 ## 実装する変数、関数
 ### 関数
-- fetch
-- random
-- alias
-- mod
+- fetch `${fetch https://example.com}`
+- random `${random choice1 choice2 choice3}`
+- alias `${alias !hoge}`
+- mod `${mod hoge}` `${mod alias !hoge}`
 
 ### 変数
 - channel
