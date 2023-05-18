@@ -26,7 +26,7 @@
   "dependencies": {
     "@suzuki3jp/logger": "^2.0.0",
     "@suzuki3jp/twitch.js": "^1.1.5",
-    "@suzuki3jp/utils": "^3.3.0",
+    "@suzuki3jp/utils": "^3.3.1",
     "@twurple/api": "^5.3.4",
     "@twurple/auth": "^5.3.4",
     "@twurple/chat": "^5.3.4",
