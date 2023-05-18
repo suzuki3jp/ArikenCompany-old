@@ -1,8 +1,15 @@
+// TODO: dayjs.tz()の引数の型が間違っている。おそらくdayjs 1.11.9以降で修正される。[該当PR](https://github.com/iamkun/dayjs/pull/2222)
+
 // nodeモジュールをインポート
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { randomUUID } from 'crypto';
+dayjs.extend(utc);
+dayjs.extend(tz);
+dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -71,9 +78,9 @@ export class CommandManager extends Base {
             _id: randomUUID(),
             name,
             message: value,
-            created_at: dayjs().toISOString(),
-            updated_at: dayjs().toISOString(),
-            last_used_at: dayjs().toISOString(),
+            created_at: dayjs.tz(undefined).toISOString(),
+            updated_at: dayjs.tz(undefined).toISOString(),
+            last_used_at: dayjs.tz(undefined).toISOString(),
             count: 0,
         };
 
@@ -103,7 +110,7 @@ export class CommandManager extends Base {
                 name,
                 _id: command._id,
                 message: value,
-                updated_at: dayjs().toISOString(),
+                updated_at: dayjs.tz(undefined).toISOString(),
                 created_at: command.created_at,
                 last_used_at: command.last_used_at,
                 count: command.count,
@@ -151,7 +158,7 @@ export class CommandManager extends Base {
                     message: command.message,
                     created_at: command.created_at,
                     updated_at: command.updated_at,
-                    last_used_at: dayjs().toISOString(),
+                    last_used_at: dayjs.tz(undefined).toISOString(),
                     count: command.count + 1,
                 });
             } else {
