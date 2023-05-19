@@ -9,6 +9,7 @@
 - random `${random choice1 choice2 choice3}`
 - alias `${alias !hoge}`
 - mod `${mod hoge}` `${mod alias !hoge}`
+- diff `${diff 2023/05/14 23:00:00}
 
 ### 変数
 - channel
