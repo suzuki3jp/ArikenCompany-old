@@ -4,7 +4,7 @@ import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { DMChannel, Message as DiscordMessage } from 'discord.js';
+import { Message as DiscordMessage } from 'discord.js';
 import { Agent } from 'https';
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -37,9 +37,7 @@ export class ValueParser extends Base {
         const startBracketLength = StringUtils.countBy(value, '${');
         const endBracketLength = StringUtils.countBy(value, '}');
 
-        if (message instanceof DiscordMessage) message = await message.fetch();
-
-        if (startBracketLength > endBracketLength) {
+        if (startBracketLength <= endBracketLength) {
             // 構文的に有効な場合
             const length = value.length;
             let index = 0;
@@ -90,12 +88,12 @@ export class ValueParser extends Base {
 
         switch (variable) {
             case 'fetch':
-                if (args[1]) {
+                if (!args[0]) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.FetchInvalidArgs);
                     this.results.code.setError(true);
                     return this.results.code;
                 } else {
-                    this.results.code.push(await this.parseFetch(args[1]));
+                    this.results.code.push(await this.parseFetch(args[0]));
                     return this.results.code;
                 }
                 break;
@@ -110,7 +108,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'alias':
-                if (args[0].startsWith('!')) {
+                if (!args[0].startsWith('!')) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.AliasInvalidArgs);
                     this.results.code.setError(true);
                     return this.results.code;
@@ -172,18 +170,14 @@ export class ValueParser extends Base {
                 break;
             default:
                 this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
+                this.results.code.setError(true);
                 return this.results.code;
                 break;
         }
     }
 
     private async parseFetch(url: string): Promise<string> {
-        const res = await this.req.get({
-            url,
-            config: {
-                httpAgent: new Agent({ rejectUnauthorized: false }),
-            },
-        });
+        const res = await this.req.get({ url, config: { httpsAgent: new Agent({ rejectUnauthorized: false }) } });
 
         if (res.status !== 200) return ErrorCodes.RemoteServerError(res.status);
         return res.data.toString();
@@ -200,7 +194,8 @@ export class ValueParser extends Base {
         commandName = commandName.toLowerCase();
         const command = this.managers.command.getCommandByName(commandName);
         if (command) {
-            const result = await this.parse(command.message, message, true);
+            const parser = new ValueParser(this);
+            const result = await parser.parse(command.message, message, true);
             if (result?.error) {
                 this.results?.code?.replaceAll(result.parsed);
                 this.results?.code?.setError(true);
