@@ -18,10 +18,8 @@ import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValueParser';
 
 export class CommandManager extends Base {
-    public valueParser: ValueParser;
     constructor(base: Base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
-        this.valueParser = new ValueParser(this);
     }
 
     getCommandByName(name: string): TwitchCommand | null {
@@ -71,7 +69,8 @@ export class CommandManager extends Base {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
-        const valueResult = await this.valueParser.parse(value, message);
+        const parser = new ValueParser(this);
+        const valueResult = await parser.parse(value, message);
         if (!valueResult || !valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command adding failed due to unknown error.');
@@ -108,7 +107,8 @@ export class CommandManager extends Base {
         const name = commandName.toLowerCase();
         if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
 
-        const valueResult = await this.valueParser.parse(value, message);
+        const parser = new ValueParser(this);
+        const valueResult = await parser.parse(value, message);
         if (!valueResult || valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command editing failed due to unknown error.');
