@@ -133,7 +133,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'diff':
-                const [_, date, time, ...__] = args;
+                const [date, time, ..._] = args;
                 if (this.validateDate(date) && this.validateTime(time)) {
                     this.results.code.push(this.parseDiff(date, time));
                     return this.results.code;
