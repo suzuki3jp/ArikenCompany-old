@@ -4,7 +4,7 @@ import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { Message as DiscordMessage, TextChannel } from 'discord.js';
+import { DMChannel, Message as DiscordMessage } from 'discord.js';
 import { Agent } from 'https';
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -30,12 +30,14 @@ export class ValueParser extends Base {
 
     async parse(
         value: string,
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage,
+        message: TwitchMessage | DiscordMessage | DummyMessage,
         aliased?: boolean
     ): Promise<ParseResult | null> {
         this.results = { value: new ParseResult(value), code: null };
         const startBracketLength = StringUtils.countBy(value, '${');
         const endBracketLength = StringUtils.countBy(value, '}');
+
+        if (message instanceof DiscordMessage) message = await message.fetch();
 
         if (startBracketLength > endBracketLength) {
             // 構文的に有効な場合
@@ -75,7 +77,7 @@ export class ValueParser extends Base {
     private async parseCode(
         code: string,
         options: {
-            message: TwitchMessage | DiscordMessage<true> | DummyMessage;
+            message: TwitchMessage | DiscordMessage | DummyMessage;
             aliased?: boolean;
             moded?: boolean;
         }
@@ -193,7 +195,7 @@ export class ValueParser extends Base {
 
     private async parseAlias(
         commandName: string,
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage
+        message: TwitchMessage | DiscordMessage | DummyMessage
     ): Promise<string> {
         commandName = commandName.toLowerCase();
         const command = this.managers.command.getCommandByName(commandName);
@@ -211,10 +213,7 @@ export class ValueParser extends Base {
         }
     }
 
-    private async parseMod(
-        args: string[],
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage
-    ): Promise<string> {
+    private async parseMod(args: string[], message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         let isMod = false;
         if (message instanceof TwitchMessage) isMod = message.member.isMod;
         if (message instanceof DiscordMessage) {
@@ -286,13 +285,14 @@ export class ValueParser extends Base {
         return isNum;
     }
 
-    private parseChannel(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+    private parseChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) return message.channel.name;
         if (message instanceof DummyMessage) return message.channel.name;
-        return message.channel.name;
+        if (message.inGuild()) return message.channel.name;
+        return ErrorCodes.PlatformError.Channel;
     }
 
-    private async parseGame(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+    private async parseGame(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Game);
             this.results?.code?.setError(true);
@@ -303,7 +303,7 @@ export class ValueParser extends Base {
         return channel.gameName;
     }
 
-    private async parseTitle(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+    private async parseTitle(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Title);
             this.results?.code?.setError(true);
@@ -315,7 +315,7 @@ export class ValueParser extends Base {
         }
     }
 
-    private parseUser(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+    private parseUser(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) return message.member.displayName;
         if (message instanceof DiscordMessage) return message.author.tag;
         return message.user.name;
@@ -412,7 +412,7 @@ export class PubValueParser {
     }
 }
 
-const ErrorCodes = {
+export const ErrorCodes = {
     RemoteServerError: (status: string | number) =>
         `RemoteServerError: リモートサーバーからエラーが返されました [code: ${status}]`,
     SyntaxError: {
@@ -439,7 +439,8 @@ const ErrorCodes = {
     },
     PlatformError: {
         Game: 'PlatformError: このプラットフォームではこの変数を使用することができません。 game',
-        Title: 'PlatformError: このプラットフォームでは',
+        Title: 'PlatformError: このプラットフォームではこの変数を使用することができません。 title',
+        Channel: 'PlatformError: このプラットフォームではこの変数を使用することができません。 channel',
     },
     TwitchAPIError: {
         CanNotGetTitle: 'TwitchAPIError: チャンネルのタイトルを取得できませんでした。',
