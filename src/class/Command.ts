@@ -70,7 +70,7 @@ export class CommandManager extends Base {
         const name = commandName.toLowerCase();
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
         const parser = new ValueParser(this);
-        const valueResult = await parser.parse(value, message);
+        const valueResult = await parser.parse(value, message, false, true);
         if (!valueResult || !valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command adding failed due to unknown error.');
@@ -108,7 +108,7 @@ export class CommandManager extends Base {
         if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
 
         const parser = new ValueParser(this);
-        const valueResult = await parser.parse(value, message);
+        const valueResult = await parser.parse(value, message, false, true);
         if (!valueResult || valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command editing failed due to unknown error.');

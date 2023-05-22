@@ -31,7 +31,8 @@ export class ValueParser extends Base {
     async parse(
         value: string,
         message: TwitchMessage | DiscordMessage | DummyMessage,
-        aliased?: boolean
+        aliased?: boolean,
+        isManageCom?: boolean
     ): Promise<ParseResult | null> {
         this.results = { value: new ParseResult(value), code: null };
         const startBracketLength = StringUtils.countBy(value, '${');
@@ -49,7 +50,12 @@ export class ValueParser extends Base {
 
                     index = index + endIndex;
                     const codeRow = value.slice(startIndex, endIndex);
-                    const parseCodeResult = await this.parseCode(codeRow, { message, aliased, moded: false });
+                    const parseCodeResult = await this.parseCode(codeRow, {
+                        message,
+                        aliased,
+                        isManageCom,
+                        moded: false,
+                    });
                     if (!parseCodeResult || parseCodeResult.error) {
                         if (!parseCodeResult) this.results.value?.replaceAll(ErrorCodes.UnknownError);
                         if (parseCodeResult) this.results.value?.replaceAll(parseCodeResult.parsed);
@@ -78,9 +84,10 @@ export class ValueParser extends Base {
             message: TwitchMessage | DiscordMessage | DummyMessage;
             aliased?: boolean;
             moded?: boolean;
+            isManageCom?: boolean;
         }
     ): Promise<ParseResult | null> {
-        const { message, aliased, moded } = options;
+        const { message, aliased, moded, isManageCom } = options;
         code = code.trim();
         code = code.replaceAll(/ +/g, ' ');
         const [variable, ...args] = code.split(' ');
@@ -154,11 +161,11 @@ export class ValueParser extends Base {
                 return this.results.code;
                 break;
             case 'game':
-                this.results.code.push(await this.parseGame(message));
+                this.results.code.push(await this.parseGame(message, isManageCom));
                 return this.results.code;
                 break;
             case 'title':
-                this.results.code.push(await this.parseTitle(message));
+                this.results.code.push(await this.parseTitle(message, isManageCom));
                 return this.results.code;
                 break;
             case 'user':
@@ -293,7 +300,11 @@ export class ValueParser extends Base {
         return ErrorCodes.PlatformError.Channel;
     }
 
-    private async parseGame(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
+    private async parseGame(
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        isManageCom?: boolean
+    ): Promise<string> {
+        if (isManageCom) return ErrorCodes.Dummy.Game;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Game);
             this.results?.code?.setError(true);
@@ -304,7 +315,11 @@ export class ValueParser extends Base {
         return channel.gameName;
     }
 
-    private async parseTitle(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
+    private async parseTitle(
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        isManageCom?: boolean
+    ): Promise<string> {
+        if (isManageCom) return ErrorCodes.Dummy.Title;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Title);
             this.results?.code?.setError(true);
@@ -446,6 +461,10 @@ export const ErrorCodes = {
     TwitchAPIError: {
         CanNotGetTitle: 'TwitchAPIError: チャンネルのタイトルを取得できませんでした。',
         CanNotGetGame: 'TwitchAPIError: チャンネルのゲームを取得できませんでした。',
+    },
+    Dummy: {
+        Game: 'Dummy game name',
+        Title: 'Dummy title name',
     },
     UnknownError: 'UnknownError: 何らかの要因で処理が失敗しました。',
 };
