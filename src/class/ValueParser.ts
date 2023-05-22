@@ -325,7 +325,7 @@ export class ValueParser extends Base {
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Title;
         } else {
-            const channel = await this.twitch._api.channels.getChannelInfoById('');
+            const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
             if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
             return channel.title;
         }
