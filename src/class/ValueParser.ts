@@ -123,7 +123,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'mod':
-                if (!moded) {
+                if (moded) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.ModLoop);
                     this.results.code.setError(true);
                     return this.results.code;
@@ -170,9 +170,14 @@ export class ValueParser extends Base {
                 return this.results.code;
                 break;
             default:
-                this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
-                this.results.code.setError(true);
-                return this.results.code;
+                if (moded) {
+                    this.results.code.push(code);
+                    return this.results.code;
+                } else {
+                    this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
+                    this.results.code.setError(true);
+                    return this.results.code;
+                }
                 break;
         }
     }
