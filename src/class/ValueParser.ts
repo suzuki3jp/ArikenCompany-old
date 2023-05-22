@@ -1,110 +1,39 @@
 // nodeモジュールをインポート
 import { ArrayUtils, JST, RequestClient, StringUtils } from '@suzuki3jp/utils';
 import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
 import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { Agent } from 'https';
+dayjs.extend(utc);
+dayjs.extend(tz);
+dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
-import { DataManager } from './DataManager';
 import { Base } from './Base';
-
-// JSON Data Manager
-const DM = new DataManager();
-
-class ValueVariables extends Base {
-    _req: RequestClient;
-
-    constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
-        this._req = new RequestClient();
-    }
-
-    getTime(): string {
-        return JST.getDateString();
-    }
-
-    async getTitle(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
-        if (message instanceof TwitchMessage) {
-            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
-            if (!stream) return '配信がオフラインの時はタイトルを取得できません。';
-            return `${stream.title}`;
-        } else return 'このプラットフォームでは`title`変数は使用できません';
-    }
-
-    async getGame(message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
-        if (message instanceof TwitchMessage) {
-            const stream = await this.twitch._api.streams.getStreamByUserId(message.channel.id);
-            if (!stream) return '配信がオフラインの時はゲームを取得できません。';
-            return `${stream.gameName}`;
-        } else return 'このプラットフォームでは`game`変数は使用できません';
-    }
-
-    getChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
-        if (message instanceof TwitchMessage) {
-            return message.channel.name;
-        } else if (message.channel instanceof TextChannel) {
-            return message.channel.name;
-        } else if (message instanceof DummyMessage) {
-            return message.channel.name;
-        } else return ParseErrorMessages.invalidDiscordChannel;
-    }
-
-    getUser(message: TwitchMessage | DiscordMessage | DummyMessage): string {
-        if (message instanceof TwitchMessage) {
-            return message.member.name;
-        } else if (message instanceof DummyMessage) {
-            return message.user.name;
-        } else {
-            return message.author.tag;
-        }
-    }
-
-    async fetch(url: string): Promise<string> {
-        const result = await this._req.get({ url, config: { httpsAgent: new Agent({ rejectUnauthorized: false }) } });
-        return result.data.toString();
-    }
-
-    random(choices: Array<string>): string {
-        return ArrayUtils.random(choices);
-    }
-
-    getCommandByAlias(commandName: string): string {
-        const { commands } = DM.getCommands();
-        const result = commands.filter((command) => command.name === commandName);
-        if (result.length === 0) return ParseErrorMessages.commandNotFound;
-        return result[0].message;
-    }
-
-    isMod(message: TwitchMessage | DiscordMessage | DummyMessage): boolean {
-        if (message instanceof TwitchMessage) {
-            return message.member.isMod;
-        } else if (message instanceof DiscordMessage) {
-            const settings = DM.getSettings();
-            return message.member?.roles.cache.has(settings.discord.modRoleId) ?? false;
-        } else return message.user.isMod;
-    }
-}
+import { CommandManager } from './Command';
 
 export class ValueParser extends Base {
-    public variablesLength: { alias: number; fetch: number; random: number; mod: number };
-    public variablesManager: ValueVariables;
+    private results: { value: ParseResult | null; code: ParseResult | null } | null;
+    private req: RequestClient;
+    private managers: { command: CommandManager };
 
     constructor(base: Base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
-        this.variablesManager = new ValueVariables(this);
-        this.variablesLength = {
-            alias: 6,
-            fetch: 6,
-            random: 7,
-            mod: 4,
+        this.results = null;
+        this.req = new RequestClient();
+        this.managers = {
+            command: new CommandManager(this),
         };
     }
 
     async parse(
         value: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage,
+        message: TwitchMessage | DiscordMessage<true> | DummyMessage,
         aliased?: boolean
-    ): Promise<ValueParseResult> {
+    ): Promise<ParseResult | null> {
+        this.results = { value: new ParseResult(value), code: null };
         const startBracketLength = StringUtils.countBy(value, '{');
         const endBracketLength = StringUtils.countBy(value, '}');
 
@@ -112,229 +41,428 @@ export class ValueParser extends Base {
             // 構文的に有効な場合
             const length = value.length;
             let index = 0;
-            const result: ValueParseResult = {
-                status: 200,
-                content: '',
-            };
 
             while (index < length) {
-                if (value[index] === '$') {
+                if (value[index] === '$' && value[index + 1] === '{') {
                     const startIndex = index + 2;
                     const endIndex = value.indexOf('}', startIndex);
+
                     index = index + endIndex;
-                    const codeRaw = value.slice(startIndex, endIndex);
-                    const parsedCode = await this._parseCode(codeRaw, message, aliased);
-                    if (parsedCode.status === 200) {
-                        result.status = parsedCode.status;
-                        result.content = result.content + parsedCode.content;
-                    } else {
-                        result.status = parsedCode.status;
-                        result.content = parsedCode.content;
-                    }
+                    const codeRow = value.slice(startIndex, endIndex);
+                    const parseCodeResult = await this.parseCode(codeRow, { message, aliased, moded: false });
+                    if (!parseCodeResult || parseCodeResult.error) {
+                        if (!parseCodeResult) this.results.value?.replaceAll(ErrorCodes.UnknownError);
+                        if (parseCodeResult) this.results.value?.replaceAll(parseCodeResult.parsed);
+                        this.results.value?.setError(true);
+                    } else this.results.value?.push(parseCodeResult.parsed);
+
                     index = endIndex + 1;
                 } else {
-                    result.content = result.content + value[index];
+                    this.results.value?.push(value[index]);
                     index = index + 1;
                 }
             }
 
-            return result;
+            return this.results.value;
         } else {
             // 構文的に無効な場合
-            const result: ValueParseResult = {
-                status: 400,
-                content: ParseErrorMessages.invalidBrackets,
-            };
-            return result;
+            this.results.value?.replaceAll(ErrorCodes.SyntaxError.InvalidBrackets);
+            this.results.value?.setError(true);
+            return this.results.value;
         }
     }
 
-    async _parseCode(
-        codeRaw: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage,
-        aliased?: boolean
-    ): Promise<ParseCodeResult> {
-        const result = await this._parseVariables(codeRaw.trim(), message, aliased);
-        if (result.status === 200) return result;
-        if (result.status === 403) return result;
-        if (result.status === 400) return result;
-        return { status: result.status, content: ParseErrorMessages.variablesNotFound };
-    }
-
-    async _parseFetch(codeRaw: string): Promise<string> {
-        const url = codeRaw.slice(this.variablesLength.fetch);
-        return await this.variablesManager.fetch(url);
-    }
-
-    _parseRandom(codeRaw: string): string {
-        const choices = codeRaw.slice(this.variablesLength.random).split(' ');
-        return this.variablesManager.random(choices);
-    }
-
-    async _parseAlias(
-        codeRaw: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
-    ): Promise<ValueParseResult> {
-        const targetCommand = codeRaw.slice(this.variablesLength.alias).toLowerCase();
-        return await this.parse(this.variablesManager.getCommandByAlias(targetCommand), message, true);
-    }
-
-    async _parseMod(codeRaw: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<ParseModResult> {
-        const newCodeRaw = codeRaw.slice(this.variablesLength.mod);
-        if (this.variablesManager.isMod(message)) {
-            const result = await this._parseVariables(newCodeRaw, message);
-            if (result.status === 200) return result;
-            return { status: 200, content: result.content };
-        } else return { status: 403, content: ParseErrorMessages.isOnlyMods };
-    }
-
-    async _parseVariables(
-        codeRaw: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage,
-        aliased?: boolean
-    ): Promise<{ status: 200 | 400 | 403 | 404; content: string }> {
-        if (codeRaw.startsWith('fetch ')) {
-            return {
-                status: 200,
-                content: await this._parseFetch(codeRaw),
-            };
-        } else if (codeRaw.startsWith('random ')) {
-            return {
-                status: 200,
-                content: this._parseRandom(codeRaw),
-            };
-        } else if (codeRaw.startsWith('alias ')) {
-            if (aliased) {
-                return {
-                    status: 400,
-                    content:
-                        'alias先のコマンドの内容でalias関数を使用することはできません。これは無限ループを防ぐためです。',
-                };
-            } else {
-                return {
-                    status: (await this._parseAlias(codeRaw, message)).status,
-                    content: (await this._parseAlias(codeRaw, message)).content,
-                };
-            }
-        } else if (codeRaw.startsWith('channel')) {
-            return {
-                status: 200,
-                content: this.variablesManager.getChannel(message),
-            };
-        } else if (codeRaw.startsWith('user')) {
-            return {
-                status: 200,
-                content: this.variablesManager.getUser(message),
-            };
-        } else if (codeRaw.startsWith('time')) {
-            return {
-                status: 200,
-                content: this.variablesManager.getTime(),
-            };
-        } else if (codeRaw.startsWith('mod ')) {
-            return {
-                status: (await this._parseMod(codeRaw, message)).status,
-                content: (await this._parseMod(codeRaw, message)).content,
-            };
-        } else if (codeRaw.startsWith('title')) {
-            return {
-                status: 200,
-                content: await this.variablesManager.getTitle(message),
-            };
-        } else if (codeRaw.startsWith('game')) {
-            return {
-                status: 200,
-                content: await this.variablesManager.getGame(message),
-            };
-        } else {
-            return {
-                status: 404,
-                content: codeRaw,
-            };
+    private async parseCode(
+        code: string,
+        options: {
+            message: TwitchMessage | DiscordMessage<true> | DummyMessage;
+            aliased?: boolean;
+            moded?: boolean;
         }
-    }
-}
+    ): Promise<ParseResult | null> {
+        const { message, aliased, moded } = options;
+        code = code.trim();
+        const [variable, ...args] = code.split(' ');
+        if (!this.results) this.results = { value: null, code: null };
+        this.results.code = new ParseResult(code);
 
-export class PubValueParser {
-    parse(value: string): ValueParseResult {
-        const startBracketLength = StringUtils.countBy(value, '{');
-        const endBracketLength = StringUtils.countBy(value, '}');
-
-        if (startBracketLength === endBracketLength) {
-            // 構文的に有効な場合
-            const length = value.length;
-            let index = 0;
-            const result: ValueParseResult = {
-                status: 200,
-                content: '',
-            };
-
-            while (index < length) {
-                if (value[index] === '$') {
-                    const startIndex = index + 2;
-                    const endIndex = value.indexOf('}', startIndex);
-                    index = index + endIndex;
-                    const codeRaw = value.slice(startIndex, endIndex);
-                    const parsedCode = this.parseCode(codeRaw);
-
-                    result.status = parsedCode.status;
-                    result.content = result.content + parsedCode.content;
-                    index = index + 1;
+        switch (variable) {
+            case 'fetch':
+                if (args[1]) {
+                    this.results.code.replaceAll(ErrorCodes.SyntaxError.FetchInvalidArgs);
+                    this.results.code.setError(true);
+                    return this.results.code;
                 } else {
-                    result.content = result.content + value[index];
-                    index = index + 1;
+                    this.results.code.push(await this.parseFetch(args[1]));
+                    return this.results.code;
                 }
-            }
-
-            return result;
-        } else {
-            // 構文的に無効な場合
-            const result: ValueParseResult = {
-                status: 400,
-                content: '${}の対応関係が崩れています',
-            };
-            return result;
+                break;
+            case 'random':
+                if (args.length === 0) {
+                    this.results.code.replaceAll(ErrorCodes.SyntaxError.RandomInvalidArgs);
+                    this.results.code.setError(true);
+                    return this.results.code;
+                } else {
+                    this.results.code.push(this.parseRandom(args));
+                    return this.results.code;
+                }
+                break;
+            case 'alias':
+                if (args[0].startsWith('!')) {
+                    this.results.code.replaceAll(ErrorCodes.SyntaxError.AliasInvalidArgs);
+                    this.results.code.setError(true);
+                    return this.results.code;
+                } else if (aliased) {
+                    this.results.code.replaceAll(ErrorCodes.SyntaxError.AliasLoop);
+                    this.results.code.setError(true);
+                    return this.results.code;
+                } else {
+                    this.results.code.push(await this.parseAlias(args[0], message));
+                    return this.results.code;
+                }
+                break;
+            case 'mod':
+                if (!moded) {
+                    this.results.code.replaceAll(ErrorCodes.SyntaxError.ModLoop);
+                    this.results.code.setError(true);
+                    return this.results.code;
+                } else {
+                    this.results.code.push(await this.parseMod(args, message));
+                    return this.results.code;
+                }
+                break;
+            case 'diff':
+                const [_, date, time, ...__] = args;
+                if (this.validateDate(date) && this.validateTime(time)) {
+                    this.results.code.push(this.parseDiff(date, time));
+                    return this.results.code;
+                } else {
+                    if (!this.validateDate(date)) {
+                        this.results.code.replaceAll(ErrorCodes.ValidationError.Date);
+                        this.results.code.setError(true);
+                        return this.results.code;
+                    } else {
+                        this.results.code.replaceAll(ErrorCodes.ValidationError.Time);
+                        this.results.code.setError(true);
+                        return this.results.code;
+                    }
+                }
+                break;
+            case 'channel':
+                this.results.code.push(this.parseChannel(message));
+                return this.results.code;
+                break;
+            case 'game':
+                this.results.code.push(await this.parseGame(message));
+                return this.results.code;
+                break;
+            case 'title':
+                this.results.code.push(await this.parseTitle(message));
+                return this.results.code;
+                break;
+            case 'user':
+                this.results.code.push(this.parseUser(message));
+                return this.results.code;
+                break;
+            case 'time':
+                this.results.code.push(this.parseTime());
+                return this.results.code;
+                break;
+            default:
+                this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
+                return this.results.code;
+                break;
         }
     }
 
-    private parseCode(codeRaw: string): ParseCodeResult {
-        if (codeRaw.startsWith('fetch ')) {
-            return {
-                status: 200,
-                content: '[fetch]',
-            };
+    private async parseFetch(url: string): Promise<string> {
+        const res = await this.req.get({
+            url,
+            config: {
+                httpAgent: new Agent({ rejectUnauthorized: false }),
+            },
+        });
+
+        if (res.status !== 200) return ErrorCodes.RemoteServerError(res.status);
+        return res.data.toString();
+    }
+
+    private parseRandom(choices: string[]): string {
+        return ArrayUtils.random(choices);
+    }
+
+    private async parseAlias(
+        commandName: string,
+        message: TwitchMessage | DiscordMessage<true> | DummyMessage
+    ): Promise<string> {
+        commandName = commandName.toLowerCase();
+        const command = this.managers.command.getCommandByName(commandName);
+        if (command) {
+            const result = await this.parse(command.message, message, true);
+            if (result?.error) {
+                this.results?.code?.replaceAll(result.parsed);
+                this.results?.code?.setError(true);
+                return result.parsed;
+            } else return result?.parsed ?? '';
         } else {
-            return {
-                status: 200,
-                content: `\$\{${codeRaw}\}`,
-            };
+            this.results?.code?.replaceAll(ErrorCodes.ReferenceError.AliasNotExist(commandName));
+            this.results?.code?.setError(true);
+            return ErrorCodes.ReferenceError.AliasNotExist(commandName);
         }
+    }
+
+    private async parseMod(
+        args: string[],
+        message: TwitchMessage | DiscordMessage<true> | DummyMessage
+    ): Promise<string> {
+        let isMod = false;
+        if (message instanceof TwitchMessage) isMod = message.member.isMod;
+        if (message instanceof DiscordMessage) {
+            const { modRoleId } = this.DM.getSettings().discord;
+            isMod = message.member?.roles.cache.has(modRoleId) ?? false;
+        }
+        if (message instanceof DummyMessage) {
+            isMod = message.user.isMod;
+        }
+
+        if (isMod) {
+            const parser = new ValueParser(this);
+            const result = await parser.parseCode(args.join(' '), { message, moded: true });
+
+            if (result?.error) {
+                this.results?.code?.replaceAll(result.parsed);
+                this.results?.code?.setError(true);
+                return result.parsed;
+            } else return result?.parsed ?? '';
+        } else {
+            this.results?.code?.replaceAll(ErrorCodes.PermissionError.onlyMods);
+            this.results?.code?.setError(true);
+            return ErrorCodes.PermissionError.onlyMods;
+        }
+    }
+
+    private parseDiff(date: string, time: string): string {
+        const now = dayjs.tz(undefined);
+        const specifiedDate = dayjs.tz(`${date} ${time}`);
+        const absoluteDiff = Math.abs(now.diff(specifiedDate));
+
+        // 取得したミリ秒差をフォーマットする
+        const sec = Math.floor(absoluteDiff / 1000);
+        const hour = Math.floor(sec / 3600);
+        const min = Math.floor((sec % 3600) / 60);
+        const rem = sec % 60;
+        return `${hour}:${min}:${rem}`;
+    }
+
+    private validateDate(date: string): boolean {
+        // 2023/05/18 のような形にvalidateする
+        const delimiter = '/';
+        const delimiterCount = StringUtils.countBy(date, delimiter);
+        if (delimiterCount !== 2) return false;
+
+        const arr = date.split(delimiter);
+        if (arr[0].length < 4) return false;
+        if (arr[1].length !== 2) return false;
+        if (arr[2].length !== 2) return false;
+
+        let isNum = true;
+        arr.forEach((d) => (isNum = !isNaN(Number(d))));
+        return isNum;
+    }
+
+    private validateTime(time: string): boolean {
+        // 23:02:59 のような形にvalidateする
+        const delimiter = ':';
+        const delimiterCount = StringUtils.countBy(time, delimiter);
+        if (delimiterCount !== 2) return false;
+
+        const arr = time.split(delimiter);
+        if (arr[0].length !== 2) return false;
+        if (arr[1].length !== 2) return false;
+        if (arr[2].length !== 2) return false;
+
+        let isNum = true;
+        arr.forEach((t) => (isNum = !isNaN(Number(t))));
+        return isNum;
+    }
+
+    private parseChannel(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+        if (message instanceof TwitchMessage) return message.channel.name;
+        if (message instanceof DummyMessage) return message.channel.name;
+        return message.channel.name;
+    }
+
+    private async parseGame(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+        if (!(message instanceof TwitchMessage)) {
+            this.results?.code?.replaceAll(ErrorCodes.PlatformError.Game);
+            this.results?.code?.setError(true);
+            return ErrorCodes.PlatformError.Game;
+        }
+        const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
+        if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetGame;
+        return channel.gameName;
+    }
+
+    private async parseTitle(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+        if (!(message instanceof TwitchMessage)) {
+            this.results?.code?.replaceAll(ErrorCodes.PlatformError.Title);
+            this.results?.code?.setError(true);
+            return ErrorCodes.PlatformError.Title;
+        } else {
+            const channel = await this.twitch._api.channels.getChannelInfoById('');
+            if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
+            return channel.title;
+        }
+    }
+
+    private parseUser(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+        if (message instanceof TwitchMessage) return message.member.displayName;
+        if (message instanceof DiscordMessage) return message.author.tag;
+        return message.user.name;
+    }
+
+    private parseTime(): string {
+        const date = dayjs.tz(undefined);
+        return `${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}:${date.second}`;
     }
 }
 
-export interface ValueParseResult {
-    status: ParseStatus;
-    content: string;
+export class ParseResult {
+    original: string;
+    parsed: string;
+    error: boolean;
+
+    constructor(original: string) {
+        this.original = original;
+        this.parsed = '';
+        this.error = false;
+    }
+
+    /**
+     * `this.parsed`に文字列を追記する
+     *
+     * **エラーが既出の場合pushしません**
+     * @param str 追記する文字列
+     * @returns 追記後の`this.parsed`
+     */
+    push(str: string) {
+        if (this.error) return;
+        this.parsed = `${this.parsed}${str}`;
+        return this.parsed;
+    }
+
+    /**
+     * `this.parsed`を全て置き換える
+     * @param str 置き換える文字列
+     * @returns 置き換えた後の`this.parsed`
+     */
+    replaceAll(str: string) {
+        this.parsed = str;
+        return;
+    }
+
+    /**
+     * Resultをエラーとしてマークする
+     *
+     * **この関数を実行した後は`this.parsed`がロックされ、`this.push()`が機能しないようになる**
+     * @param bool
+     */
+    setError(bool: boolean) {
+        this.error = bool;
+    }
 }
 
-export interface ParseCodeResult {
-    status: 200 | 400 | 403 | 404;
-    content: string;
-}
+// export class PubValueParser {
+//     parse(value: string): ValueParseResult {
+//         const startBracketLength = StringUtils.countBy(value, '{');
+//         const endBracketLength = StringUtils.countBy(value, '}');
 
-export interface ParseModResult {
-    status: 200 | 400 | 403 | 404;
-    content: string;
-}
+//         if (startBracketLength === endBracketLength) {
+//             // 構文的に有効な場合
+//             const length = value.length;
+//             let index = 0;
+//             const result: ValueParseResult = {
+//                 status: 200,
+//                 content: '',
+//             };
 
-export type ParseStatus = 200 | 400 | 403 | 404;
+//             while (index < length) {
+//                 if (value[index] === '$') {
+//                     const startIndex = index + 2;
+//                     const endIndex = value.indexOf('}', startIndex);
+//                     index = index + endIndex;
+//                     const codeRaw = value.slice(startIndex, endIndex);
+//                     const parsedCode = this.parseCode(codeRaw);
 
-const ParseErrorMessages = {
-    invalidDiscordChannel: 'テキストチャンネル以外でこの変数は使用できません',
-    invalidBrackets: '${}の対応関係が崩れています',
-    isOnlyMods: 'モデレータ専用コマンドです',
-    variablesNotFound: '変数が見つかりませんでした',
-    commandNotFound: 'コマンドが見つかりませんでした',
+//                     result.status = parsedCode.status;
+//                     result.content = result.content + parsedCode.content;
+//                     index = index + 1;
+//                 } else {
+//                     result.content = result.content + value[index];
+//                     index = index + 1;
+//                 }
+//             }
+
+//             return result;
+//         } else {
+//             // 構文的に無効な場合
+//             const result: ValueParseResult = {
+//                 status: 400,
+//                 content: '${}の対応関係が崩れています',
+//             };
+//             return result;
+//         }
+//     }
+
+//     private parseCode(codeRaw: string): ParseResult {
+//         if (codeRaw.startsWith('fetch ')) {
+//             return {
+//                 status: 200,
+//                 content: '[fetch]',
+//             };
+//         } else {
+//             return {
+//                 status: 200,
+//                 content: `\$\{${codeRaw}\}`,
+//             };
+//         }
+//     }
+// }
+
+const ErrorCodes = {
+    RemoteServerError: (status: string | number) =>
+        `RemoteServerError: リモートサーバーからエラーが返されました [code: ${status}]`,
+    SyntaxError: {
+        FetchInvalidArgs: 'SyntaxError: fetch は半角スペースの後にurlを指定する必要があります',
+        RandomInvalidArgs: 'SyntaxError: random は半角スペースを使用して選択肢を指定する必要があります',
+        AliasInvalidArgs: 'SyntaxError: alias は半角スペースの後に ![コマンド名] でコマンドを指定する必要があります',
+        AliasLoop:
+            'SyntaxError: alias を使用しているコマンドに対してaliasを行うことはできません。これは無限ループを防ぐためです。',
+        ModLoop:
+            'SyntaxError: mod を使用したコード内で二個目のmod を使用することはできません。これは無限ループを防ぐためです。',
+        InvalidBrackets: 'SyntaxError: {}の対応関係が崩れています。',
+    },
+    ReferenceError: {
+        AliasNotExist: (command: string) => `ReferenceError: alias先のコマンドが存在しません [command: ${command}]`,
+        VariableNotExit: (variable: string) =>
+            `ReferenceError: 変数または関数が見つかりません。 [variable: ${variable}]`,
+    },
+    PermissionError: {
+        onlyMods: 'PermissionError: このコマンドはモデレーター専用です。',
+    },
+    ValidationError: {
+        Date: 'ValidationError: 日付の指定方法が間違っています。(例: 2023/05/18)',
+        Time: 'ValidationError: 時刻の指定方法が間違っています。(例: 23:59:05)',
+    },
+    PlatformError: {
+        Game: 'PlatformError: このプラットフォームではこの変数を使用することができません。 game',
+        Title: 'PlatformError: このプラットフォームでは',
+    },
+    TwitchAPIError: {
+        CanNotGetTitle: 'TwitchAPIError: チャンネルのタイトルを取得できませんでした。',
+        CanNotGetGame: 'TwitchAPIError: チャンネルのゲームを取得できませんでした。',
+    },
+    UnknownError: 'UnknownError: 何らかの要因で処理が失敗しました。',
 };
 
 export class DummyMessage {
@@ -350,16 +478,3 @@ export class DummyMessage {
         };
     }
 }
-
-// ${fetch https://example.com}hoge
-// ${random huge huge huge}
-// ${alias !hg}
-// ${time}
-// ${channel}
-// ${user}
-// ${mod fetch https://example.com}
-
-// 200 - 成功
-// 400 - 構文が無効
-// 403 - 権限不足
-// 404 - 変数が見つからない
