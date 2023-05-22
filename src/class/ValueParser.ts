@@ -324,7 +324,7 @@ export class ValueParser extends Base {
 
     private parseTime(): string {
         const date = dayjs.tz(undefined);
-        return `${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}:${date.second}`;
+        return `${date.year()}/${date.month() + 1}/${date.date()} ${date.hour()}:${date.minute()}:${date.second()}`;
     }
 }
 
