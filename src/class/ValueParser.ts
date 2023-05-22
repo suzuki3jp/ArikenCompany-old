@@ -82,6 +82,7 @@ export class ValueParser extends Base {
     ): Promise<ParseResult | null> {
         const { message, aliased, moded } = options;
         code = code.trim();
+        code = code.replaceAll(/ +/g, ' ');
         const [variable, ...args] = code.split(' ');
         if (!this.results) this.results = { value: null, code: null };
         this.results.code = new ParseResult(code);
