@@ -34,10 +34,10 @@ export class ValueParser extends Base {
         aliased?: boolean
     ): Promise<ParseResult | null> {
         this.results = { value: new ParseResult(value), code: null };
-        const startBracketLength = StringUtils.countBy(value, '{');
+        const startBracketLength = StringUtils.countBy(value, '${');
         const endBracketLength = StringUtils.countBy(value, '}');
 
-        if (startBracketLength === endBracketLength) {
+        if (startBracketLength > endBracketLength) {
             // 構文的に有効な場合
             const length = value.length;
             let index = 0;
