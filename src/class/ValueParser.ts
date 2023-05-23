@@ -4,7 +4,7 @@ import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { Message as DiscordMessage, TextChannel } from 'discord.js';
+import { Message as DiscordMessage } from 'discord.js';
 import { Agent } from 'https';
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -30,14 +30,15 @@ export class ValueParser extends Base {
 
     async parse(
         value: string,
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage,
-        aliased?: boolean
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        aliased?: boolean,
+        isManageCom?: boolean
     ): Promise<ParseResult | null> {
         this.results = { value: new ParseResult(value), code: null };
         const startBracketLength = StringUtils.countBy(value, '${');
         const endBracketLength = StringUtils.countBy(value, '}');
 
-        if (startBracketLength > endBracketLength) {
+        if (startBracketLength <= endBracketLength) {
             // 構文的に有効な場合
             const length = value.length;
             let index = 0;
@@ -49,7 +50,12 @@ export class ValueParser extends Base {
 
                     index = index + endIndex;
                     const codeRow = value.slice(startIndex, endIndex);
-                    const parseCodeResult = await this.parseCode(codeRow, { message, aliased, moded: false });
+                    const parseCodeResult = await this.parseCode(codeRow, {
+                        message,
+                        aliased,
+                        isManageCom,
+                        moded: false,
+                    });
                     if (!parseCodeResult || parseCodeResult.error) {
                         if (!parseCodeResult) this.results.value?.replaceAll(ErrorCodes.UnknownError);
                         if (parseCodeResult) this.results.value?.replaceAll(parseCodeResult.parsed);
@@ -75,25 +81,27 @@ export class ValueParser extends Base {
     private async parseCode(
         code: string,
         options: {
-            message: TwitchMessage | DiscordMessage<true> | DummyMessage;
+            message: TwitchMessage | DiscordMessage | DummyMessage;
             aliased?: boolean;
             moded?: boolean;
+            isManageCom?: boolean;
         }
     ): Promise<ParseResult | null> {
-        const { message, aliased, moded } = options;
+        const { message, aliased, moded, isManageCom } = options;
         code = code.trim();
+        code = code.replaceAll(/ +/g, ' ');
         const [variable, ...args] = code.split(' ');
         if (!this.results) this.results = { value: null, code: null };
         this.results.code = new ParseResult(code);
 
         switch (variable) {
             case 'fetch':
-                if (args[1]) {
+                if (!args[0]) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.FetchInvalidArgs);
                     this.results.code.setError(true);
                     return this.results.code;
                 } else {
-                    this.results.code.push(await this.parseFetch(args[1]));
+                    this.results.code.push(await this.parseFetch(args[0]));
                     return this.results.code;
                 }
                 break;
@@ -108,7 +116,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'alias':
-                if (args[0].startsWith('!')) {
+                if (!args[0].startsWith('!')) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.AliasInvalidArgs);
                     this.results.code.setError(true);
                     return this.results.code;
@@ -122,7 +130,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'mod':
-                if (!moded) {
+                if (moded) {
                     this.results.code.replaceAll(ErrorCodes.SyntaxError.ModLoop);
                     this.results.code.setError(true);
                     return this.results.code;
@@ -132,7 +140,7 @@ export class ValueParser extends Base {
                 }
                 break;
             case 'diff':
-                const [_, date, time, ...__] = args;
+                const [date, time, ..._] = args;
                 if (this.validateDate(date) && this.validateTime(time)) {
                     this.results.code.push(this.parseDiff(date, time));
                     return this.results.code;
@@ -153,11 +161,11 @@ export class ValueParser extends Base {
                 return this.results.code;
                 break;
             case 'game':
-                this.results.code.push(await this.parseGame(message));
+                this.results.code.push(await this.parseGame(message, isManageCom));
                 return this.results.code;
                 break;
             case 'title':
-                this.results.code.push(await this.parseTitle(message));
+                this.results.code.push(await this.parseTitle(message, isManageCom));
                 return this.results.code;
                 break;
             case 'user':
@@ -169,19 +177,20 @@ export class ValueParser extends Base {
                 return this.results.code;
                 break;
             default:
-                this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
-                return this.results.code;
+                if (moded) {
+                    this.results.code.push(code);
+                    return this.results.code;
+                } else {
+                    this.results.code.replaceAll(ErrorCodes.ReferenceError.VariableNotExit(variable));
+                    this.results.code.setError(true);
+                    return this.results.code;
+                }
                 break;
         }
     }
 
     private async parseFetch(url: string): Promise<string> {
-        const res = await this.req.get({
-            url,
-            config: {
-                httpAgent: new Agent({ rejectUnauthorized: false }),
-            },
-        });
+        const res = await this.req.get({ url, config: { httpsAgent: new Agent({ rejectUnauthorized: false }) } });
 
         if (res.status !== 200) return ErrorCodes.RemoteServerError(res.status);
         return res.data.toString();
@@ -193,12 +202,13 @@ export class ValueParser extends Base {
 
     private async parseAlias(
         commandName: string,
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage
+        message: TwitchMessage | DiscordMessage | DummyMessage
     ): Promise<string> {
         commandName = commandName.toLowerCase();
         const command = this.managers.command.getCommandByName(commandName);
         if (command) {
-            const result = await this.parse(command.message, message, true);
+            const parser = new ValueParser(this);
+            const result = await parser.parse(command.message, message, true);
             if (result?.error) {
                 this.results?.code?.replaceAll(result.parsed);
                 this.results?.code?.setError(true);
@@ -211,12 +221,11 @@ export class ValueParser extends Base {
         }
     }
 
-    private async parseMod(
-        args: string[],
-        message: TwitchMessage | DiscordMessage<true> | DummyMessage
-    ): Promise<string> {
+    private async parseMod(args: string[], message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         let isMod = false;
-        if (message instanceof TwitchMessage) isMod = message.member.isMod;
+        if (message instanceof TwitchMessage) {
+            if (message.member.isBroadCaster || message.member.isMod || message.member.isVip) isMod = true;
+        }
         if (message instanceof DiscordMessage) {
             const { modRoleId } = this.DM.getSettings().discord;
             isMod = message.member?.roles.cache.has(modRoleId) ?? false;
@@ -286,13 +295,18 @@ export class ValueParser extends Base {
         return isNum;
     }
 
-    private parseChannel(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+    private parseChannel(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) return message.channel.name;
         if (message instanceof DummyMessage) return message.channel.name;
-        return message.channel.name;
+        if (message.inGuild()) return message.channel.name;
+        return ErrorCodes.PlatformError.Channel;
     }
 
-    private async parseGame(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+    private async parseGame(
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        isManageCom?: boolean
+    ): Promise<string> {
+        if (isManageCom) return ErrorCodes.Dummy.Game;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Game);
             this.results?.code?.setError(true);
@@ -303,19 +317,23 @@ export class ValueParser extends Base {
         return channel.gameName;
     }
 
-    private async parseTitle(message: TwitchMessage | DiscordMessage<true> | DummyMessage): Promise<string> {
+    private async parseTitle(
+        message: TwitchMessage | DiscordMessage | DummyMessage,
+        isManageCom?: boolean
+    ): Promise<string> {
+        if (isManageCom) return ErrorCodes.Dummy.Title;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Title);
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Title;
         } else {
-            const channel = await this.twitch._api.channels.getChannelInfoById('');
+            const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
             if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
             return channel.title;
         }
     }
 
-    private parseUser(message: TwitchMessage | DiscordMessage<true> | DummyMessage): string {
+    private parseUser(message: TwitchMessage | DiscordMessage | DummyMessage): string {
         if (message instanceof TwitchMessage) return message.member.displayName;
         if (message instanceof DiscordMessage) return message.author.tag;
         return message.user.name;
@@ -323,7 +341,7 @@ export class ValueParser extends Base {
 
     private parseTime(): string {
         const date = dayjs.tz(undefined);
-        return `${date.year}/${date.month}/${date.day} ${date.hour}:${date.minute}:${date.second}`;
+        return `${date.year()}/${date.month() + 1}/${date.date()} ${date.hour()}:${date.minute()}:${date.second()}`;
     }
 }
 
@@ -412,7 +430,7 @@ export class PubValueParser {
     }
 }
 
-const ErrorCodes = {
+export const ErrorCodes = {
     RemoteServerError: (status: string | number) =>
         `RemoteServerError: リモートサーバーからエラーが返されました [code: ${status}]`,
     SyntaxError: {
@@ -439,11 +457,16 @@ const ErrorCodes = {
     },
     PlatformError: {
         Game: 'PlatformError: このプラットフォームではこの変数を使用することができません。 game',
-        Title: 'PlatformError: このプラットフォームでは',
+        Title: 'PlatformError: このプラットフォームではこの変数を使用することができません。 title',
+        Channel: 'PlatformError: このプラットフォームではこの変数を使用することができません。 channel',
     },
     TwitchAPIError: {
         CanNotGetTitle: 'TwitchAPIError: チャンネルのタイトルを取得できませんでした。',
         CanNotGetGame: 'TwitchAPIError: チャンネルのゲームを取得できませんでした。',
+    },
+    Dummy: {
+        Game: 'Dummy game name',
+        Title: 'Dummy title name',
     },
     UnknownError: 'UnknownError: 何らかの要因で処理が失敗しました。',
 };

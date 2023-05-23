@@ -15,13 +15,11 @@ dayjs.tz.setDefault('Asia/Tokyo');
 import { Base } from './Base';
 import { CommandsJson, PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
-import { DummyMessage, PubValueParser, ValueParser } from './ValueParser';
+import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValueParser';
 
 export class CommandManager extends Base {
-    public valueParser: ValueParser;
     constructor(base: Base) {
         super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
-        this.valueParser = new ValueParser(this);
     }
 
     getCommandByName(name: string): TwitchCommand | null {
@@ -71,9 +69,17 @@ export class CommandManager extends Base {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
+        const parser = new ValueParser(this);
+        const valueResult = await parser.parse(value, message, false, true);
+        if (!valueResult || !valueResult.error) {
+            if (!valueResult) {
+                this.logger.debug('Command adding failed due to unknown error.');
+                return ErrorCodes.UnknownError;
+            }
+            this.logger.debug(`Command adding failed due to ${valueResult.parsed.split(':')[0]}`);
+            return valueResult.parsed;
+        }
 
-        const valueResult = await this.valueParser.parse(value, message);
-        if (valueResult.status !== 200) return valueResult.content;
         const newCommand: TwitchCommand = {
             _id: randomUUID(),
             name,
@@ -101,8 +107,17 @@ export class CommandManager extends Base {
         const name = commandName.toLowerCase();
         if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
 
-        const valueResult = await this.valueParser.parse(value, message);
-        if (valueResult.status !== 200) return valueResult.content;
+        const parser = new ValueParser(this);
+        const valueResult = await parser.parse(value, message, false, true);
+        if (!valueResult || valueResult.error) {
+            if (!valueResult) {
+                this.logger.debug('Command editing failed due to unknown error.');
+                return ErrorCodes.UnknownError;
+            }
+            this.logger.debug(`Command editing failed due to ${valueResult.parsed.split(':')[0]}`);
+            return valueResult.parsed;
+        }
+
         let newCommands: CommandsJson = { commands: [] };
         commands.commands.forEach((command) => {
             if (command.name !== name) return newCommands.commands.push(command);
@@ -190,7 +205,7 @@ export class CommandManager extends Base {
         let publicCommands: PublicCommandsJson = {};
         commands.forEach((command) => {
             const parsedData = new PubValueParser().parse(command.message);
-            publicCommands[command.name] = parsedData.content;
+            publicCommands[command.name] = parsedData.parsed;
         });
 
         this.DM.setPublicCommands(publicCommands);
