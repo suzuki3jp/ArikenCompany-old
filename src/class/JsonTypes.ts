@@ -81,6 +81,11 @@ export interface SettingsJson {
          */
         key: string;
     };
+
+    /**
+     * サイトのリンク
+     */
+    web: string;
 }
 
 export interface StreamStatusJson {
