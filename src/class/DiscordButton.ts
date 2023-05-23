@@ -4,7 +4,14 @@ import { ButtonInteraction, GuildMember, Message, MessageButton } from 'discord.
 // モジュールをインポート
 import { Base } from './Base';
 import { CommandManager } from './Command';
-import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal } from './Components';
+import {
+    addTemplateModal,
+    addModal,
+    ComponentCustomIds,
+    editModal,
+    removeModal,
+    createCommandPanelActionRow,
+} from './Components';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
 
 export class DiscordButton extends Base {
@@ -42,33 +49,32 @@ export class DiscordButton extends Base {
     next() {
         const manageCommandPanel = this.interaction.message;
         const embeds = manageCommandPanel.embeds;
-        const components = manageCommandPanel.components;
-        if (!components || !isMessage(manageCommandPanel)) return;
+        if (!isMessage(manageCommandPanel)) return;
         const isFirstPage = isFirstPageByFooter(this.interaction.message.embeds[0]);
         const currentPageNumber = currentPage(this.interaction.message.embeds[0]);
         const newPage = createCommandPanelEmbeds()[currentPageNumber];
+
+        const { pageController, commandController } = createCommandPanelActionRow(this);
         if (isFirstPage) {
             // 最初のページから次のページに遷移したとき、戻るボタンの無効化を解除
-            if (components[0].components[0] instanceof MessageButton) {
-                components[0].components[0].setDisabled(false);
-            }
+            pageController.components[0].setDisabled(false);
+
             embeds[0] = newPage;
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         } else if (isLastPageByFooter(newPage)) {
             // 最後のページに遷移したとき、次へボタンを無効化
-            if (components[0].components[1] instanceof MessageButton) {
-                components[0].components[1].setDisabled(true);
-            }
+            pageController.components[1].setDisabled(true);
+
             embeds[0] = newPage;
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         } else {
@@ -76,7 +82,7 @@ export class DiscordButton extends Base {
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         }
@@ -85,33 +91,30 @@ export class DiscordButton extends Base {
     previous() {
         const manageCommandPanel = this.interaction.message;
         const embeds = manageCommandPanel.embeds;
-        const components = manageCommandPanel.components;
-        if (!components || !isMessage(manageCommandPanel)) return;
+        if (!isMessage(manageCommandPanel)) return;
         const isLastPage = isLastPageByFooter(this.interaction.message.embeds[0]);
         const currentPageNumber = currentPage(this.interaction.message.embeds[0]);
         const newPage = createCommandPanelEmbeds()[currentPageNumber - 2];
+
+        const { pageController, commandController } = createCommandPanelActionRow(this);
         if (isLastPage) {
             // 最後のページから戻ったときに次へボタンを有効化する
-            if (components[0].components[1] instanceof MessageButton) {
-                components[0].components[1].setDisabled(false);
-            }
+            pageController.components[1].setDisabled(false);
             embeds[0] = newPage;
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         } else if (isFirstPageByFooter(newPage)) {
             // 最初のページに戻る時に戻るボタンを無効化する
-            if (components[0].components[0] instanceof MessageButton) {
-                components[0].components[0].setDisabled(true);
-            }
+            pageController.components[0].setDisabled(true);
             embeds[0] = newPage;
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         } else {
@@ -119,7 +122,7 @@ export class DiscordButton extends Base {
             manageCommandPanel.edit({
                 embeds,
                 // @ts-ignore
-                components,
+                components: [pageController, commandController],
             });
             this.interaction.deferUpdate();
         }

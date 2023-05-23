@@ -2,7 +2,7 @@ import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { ApiAuthManager } from './ApiAuth';
 import { Base } from './Base';
-import { addTemplateButton, commandManagerActionRow, pageManagerActionRow } from './Components';
+import { addTemplateButton, createCommandPanelActionRow } from './Components';
 import { TwitchStreamer } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
@@ -28,11 +28,12 @@ export class DiscordSlashCommand extends Base {
     }
 
     async setupPanel() {
-        pageManagerActionRow.components[0].setDisabled(true);
+        const { pageController, commandController } = createCommandPanelActionRow(this);
+        pageController.components[0].setDisabled(true);
         const settings = this.DM.getSettings();
         const panel = await this.interaction.channel?.send({
             embeds: [createCommandPanelEmbeds()[0]],
-            components: [pageManagerActionRow, commandManagerActionRow],
+            components: [pageController, commandController],
         });
         settings.discord.manageCommandPanelId = panel?.id ?? null;
         this.DM.setSettings(settings);

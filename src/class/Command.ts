@@ -5,7 +5,7 @@ import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { Message as DiscordMessage, TextChannel } from 'discord.js';
+import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
 import { randomUUID } from 'crypto';
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -13,6 +13,7 @@ dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
 import { Base } from './Base';
+import { createCommandPanelActionRow } from './Components';
 import { CommandsJson, PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValueParser';
@@ -192,11 +193,11 @@ export class CommandManager extends Base {
         if (manageCommandChannel instanceof TextChannel) {
             if (!settings.discord.manageCommandPanelId) return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);
-            const components = panel.components;
             const currentPageNum = currentPage(panel.embeds[0]);
             const currentPageIndex = currentPageNum - 1;
             this.logger.debug(`Synchronized command panel. current page: ${currentPageNum}`);
-            panel.edit({ embeds: [pages[currentPageIndex]], components });
+            const { pageController, commandController } = createCommandPanelActionRow(this);
+            panel.edit({ embeds: [pages[currentPageIndex]], components: [pageController, commandController] });
         } else return;
     }
 

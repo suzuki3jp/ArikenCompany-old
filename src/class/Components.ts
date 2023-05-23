@@ -1,6 +1,7 @@
 // nodeモジュールをインポート
 import { MessageActionRow, MessageButton, Modal, ModalActionRowComponent, TextInputComponent } from 'discord.js';
 import { MessageButtonStyles, TextInputStyles } from 'discord.js/typings/enums';
+import { Base } from './Base';
 
 export const ComponentCustomIds = {
     button: {
@@ -71,10 +72,6 @@ export const removeButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.remove)
     .setStyle(MessageButtonStyles.SUCCESS)
     .setLabel(ComponentLabels.button.remove);
-export const siteButton = new MessageButton()
-    .setLabel(ComponentLabels.button.site)
-    .setStyle(MessageButtonStyles.LINK)
-    .setURL(ArikenCompanyHP);
 
 export const addTemplateButton = new MessageButton()
     .setCustomId(ComponentCustomIds.button.addTemplate)
@@ -93,15 +90,7 @@ const valueInput = new TextInputComponent()
     .setLabel(ComponentLabels.text.value)
     .setStyle(TextInputStyles.PARAGRAPH);
 
-// ActionRows
-export const pageManagerActionRow = new MessageActionRow().addComponents(previousButton, nextButton);
-export const commandManagerActionRow = new MessageActionRow().addComponents(
-    addButton,
-    editButton,
-    removeButton,
-    siteButton
-);
-
+// constant action rows
 const commandNameInputActionRow = new MessageActionRow<ModalActionRowComponent>().addComponents(targetCommandInput);
 const valueInputActionRow = new MessageActionRow<ModalActionRowComponent>().addComponents(valueInput);
 
@@ -125,3 +114,19 @@ export const addTemplateModal = new Modal()
     .setCustomId(ComponentCustomIds.modal.addTemplate)
     .setTitle(ComponentLabels.modal.addTemplate)
     .addComponents(valueInputActionRow);
+
+export const createCommandPanelActionRow = (
+    base: Base
+): {
+    pageController: MessageActionRow;
+    commandController: MessageActionRow;
+} => {
+    const { web } = base.DM.getSettings();
+    const siteButton = new MessageButton()
+        .setLabel(ComponentLabels.button.site)
+        .setStyle(MessageButtonStyles.LINK)
+        .setURL(web);
+    const pageController = new MessageActionRow().addComponents(previousButton, nextButton);
+    const commandController = new MessageActionRow().addComponents(addButton, editButton, removeButton, siteButton);
+    return { pageController, commandController };
+};
