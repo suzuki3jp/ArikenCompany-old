@@ -223,7 +223,9 @@ export class ValueParser extends Base {
 
     private async parseMod(args: string[], message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         let isMod = false;
-        if (message instanceof TwitchMessage) isMod = message.member.isMod;
+        if (message instanceof TwitchMessage) {
+            if (message.member.isBroadCaster || message.member.isMod || message.member.isVip) isMod = true;
+        }
         if (message instanceof DiscordMessage) {
             const { modRoleId } = this.DM.getSettings().discord;
             isMod = message.member?.roles.cache.has(modRoleId) ?? false;
