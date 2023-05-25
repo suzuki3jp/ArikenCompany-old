@@ -424,7 +424,7 @@ export class PubValueParser {
                 return '[fetch]';
                 break;
             default:
-                return `${variable} ${args.join(' ')}`;
+                return `\${${variable} ${args.join(' ')}}`;
                 break;
         }
     }
