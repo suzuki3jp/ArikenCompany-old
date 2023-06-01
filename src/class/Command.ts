@@ -196,7 +196,7 @@ export class CommandManager extends Base {
             const currentPageNum = currentPage(panel.embeds[0]);
             const currentPageIndex = currentPageNum - 1;
             this.logger.debug(`Synchronized command panel. current page: ${currentPageNum}`);
-            const { pageController, commandController } = createCommandPanelActionRow(this);
+            const [pageController, commandController] = panel.components;
             panel.edit({ embeds: [pages[currentPageIndex]], components: [pageController, commandController] });
         } else return;
     }
