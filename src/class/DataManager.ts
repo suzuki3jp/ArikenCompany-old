@@ -28,10 +28,10 @@ export class DataManager {
     constructor() {
         this._paths = {
             chatters: resolve(__dirname, '../../data/Chatters.json'),
-            cert: '/etc/letsencrypt/live/suzuki-dev.com-0001/fullchain.pem',
+            cert: '/etc/letsencrypt/live/api.suzuki3jp.xyz/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
             env: resolve(__dirname, '../../.env'),
-            key: '/etc/letsencrypt/live/suzuki-dev.com-0001/privkey.pem',
+            key: '/etc/letsencrypt/live/api.suzuki3jp.xyz/privkey.pem',
             managers: resolve(__dirname, '../../data/Managers.json'),
             publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
             settings: resolve(__dirname, '../../data/settings.json'),

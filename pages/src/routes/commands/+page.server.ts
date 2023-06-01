@@ -1,4 +1,4 @@
 export const load = async () => {
-	const commands = await (await fetch('https://suzuki-dev.com:3150/commands')).json();
+	const commands = await (await fetch('https://api.suzuki3jp.xyz:3150/commands')).json();
 	return { commands };
 };
