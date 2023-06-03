@@ -10,7 +10,7 @@ export class CoolTimeManager extends Base {
     public _commandManager: CommandManager;
 
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this._commandManager = new CommandManager(this);
     }
 

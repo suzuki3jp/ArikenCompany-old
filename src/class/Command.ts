@@ -20,7 +20,7 @@ import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValuePa
 
 export class CommandManager extends Base {
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
     }
 
     getCommandByName(name: string): TwitchCommand | null {

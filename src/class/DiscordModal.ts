@@ -17,7 +17,7 @@ export class DiscordModal extends Base {
     public _commandManager: CommandManager;
 
     constructor(base: Base, modalInteraction: ModalSubmitInteraction) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
         this._commandManager = new CommandManager(this.getMe());

@@ -17,7 +17,7 @@ export class TwitchCommand extends Base {
     public _cooltimeManager: CoolTimeManager;
 
     constructor(base: Base, message: TwitchMessage) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.command = new CommandParser(message.content, {
             manageCommands: this.DM.getSettings().twitch.manageCommands,
         });

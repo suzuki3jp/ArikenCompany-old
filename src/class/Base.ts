@@ -22,24 +22,40 @@ export class Base {
     public DM: DataManager;
 
     constructor(options: {
-        twitchChat: ChatClient;
-        twitchApi: ApiClient;
-        twitchEventSub: EventSubWsListener;
-        discord: Discord;
-        apiApp: Express;
-        apiServer: HTTP | HTTPS;
-        logger: Logger;
+        twitchChat?: ChatClient;
+        twitchApi?: ApiClient;
+        twitchEventSub?: EventSubWsListener;
+        discord?: Discord;
+        apiApp?: Express;
+        apiServer?: HTTP | HTTPS;
+        logger?: Logger;
+        base?: Base;
     }) {
-        this.api = {
-            app: options.apiApp,
-            server: options.apiServer,
-        };
-        this.twitchChat = options.twitchChat;
-        this.twitchEventSub = options.twitchEventSub;
-        this.twitchApi = options.twitchApi;
-        this.discord = options.discord;
-        this.logger = options.logger;
-        this.DM = new DataManager();
+        if (options.base) {
+            this.api = options.base.api;
+            this.twitchApi = options.base.twitchApi;
+            this.twitchChat = options.base.twitchChat;
+            this.DM = options.base.DM;
+            this.api = options.base.api;
+            this.discord = options.base.discord;
+            this.twitchEventSub = options.base.twitchEventSub;
+            this.logger = options.base.logger;
+        } else {
+            const { apiApp, apiServer, twitchApi, twitchChat, twitchEventSub, discord, logger } = options;
+            if (!apiApp || !apiServer || !twitchApi || !twitchChat || !twitchEventSub || !discord || !logger)
+                throw new Error('Invalid Base args.');
+
+            this.api = {
+                app: apiApp,
+                server: apiServer,
+            };
+            this.twitchChat = twitchChat;
+            this.twitchEventSub = twitchEventSub;
+            this.twitchApi = twitchApi;
+            this.discord = discord;
+            this.logger = logger;
+            this.DM = new DataManager();
+        }
     }
 
     getMe(): Base {

@@ -20,7 +20,7 @@ export class ValueParser extends Base {
     private managers: { command: CommandManager };
 
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.results = null;
         this.req = new RequestClient();
         this.managers = {
