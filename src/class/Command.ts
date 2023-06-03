@@ -71,7 +71,7 @@ export class CommandManager extends Base {
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
         const parser = new ValueParser(this);
         const valueResult = await parser.parse(value, message, false, true);
-        if (!valueResult || !valueResult.error) {
+        if (!valueResult || valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command adding failed due to unknown error.');
                 return ErrorCodes.UnknownError;
