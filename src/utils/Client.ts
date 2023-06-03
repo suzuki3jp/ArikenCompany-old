@@ -44,12 +44,15 @@ export const createClients = async (
             logger.info('Twitch token has been refreshed.');
         },
     });
-    await auth.addUserForToken({
-        accessToken: TWITCH_TOKEN,
-        refreshToken: TWITCH_REFRESHTOKEN,
-        expiresIn: 0,
-        obtainmentTimestamp: 0,
-    });
+    await auth.addUserForToken(
+        {
+            accessToken: TWITCH_TOKEN,
+            refreshToken: TWITCH_REFRESHTOKEN,
+            expiresIn: 0,
+            obtainmentTimestamp: 0,
+        },
+        ['chat']
+    );
     const twitchApi = new ApiClient({ authProvider: auth });
     const twitchChat = new ChatClient({ authProvider: auth, channels });
     const twitchEventSub = new EventSubWsListener({ apiClient: twitchApi });
