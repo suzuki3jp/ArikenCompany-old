@@ -1,5 +1,5 @@
 // nodeモジュールをインポート
-import { ButtonInteraction, GuildMember, Message, MessageButton } from 'discord.js';
+import { ButtonInteraction, GuildMember, Message } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';

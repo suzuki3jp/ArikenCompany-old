@@ -1,8 +1,8 @@
 // nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
-import type { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 
 // モジュールをインポート
+import { Message as TwitchMessage } from '../twitchjs/index';
 import { Base } from './Base';
 import { CommandManager } from './Command';
 import { CoolTimeManager } from './CoolTime';

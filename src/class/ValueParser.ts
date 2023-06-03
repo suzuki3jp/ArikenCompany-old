@@ -1,6 +1,5 @@
 // nodeモジュールをインポート
-import { ArrayUtils, JST, RequestClient, StringUtils } from '@suzuki3jp/utils';
-import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
+import { ArrayUtils, RequestClient, StringUtils } from '@suzuki3jp/utils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
@@ -11,6 +10,7 @@ dayjs.extend(tz);
 dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
+import { Message as TwitchMessage } from '../twitchjs/index';
 import { Base } from './Base';
 import { CommandManager } from './Command';
 

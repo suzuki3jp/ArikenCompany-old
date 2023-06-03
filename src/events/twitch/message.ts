@@ -1,10 +1,8 @@
-// nodeモジュールをインポート
-import { Message } from '@suzuki3jp/twitch.js';
-
 // モジュールをインポート
 import { Base } from '../../class/Base';
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
+import { Message } from '../../twitchjs/index';
 
 export const twitchMessage = async (base: Base, message: Message) => {
     const twitchCommand = new TwitchCommand(base, message);
