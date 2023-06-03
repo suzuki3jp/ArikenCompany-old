@@ -1,80 +1,64 @@
 // nodeモジュールをインポート
-import type { AccessToken } from '@twurple/auth';
+import { ApiClient } from '@twurple/api';
+import { RefreshingAuthProvider } from '@twurple/auth';
+import { ChatClient } from '@twurple/chat';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-import { TwitchClient as Twitch, AuthConfig, ClientOptions as TwitchClientOptions } from '@suzuki3jp/twitch.js';
-import { CustomError, Env } from '@suzuki3jp/utils';
 import { Logger } from '@suzuki3jp/logger';
 import { Client as Discord, ClientOptions as DiscordClientOptions, Intents } from 'discord.js';
 
 // モジュールをインポート
 import { DataManager } from '../class/DataManager';
+import { dotenv } from './Env';
+import { DotEnv } from '../class/JsonTypes';
 
 const DM = new DataManager();
 
-// 環境変数を変数に代入
-const twitchToken = process.env.TWITCH_TOKEN;
-const twitchRefreshToken = process.env.TWITCH_REFRESHTOKEN;
-const twitchClientId = process.env.TWITCH_CLIENTID;
-const twitchClientSecret = process.env.TWITCH_CLIENTSECRET;
-const discordToken = process.env.DISCORD_TOKEN;
-
-export const createClients = (
+export const createClients = async (
     logger: Logger
-): { twitch: Twitch; eventSub: EventSubWsListener; discord: { client: Discord; token: string } } => {
-    if (!discordToken) throw new CustomError('ENV_ERROR', '.env content is invalid.');
-    const twitch = createTwitchClient(logger);
-    return {
-        twitch,
-        eventSub: createEventSubClient(twitch),
-        discord: { client: createDiscordClient(), token: discordToken },
+): Promise<{
+    twitch: { chat: ChatClient; api: ApiClient; eventSub: EventSubWsListener };
+    discord: {
+        client: Discord;
+        token: string;
     };
-};
+}> => {
+    const { TWITCH_CLIENTID, TWITCH_CLIENTSECRET, TWITCH_TOKEN, TWITCH_REFRESHTOKEN, DISCORD_TOKEN } = dotenv();
+    const {
+        twitch: { channels },
+    } = DM.getSettings();
 
-const createTwitchClient = (logger: Logger): Twitch => {
-    const { authConfig, options } = createTwitchClientOptions(logger);
-    return new Twitch(authConfig, options);
-};
-
-const createDiscordClient = (): Discord => {
-    return new Discord(createDiscordClientOptions());
-};
-
-const createEventSubClient = (twitchClient: Twitch) => {
-    return new EventSubWsListener({ apiClient: twitchClient._api });
-};
-
-const createTwitchClientOptions = (logger: Logger): { authConfig: AuthConfig; options: TwitchClientOptions } => {
-    if (twitchToken && twitchClientId && twitchClientSecret && twitchRefreshToken && discordToken) {
-        const onRefresh = (tokenInfo: AccessToken) => {
-            const newToken = tokenInfo.accessToken;
-            const newRefreshToken = tokenInfo.refreshToken;
-            const envDataObj = {
-                TWITCH_TOKEN: newToken,
-                TWITCH_REFRESHTOKEN: newRefreshToken,
-                TWITCH_CLIENTID: twitchClientId,
-                TWITCH_CLIENTSECRET: twitchClientSecret,
-                DISCORD_TOKEN: discordToken,
+    // twitch clients
+    const auth = new RefreshingAuthProvider({
+        clientId: TWITCH_CLIENTID,
+        clientSecret: TWITCH_CLIENTSECRET,
+        onRefresh: (userId, newTokens) => {
+            if (!newTokens.refreshToken) throw new Error('Twitch token refresh error.');
+            const newEnv: DotEnv = {
+                TWITCH_CLIENTID,
+                TWITCH_CLIENTSECRET,
+                TWITCH_REFRESHTOKEN: newTokens.refreshToken,
+                TWITCH_TOKEN: newTokens.accessToken,
+                DISCORD_TOKEN,
             };
-            const newEnvData = Env.parseToEnv(envDataObj);
+            DM.setEnv(newEnv);
+            logger.info('Twitch token has been refreshed.');
+        },
+    });
+    await auth.addUserForToken({
+        accessToken: TWITCH_TOKEN,
+        refreshToken: TWITCH_REFRESHTOKEN,
+        expiresIn: 0,
+        obtainmentTimestamp: 0,
+    });
+    const twitchApi = new ApiClient({ authProvider: auth });
+    const twitchChat = new ChatClient({ authProvider: auth, channels });
+    const twitchEventSub = new EventSubWsListener({ apiClient: twitchApi });
 
-            DM.setEnv(newEnvData);
+    // discord client
+    const discordClient = new Discord({ intents: Object.values(Intents.FLAGS) });
 
-            logger.info(`Twitch token has been refreshed.`);
-        };
-
-        const authConfig: AuthConfig = {
-            accessToken: twitchToken,
-            refreshToken: twitchRefreshToken,
-            clientId: twitchClientId,
-            clientSecret: twitchClientSecret,
-            onRefresh,
-        };
-        return { authConfig, options: { channels: DM.getSettings().twitch.channels } };
-    } else {
-        throw new CustomError('ENV_ERROR', '.env content is invalid.');
-    }
-};
-
-const createDiscordClientOptions = (): DiscordClientOptions => {
-    return { intents: Object.values(Intents.FLAGS) };
+    return {
+        twitch: { chat: twitchChat, api: twitchApi, eventSub: twitchEventSub },
+        discord: { client: discordClient, token: DISCORD_TOKEN },
+    };
 };

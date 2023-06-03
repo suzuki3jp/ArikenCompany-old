@@ -1,5 +1,7 @@
 // nodeモジュールをインポート
-import type { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+// import type { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
+import { ApiClient } from '@twurple/api';
+import { ChatClient } from '@twurple/chat';
 import type { Logger } from '@suzuki3jp/logger';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { Express } from 'express';
@@ -12,28 +14,31 @@ import { DataManager } from './DataManager';
 
 export class Base {
     public api: { app: Express; server: HTTP | HTTPS };
-    public twitch: Twitch;
+    public twitchChat: ChatClient;
     public discord: Discord;
-    public eventSub: EventSubWsListener;
+    public twitchEventSub: EventSubWsListener;
+    public twitchApi: ApiClient;
     public logger: Logger;
     public DM: DataManager;
 
-    constructor(
-        twitch: Twitch,
-        discord: Discord,
-        eventSub: EventSubWsListener,
-        logger: Logger,
-        apiApp: Express,
-        apiServer: HTTP | HTTPS
-    ) {
+    constructor(options: {
+        twitchChat: ChatClient;
+        twitchApi: ApiClient;
+        twitchEventSub: EventSubWsListener;
+        discord: Discord;
+        apiApp: Express;
+        apiServer: HTTP | HTTPS;
+        logger: Logger;
+    }) {
         this.api = {
-            app: apiApp,
-            server: apiServer,
+            app: options.apiApp,
+            server: options.apiServer,
         };
-        this.twitch = twitch;
-        this.discord = discord;
-        this.eventSub = eventSub;
-        this.logger = logger;
+        this.twitchChat = options.twitchChat;
+        this.twitchEventSub = options.twitchEventSub;
+        this.twitchApi = options.twitchApi;
+        this.discord = options.discord;
+        this.logger = options.logger;
         this.DM = new DataManager();
     }
 
