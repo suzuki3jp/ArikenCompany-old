@@ -63,7 +63,7 @@ export class DiscordSlashCommand extends Base {
         if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
-        const user = await this.twitch._api.users.getUserByName(name);
+        const user = await this.twitchApi.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
         // 取得したユーザーから配信を取得する

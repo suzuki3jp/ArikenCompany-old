@@ -312,7 +312,7 @@ export class ValueParser extends Base {
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Game;
         }
-        const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
+        const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
         if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetGame;
         return channel.gameName;
     }
@@ -327,7 +327,7 @@ export class ValueParser extends Base {
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Title;
         } else {
-            const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
+            const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
             if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
             return channel.title;
         }

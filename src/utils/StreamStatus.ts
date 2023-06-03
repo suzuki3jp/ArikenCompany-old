@@ -4,9 +4,9 @@ import { TwitchStreamer } from '../class/JsonTypes';
 export const syncStreamStatusJson = async (base: Base) => {
     const { users } = base.DM.getStreamStatus();
     users.forEach(async (user, index) => {
-        const currentUserStatus = await base.twitch._api.channels.getChannelInfoById(user.id);
+        const currentUserStatus = await base.twitchApi.channels.getChannelInfoById(user.id);
         if (currentUserStatus) {
-            const stream = await base.twitch._api.streams.getStreamByUserId(currentUserStatus.id);
+            const stream = await base.twitchApi.streams.getStreamByUserId(currentUserStatus.id);
             const newTwitchStreamer: TwitchStreamer = {
                 id: currentUserStatus.id,
                 name: currentUserStatus.name,

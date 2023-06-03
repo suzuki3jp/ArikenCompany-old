@@ -14,6 +14,6 @@ export const eventSub = async (base: Base) => {
         base.discord.on('ready', () => changeArikenActivity(user.isStreaming, base));
     });
 
-    base.eventSub.start();
+    base.twitchEventSub.start();
     base.logger.system(`Twitch event-sub client is ready.`);
 };
