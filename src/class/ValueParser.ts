@@ -1,6 +1,5 @@
 // nodeモジュールをインポート
-import { ArrayUtils, JST, RequestClient, StringUtils } from '@suzuki3jp/utils';
-import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
+import { ArrayUtils, RequestClient, StringUtils } from '@suzuki3jp/utils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
@@ -11,6 +10,7 @@ dayjs.extend(tz);
 dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
+import { Message as TwitchMessage } from '../twitchjs/index';
 import { Base } from './Base';
 import { CommandManager } from './Command';
 
@@ -20,7 +20,7 @@ export class ValueParser extends Base {
     private managers: { command: CommandManager };
 
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.results = null;
         this.req = new RequestClient();
         this.managers = {
@@ -312,7 +312,7 @@ export class ValueParser extends Base {
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Game;
         }
-        const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
+        const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
         if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetGame;
         return channel.gameName;
     }
@@ -327,7 +327,7 @@ export class ValueParser extends Base {
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Title;
         } else {
-            const channel = await this.twitch._api.channels.getChannelInfoById(message.channel.id);
+            const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
             if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
             return channel.title;
         }

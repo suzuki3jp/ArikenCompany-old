@@ -1,8 +1,8 @@
 // nodeモジュールをインポート
 import { CommandParser } from '@suzuki3jp/twitch.js';
-import type { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 
 // モジュールをインポート
+import { Message as TwitchMessage } from '../twitchjs/index';
 import { Base } from './Base';
 import { CommandManager } from './Command';
 import { CoolTimeManager } from './CoolTime';
@@ -17,7 +17,7 @@ export class TwitchCommand extends Base {
     public _cooltimeManager: CoolTimeManager;
 
     constructor(base: Base, message: TwitchMessage) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.command = new CommandParser(message.content, {
             manageCommands: this.DM.getSettings().twitch.manageCommands,
         });

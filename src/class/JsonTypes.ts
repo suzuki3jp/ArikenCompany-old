@@ -124,3 +124,11 @@ export interface TwitchChatter {
     displayName: string;
     messageCount: number;
 }
+
+export interface DotEnv {
+    TWITCH_TOKEN: string;
+    TWITCH_REFRESHTOKEN: string;
+    TWITCH_CLIENTID: string;
+    TWITCH_CLIENTSECRET: string;
+    DISCORD_TOKEN: string;
+}

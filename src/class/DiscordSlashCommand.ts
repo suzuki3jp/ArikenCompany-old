@@ -13,7 +13,7 @@ export class DiscordSlashCommand extends Base {
     public subCommand: string | null;
 
     constructor(base: Base, interaction: CommandInteraction) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.interaction = interaction;
         this.command = this.interaction.commandName;
         this.subCommand = this.interaction.options.getSubcommand();
@@ -63,7 +63,7 @@ export class DiscordSlashCommand extends Base {
         if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
-        const user = await this.twitch._api.users.getUserByName(name);
+        const user = await this.twitchApi.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
         // 取得したユーザーから配信を取得する

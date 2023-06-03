@@ -1,26 +1,25 @@
 // TODO: dayjs.tz()の引数の型が間違っている。おそらくdayjs 1.11.9以降で修正される。[該当PR](https://github.com/iamkun/dayjs/pull/2222)
 
 // nodeモジュールをインポート
-import { Message as TwitchMessage } from '@suzuki3jp/twitch.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { Message as DiscordMessage, MessageButton, TextChannel } from 'discord.js';
+import { Message as DiscordMessage, TextChannel } from 'discord.js';
 import { randomUUID } from 'crypto';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
+import { Message as TwitchMessage } from '../twitchjs/index';
 import { Base } from './Base';
-import { createCommandPanelActionRow } from './Components';
 import { CommandsJson, PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValueParser';
 
 export class CommandManager extends Base {
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
     }
 
     getCommandByName(name: string): TwitchCommand | null {
@@ -72,7 +71,7 @@ export class CommandManager extends Base {
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
         const parser = new ValueParser(this);
         const valueResult = await parser.parse(value, message, false, true);
-        if (!valueResult || !valueResult.error) {
+        if (!valueResult || valueResult.error) {
             if (!valueResult) {
                 this.logger.debug('Command adding failed due to unknown error.');
                 return ErrorCodes.UnknownError;

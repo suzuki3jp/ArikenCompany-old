@@ -2,6 +2,7 @@
 import { Base } from '../class/Base';
 import { discordInteraction, discordMessage, discordReady } from './discord/index';
 import { twitchMessage, twitchReady } from './twitch/index';
+import { Message } from '../twitchjs/index';
 
 export const events = (base: Base, discordToken: string) => {
     // discord events
@@ -12,9 +13,11 @@ export const events = (base: Base, discordToken: string) => {
     base.discord.on('interactionCreate', (interaction) => discordInteraction(base, interaction));
 
     // twitch events
-    base.twitch.on('ready', () => twitchReady(base));
+    base.twitchChat.onConnect(() => twitchReady(base));
 
-    base.twitch.on('messageCreate', (message) => twitchMessage(base, message));
+    base.twitchChat.onMessage((channel, user, text, message) =>
+        twitchMessage(base, new Message(base, channel, text, message))
+    );
 
     // logger events
     base.logger.on('debug', (msg) => {
@@ -34,6 +37,6 @@ export const events = (base: Base, discordToken: string) => {
     });
 
     // client login
-    base.twitch.login();
+    base.twitchChat.connect();
     base.discord.login(discordToken);
 };

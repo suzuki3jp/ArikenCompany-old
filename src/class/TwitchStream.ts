@@ -12,7 +12,7 @@ export class TwitchStream extends Base {
     public user: TwitchStreamer | null;
     public userIndex: number | null;
     constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.users = this.DM.getStreamStatus().users;
         this.user = null;
         this.userIndex = null;
@@ -27,7 +27,7 @@ export class TwitchStream extends Base {
         if (this.userIndex === null || this.user === null) return;
 
         const channel = await this.discord.channels.fetch(this.user.notificationChannelId);
-        const stream = await this.twitch._api.streams.getStreamByUserId(this.user.id);
+        const stream = await this.twitchApi.streams.getStreamByUserId(this.user.id);
         if (!channel || !stream) return;
         this._updateData(true);
         this._changeDiscordActivity();

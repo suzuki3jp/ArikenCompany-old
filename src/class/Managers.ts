@@ -3,7 +3,7 @@ import { Base } from './Base';
 
 export class ManagersManager extends Base {
     constructor(base: Base) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
     }
 
     isManagersByTarget(target: string) {

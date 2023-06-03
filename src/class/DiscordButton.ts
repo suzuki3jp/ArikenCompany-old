@@ -1,5 +1,5 @@
 // nodeモジュールをインポート
-import { ButtonInteraction, GuildMember, Message, MessageButton } from 'discord.js';
+import { ButtonInteraction, GuildMember, Message } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from './Base';
@@ -22,7 +22,7 @@ export class DiscordButton extends Base {
     public _commandManager: CommandManager;
 
     constructor(base: Base, interaction: ButtonInteraction) {
-        super(base.twitch, base.discord, base.eventSub, base.logger, base.api.app, base.api.server);
+        super({ base });
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
