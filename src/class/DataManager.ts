@@ -1,4 +1,5 @@
 // nodeモジュールをインポート
+import { Env } from '@suzuki3jp/utils';
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -10,6 +11,7 @@ import {
     PublicCommandsJson,
     SettingsJson,
     StreamStatusJson,
+    DotEnv,
 } from './JsonTypes';
 
 export class DataManager {
@@ -59,8 +61,12 @@ export class DataManager {
         this._writeFile(this._paths.commands, data);
     }
 
-    setEnv(data: string) {
-        this._writeFile(this._paths.env, data);
+    setEnv(data: string | DotEnv) {
+        if (typeof data === 'string') {
+            this._writeFile(this._paths.env, data);
+        } else {
+            this._writeFile(this._paths.env, Env.parseToEnv(data));
+        }
     }
 
     getKey(): string {
