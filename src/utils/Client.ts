@@ -4,7 +4,7 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { Logger } from '@suzuki3jp/logger';
-import { Client as Discord, ClientOptions as DiscordClientOptions, Intents } from 'discord.js';
+import { Client as Discord, Intents } from 'discord.js';
 
 // モジュールをインポート
 import { DataManager } from '../class/DataManager';
@@ -26,6 +26,7 @@ export const createClients = async (
     const {
         twitch: { channels },
     } = DM.getSettings();
+    const { users } = DM.getStreamStatus();
 
     // twitch clients
     const auth = new RefreshingAuthProvider({
@@ -53,6 +54,16 @@ export const createClients = async (
         },
         ['chat']
     );
+    // eventsubのためにユーザーを追加する
+    users.forEach((streamer) => {
+        auth.addUser(streamer.id, {
+            accessToken: TWITCH_TOKEN,
+            refreshToken: TWITCH_REFRESHTOKEN,
+            expiresIn: 0,
+            obtainmentTimestamp: 0,
+        });
+    });
+
     const twitchApi = new ApiClient({ authProvider: auth });
     const twitchChat = new ChatClient({ authProvider: auth, channels });
     const twitchEventSub = new EventSubWsListener({ apiClient: twitchApi });

@@ -1,8 +1,6 @@
 // nodeモジュールをインポート
-import { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
-import { Logger } from '@suzuki3jp/utils';
 import { Message } from 'discord.js';
-import type { Client as Discord, ModalSubmitInteraction } from 'discord.js';
+import type { ModalSubmitInteraction } from 'discord.js';
 
 // モジュールをインポート
 import { Base } from '../../class/Base';

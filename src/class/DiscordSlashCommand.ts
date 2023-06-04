@@ -6,6 +6,7 @@ import { addTemplateButton, createCommandPanelActionRow } from './Components';
 import { TwitchStreamer } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
+import { restartPm2Process } from '../utils/Pm2';
 
 export class DiscordSlashCommand extends Base {
     public interaction: CommandInteraction;
@@ -78,10 +79,6 @@ export class DiscordSlashCommand extends Base {
             notificationChannelId: this.interaction.channel.id,
         };
 
-        // EventSubリスナーを登録する
-        subscribeOnlineEvent(this.getMe(), newUser.id);
-        subscribeOfflineEvent(this.getMe(), newUser.id);
-
         // StreamStatusJsonにプッシュする
         users.push(newUser);
         this.DM.setStreamStatus({ users });
@@ -89,6 +86,8 @@ export class DiscordSlashCommand extends Base {
         const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(
             newUser.notificationChannelId
         )}に送信するよう設定しました。`;
+        await this.interaction.reply(result);
+        restartPm2Process(this);
         return result;
     }
 
