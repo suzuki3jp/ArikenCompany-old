@@ -1,5 +1,4 @@
 // nodeモジュールをインポート
-// import type { TwitchClient as Twitch } from '@suzuki3jp/twitch.js';
 import { ApiClient } from '@twurple/api';
 import { ChatClient } from '@twurple/chat';
 import type { Logger } from '@suzuki3jp/logger';

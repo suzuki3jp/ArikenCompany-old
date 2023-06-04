@@ -1,5 +1,5 @@
 // nodeモジュールをインポート
-import { Logger, Options } from '@suzuki3jp/logger';
+import { Logger } from '@suzuki3jp/logger';
 import cron from 'node-cron';
 import pm2 from 'pm2';
 import dotenv from 'dotenv';
