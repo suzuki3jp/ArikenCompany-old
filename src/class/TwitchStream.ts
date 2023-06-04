@@ -31,7 +31,7 @@ export class TwitchStream extends Base {
         if (!channel || !stream) return;
         this._updateData(true);
         this._changeDiscordActivity();
-        const embeds = this._createOnStreamEmbed(stream);
+        const embeds = await this._createOnStreamEmbed(stream);
         if (channel instanceof TextChannel) {
             await channel.send({ content: '@everyone', embeds });
             this.logger.info(`Sent stream notification. [${stream.userDisplayName}](${stream.userId})`);
@@ -55,13 +55,16 @@ export class TwitchStream extends Base {
         this.logger.debug(`Update isStreaming to ${isStreaming}. [${this.user.displayName}](${this.user.id})`);
     }
 
-    _createOnStreamEmbed(stream: HelixStream): MessageEmbed[] {
+    async _createOnStreamEmbed(stream: HelixStream): Promise<MessageEmbed[]> {
+        const archives = (await this.twitchApi.videos.getVideosByUser(stream.userId, { type: 'archive' })).data;
+        const latestArchive = archives[0];
+
         const embed: APIEmbed = {
             title: `${stream.userDisplayName}が配信を開始しました`,
             url: `https://www.twitch.tv/${stream.userName}`,
             description: `**タイトル**: ${stream.title}, **ゲーム**: ${stream.gameName}`,
             footer: {
-                text: JST.getDateString(),
+                text: `${JST.getDateString()} | videoId: ${latestArchive.streamId === stream.id ? latestArchive.id : 'アーカイブ未生成'}`,
             },
         };
         // @ts-expect-error
