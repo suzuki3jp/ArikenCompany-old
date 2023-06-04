@@ -26,6 +26,7 @@ export const createClients = async (
     const {
         twitch: { channels },
     } = DM.getSettings();
+    const { users } = DM.getStreamStatus();
 
     // twitch clients
     const auth = new RefreshingAuthProvider({
@@ -53,6 +54,16 @@ export const createClients = async (
         },
         ['chat']
     );
+    // eventsubのためにユーザーを追加する
+    users.forEach((streamer) => {
+        auth.addUser(streamer.id, {
+            accessToken: TWITCH_TOKEN,
+            refreshToken: TWITCH_REFRESHTOKEN,
+            expiresIn: 0,
+            obtainmentTimestamp: 0,
+        });
+    });
+
     const twitchApi = new ApiClient({ authProvider: auth });
     const twitchChat = new ChatClient({ authProvider: auth, channels });
     const twitchEventSub = new EventSubWsListener({ apiClient: twitchApi });
