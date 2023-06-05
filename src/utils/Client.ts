@@ -54,13 +54,14 @@ export const createClients = async (
         },
         ['chat']
     );
+    const token = await auth.getAppAccessToken();
     // eventsubのためにユーザーを追加する
     users.forEach((streamer) => {
         auth.addUser(streamer.id, {
             accessToken: TWITCH_TOKEN,
             refreshToken: TWITCH_REFRESHTOKEN,
-            expiresIn: 0,
-            obtainmentTimestamp: 0,
+            expiresIn: token.expiresIn,
+            obtainmentTimestamp: token.obtainmentTimestamp,
         });
     });
 
