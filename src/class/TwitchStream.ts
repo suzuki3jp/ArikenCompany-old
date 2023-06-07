@@ -2,17 +2,17 @@ import { JST } from '@suzuki3jp/utils';
 import { HelixStream } from '@twurple/api';
 import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 
-import { Base } from './Base';
 import { TwitchStreamer } from './JsonTypes';
 import { MessageEmbed, TextChannel } from 'discord.js';
 import { APIEmbed } from 'discord-api-types/v9';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class TwitchStream extends Base {
+export class TwitchStream extends ArikenCompany {
     public users: TwitchStreamer[];
     public user: TwitchStreamer | null;
     public userIndex: number | null;
-    constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
-        super({ base });
+    constructor(app: ArikenCompany, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
+        super(app);
         this.users = this.DM.getStreamStatus().users;
         this.user = null;
         this.userIndex = null;
@@ -26,8 +26,8 @@ export class TwitchStream extends Base {
     async turnOnline() {
         if (this.userIndex === null || this.user === null) return;
 
-        const channel = await this.discord.channels.fetch(this.user.notificationChannelId);
-        const stream = await this.twitchApi.streams.getStreamByUserId(this.user.id);
+        const channel = await this.client.discord.channels.fetch(this.user.notificationChannelId);
+        const stream = await this.client.twitch.api.streams.getStreamByUserId(this.user.id);
         if (!channel || !stream) return;
         this._updateData(true);
         this._changeDiscordActivity();
@@ -56,7 +56,7 @@ export class TwitchStream extends Base {
     }
 
     async _createOnStreamEmbed(stream: HelixStream): Promise<MessageEmbed[]> {
-        const archives = (await this.twitchApi.videos.getVideosByUser(stream.userId, { type: 'archive' })).data;
+        const archives = (await this.client.twitch.api.videos.getVideosByUser(stream.userId, { type: 'archive' })).data;
         const latestArchive = archives[0];
 
         const embed: APIEmbed = {
@@ -81,18 +81,18 @@ export class TwitchStream extends Base {
 }
 
 export const ARIKEN_TWITCH_ID = 'arikendebu';
-export const changeArikenActivity = (isStreaming: boolean, base: Base) => {
+export const changeArikenActivity = (isStreaming: boolean, app: ArikenCompany) => {
     const streamingStr = 'ありけん: 配信中';
     if (isStreaming) {
-        base.discord.user?.setPresence({
+        app.client.discord.user?.setPresence({
             activities: [{ name: streamingStr, type: 'STREAMING', url: 'https://www.twitch.tv/arikendebu' }],
             status: 'online',
         });
-        base.logger.info(`Discord activity changed to streaming.`);
+        app.logger.info(`Discord activity changed to streaming.`);
     } else {
-        base.discord.user?.setPresence({
+        app.client.discord.user?.setPresence({
             status: 'idle',
         });
-        base.logger.info(`Discord activity changed to not-streming.`);
+        app.logger.info(`Discord activity changed to not-streming.`);
     }
 };

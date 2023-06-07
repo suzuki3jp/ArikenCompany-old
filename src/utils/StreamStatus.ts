@@ -1,12 +1,12 @@
-import { Base } from '../class/Base';
+import { ArikenCompany } from '../ArikenCompany';
 import { TwitchStreamer } from '../class/JsonTypes';
 
-export const syncStreamStatusJson = async (base: Base) => {
-    const { users } = base.DM.getStreamStatus();
+export const syncStreamStatusJson = async (app: ArikenCompany) => {
+    const { users } = app.DM.getStreamStatus();
     users.forEach(async (user, index) => {
-        const currentUserStatus = await base.twitchApi.channels.getChannelInfoById(user.id);
+        const currentUserStatus = await app.client.twitch.api.channels.getChannelInfoById(user.id);
         if (currentUserStatus) {
-            const stream = await base.twitchApi.streams.getStreamByUserId(currentUserStatus.id);
+            const stream = await app.client.twitch.api.streams.getStreamByUserId(currentUserStatus.id);
             const newTwitchStreamer: TwitchStreamer = {
                 id: currentUserStatus.id,
                 name: currentUserStatus.name,
@@ -16,7 +16,7 @@ export const syncStreamStatusJson = async (base: Base) => {
             };
             users.splice(index, 1);
             users.splice(index, 0, newTwitchStreamer);
-            base.DM.setStreamStatus({ users });
+            app.DM.setStreamStatus({ users });
         } else return;
     });
 };

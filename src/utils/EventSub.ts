@@ -1,12 +1,12 @@
-import { Base } from '../class/Base';
+import { ArikenCompany } from '../ArikenCompany';
 import { TwitchStream } from '../class/TwitchStream';
 
-export const subscribeOnlineEvent = (base: Base, id: string) => {
-    base.twitchEventSub.onStreamOnline(id, (event) => new TwitchStream(base, event).turnOnline());
-    base.logger.info(`Listening stream event-sub ${id}`);
+export const subscribeOnlineEvent = (app: ArikenCompany, id: string) => {
+    app.client.twitch.eventSub.onStreamOnline(id, (event) => new TwitchStream(app, event).turnOnline());
+    app.logger.info(`Listening stream event-sub ${id}`);
 };
 
-export const subscribeOfflineEvent = (base: Base, id: string) => {
-    base.twitchEventSub.onStreamOffline(id, (event) => new TwitchStream(base, event).turnOffline());
-    base.logger.info(`Listening stream event-sub ${id}`);
+export const subscribeOfflineEvent = (app: ArikenCompany, id: string) => {
+    app.client.twitch.eventSub.onStreamOffline(id, (event) => new TwitchStream(app, event).turnOffline());
+    app.logger.info(`Listening stream event-sub ${id}`);
 };
