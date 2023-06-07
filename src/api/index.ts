@@ -6,7 +6,6 @@ import { addCommands, allowManagers, denyManagers, editCommands, getChatters, ge
 import { ArikenCompany } from '../ArikenCompany';
 
 export const api = (app: ArikenCompany) => {
-    app.api.listen();
     app.api.app.use(bodyToJson());
     app.api.app.use(urlencoded({ extended: true }));
 

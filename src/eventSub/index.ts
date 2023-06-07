@@ -13,7 +13,5 @@ export const eventSub = async (app: ArikenCompany) => {
         if (user.name !== ARIKEN_TWITCH_ID) return;
         app.client.discord.on('ready', () => changeArikenActivity(user.isStreaming, app));
     });
-
-    app.client.twitch.eventSub.start();
     app.logger.system(`Twitch event-sub client is ready.`);
 };
