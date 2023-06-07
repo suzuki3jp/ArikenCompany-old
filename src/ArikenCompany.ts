@@ -139,12 +139,16 @@ export class ClientManager {
                 this.logger.info('Twitch token has been refreshed.');
             },
         });
-        twitchAuth.addUser(id, {
-            accessToken: this.TWITCH_TOKEN,
-            refreshToken: this.TWITCH_REFRESHTOKEN,
-            expiresIn: 0,
-            obtainmentTimestamp: 0,
-        });
+        twitchAuth.addUser(
+            id,
+            {
+                accessToken: this.TWITCH_TOKEN,
+                refreshToken: this.TWITCH_REFRESHTOKEN,
+                expiresIn: 0,
+                obtainmentTimestamp: 0,
+            },
+            ['chat']
+        );
         const eventSubAdapter = new EventSubAdapter({
             hostName: httpHostName,
             sslCert: {
