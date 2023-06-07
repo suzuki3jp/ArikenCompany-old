@@ -21,16 +21,25 @@ export class ArikenCompany {
 
     private env: DotEnv;
 
-    constructor() {
-        const logger = new Logger(false);
-        // private property
-        this.env = dotenv();
+    constructor(extend?: ArikenCompany) {
+        if (!extend) {
+            const logger = new Logger(false);
+            // private property
+            this.env = dotenv();
 
-        // public property
-        this.api = new ApiManager(logger);
-        this.client = new ClientManager(this.env, logger);
-        this.DM = new DataManager();
-        this.logger = logger;
+            // public property
+            this.api = new ApiManager(logger);
+            this.client = new ClientManager(this.env, logger);
+            this.DM = new DataManager();
+            this.logger = logger;
+        } else {
+            const { api, client, DM, logger } = extend;
+            this.api = api;
+            this.client = client;
+            this.DM = DM;
+            this.logger = logger;
+            this.env = dotenv();
+        }
     }
 
     async start() {
