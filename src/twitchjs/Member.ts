@@ -1,15 +1,15 @@
-import type { ChatUser, ChatSubGiftInfo } from '@twurple/chat';
+import type { ChatUser } from '@twurple/chat';
 import type { HelixUser } from '@twurple/api';
-import { Base } from '../class/Base';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class BaseUser extends Base {
+export class BaseUser extends ArikenCompany {
     /**
      * The id of the user.
      */
     public id: string;
 
-    constructor(base: Base, id: string) {
-        super({ base });
+    constructor(app: ArikenCompany, id: string) {
+        super(app);
         this.id = id;
     }
 
@@ -17,7 +17,7 @@ export class BaseUser extends Base {
      * Get infomation of the user.
      */
     async getInfo(): Promise<HelixUser | null> {
-        return await this.twitchApi.users.getUserById(this.id);
+        return await this.client.twitch.api.users.getUserById(this.id);
     }
 }
 
@@ -27,8 +27,8 @@ export class User extends BaseUser {
      */
     public name: string;
 
-    constructor(base: Base, userId: string, userName: string) {
-        super(base, userId);
+    constructor(app: ArikenCompany, userId: string, userName: string) {
+        super(app, userId);
         this.name = userName;
     }
 }
@@ -90,8 +90,8 @@ export class ChannelMember extends BaseUser {
      */
     public color: string | null;
 
-    constructor(base: Base, userInfo: ChatUser) {
-        super(base, userInfo.userId);
+    constructor(app: ArikenCompany, userInfo: ChatUser) {
+        super(app, userInfo.userId);
         this.id = userInfo.userId;
         this.name = userInfo.userName;
         this.displayName = userInfo.displayName;

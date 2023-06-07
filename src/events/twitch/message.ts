@@ -1,11 +1,11 @@
 // モジュールをインポート
-import { Base } from '../../class/Base';
+import { ArikenCompany } from '../../ArikenCompany';
 import { TwitchCommand } from '../../class/TwitchCommand';
 import { ValueParser } from '../../class/ValueParser';
 import { Message } from '../../twitchjs/index';
 
-export const twitchMessage = async (base: Base, message: Message) => {
-    const twitchCommand = new TwitchCommand(base, message);
+export const twitchMessage = async (app: ArikenCompany, message: Message) => {
+    const twitchCommand = new TwitchCommand(app, message);
     const reply = (content: string) => {
         message.reply(content);
     };
@@ -40,7 +40,7 @@ export const twitchMessage = async (base: Base, message: Message) => {
         const commandValue = twitchCommand.commandValue();
         if (!commandValue) return;
         twitchCommand.saveCooltime();
-        const valueParser = new ValueParser(base);
+        const valueParser = new ValueParser(app);
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (!valueParseResult || valueParseResult.error) return;
         message.channel.send(valueParseResult.parsed);

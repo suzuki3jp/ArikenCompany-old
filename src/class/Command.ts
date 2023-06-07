@@ -12,14 +12,14 @@ dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
 import { Message as TwitchMessage } from '../twitchjs/index';
-import { Base } from './Base';
 import { CommandsJson, PublicCommandsJson, TwitchCommand } from './JsonTypes';
 import { createCommandPanelEmbeds, currentPage } from '../utils/Embed';
 import { DummyMessage, PubValueParser, ValueParser, ErrorCodes } from './ValueParser';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class CommandManager extends Base {
-    constructor(base: Base) {
-        super({ base });
+export class CommandManager extends ArikenCompany {
+    constructor(app: ArikenCompany) {
+        super(app);
     }
 
     getCommandByName(name: string): TwitchCommand | null {
@@ -61,11 +61,7 @@ export class CommandManager extends Base {
         return this.DM.getSettings().twitch.command;
     }
 
-    async addCom(
-        commandName: string,
-        value: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
-    ): Promise<string> {
+    async addCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (this.getCommandByName(name)) return manageCommandError.existCommandName;
@@ -98,11 +94,7 @@ export class CommandManager extends Base {
         return `${name} を追加しました`;
     }
 
-    async editCom(
-        commandName: string,
-        value: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
-    ): Promise<string> {
+    async editCom(commandName: string, value: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         const commands = this.DM.getCommands();
         const name = commandName.toLowerCase();
         if (!this.getCommandByName(name)) return manageCommandError.notExistCommandName;
@@ -188,7 +180,7 @@ export class CommandManager extends Base {
     async syncCommandPanel() {
         const settings = this.DM.getSettings();
         const pages = createCommandPanelEmbeds();
-        const manageCommandChannel = this.discord.channels.cache.get(settings.discord.manageCommandChannelId);
+        const manageCommandChannel = this.client.discord.channels.cache.get(settings.discord.manageCommandChannelId);
         if (manageCommandChannel instanceof TextChannel) {
             if (!settings.discord.manageCommandPanelId) return;
             const panel = await manageCommandChannel.messages.fetch(settings.discord.manageCommandPanelId);

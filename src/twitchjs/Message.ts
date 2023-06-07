@@ -1,9 +1,9 @@
+import { ArikenCompany } from '../ArikenCompany';
 import { Channel } from './Channel';
 import { ChannelMember } from './Member';
 import type { PrivateMessage } from '@twurple/chat';
-import { Base } from '../class/Base';
 
-export class Message extends Base {
+export class Message extends ArikenCompany {
     /**
      * The content of the message.
      */
@@ -29,8 +29,8 @@ export class Message extends Base {
      */
     public member: ChannelMember;
 
-    constructor(base: Base, channelName: string, content: string, message: PrivateMessage) {
-        super({ base });
+    constructor(app: ArikenCompany, channelName: string, content: string, message: PrivateMessage) {
+        super(app);
         if (!message.channelId) throw new Error('MESSAGE_CHANNELID_IS_NOT_DEFINED');
         this.content = content;
         this.id = message.id;
@@ -44,6 +44,6 @@ export class Message extends Base {
      * @param content The content of reply message.
      */
     reply(content: string) {
-        this.twitchChat.say(this.channel.name, content, { replyTo: this.id });
+        this.client.twitch.chat.say(this.channel.name, content, { replyTo: this.id });
     }
 }

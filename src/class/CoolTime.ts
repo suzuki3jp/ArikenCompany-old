@@ -2,15 +2,15 @@
 import dayjs from 'dayjs';
 
 // モジュールをインポート
-import { Base } from './Base';
 import type { TwitchCommand } from './TwitchCommand';
 import { CommandManager } from './Command';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class CoolTimeManager extends Base {
+export class CoolTimeManager extends ArikenCompany {
     public _commandManager: CommandManager;
 
-    constructor(base: Base) {
-        super({ base });
+    constructor(app: ArikenCompany) {
+        super(app);
         this._commandManager = new CommandManager(this);
     }
 

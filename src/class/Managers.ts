@@ -1,9 +1,9 @@
 // モジュールをインポート
-import { Base } from './Base';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class ManagersManager extends Base {
-    constructor(base: Base) {
-        super({ base });
+export class ManagersManager extends ArikenCompany {
+    constructor(app: ArikenCompany) {
+        super(app);
     }
 
     isManagersByTarget(target: string) {

@@ -11,16 +11,16 @@ dayjs.tz.setDefault('Asia/Tokyo');
 
 // モジュールをインポート
 import { Message as TwitchMessage } from '../twitchjs/index';
-import { Base } from './Base';
 import { CommandManager } from './Command';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class ValueParser extends Base {
+export class ValueParser extends ArikenCompany {
     private results: { value: ParseResult | null; code: ParseResult | null } | null;
     private req: RequestClient;
     private managers: { command: CommandManager };
 
-    constructor(base: Base) {
-        super({ base });
+    constructor(app: ArikenCompany) {
+        super(app);
         this.results = null;
         this.req = new RequestClient();
         this.managers = {
@@ -28,12 +28,7 @@ export class ValueParser extends Base {
         };
     }
 
-    async parse(
-        value: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage,
-        aliased?: boolean,
-        isManageCom?: boolean
-    ): Promise<ParseResult | null> {
+    async parse(value: string, message: TwitchMessage | DiscordMessage | DummyMessage, aliased?: boolean, isManageCom?: boolean): Promise<ParseResult | null> {
         this.results = { value: new ParseResult(value), code: null };
         const startBracketLength = StringUtils.countBy(value, '${');
         const endBracketLength = StringUtils.countBy(value, '}');
@@ -200,10 +195,7 @@ export class ValueParser extends Base {
         return ArrayUtils.random(choices);
     }
 
-    private async parseAlias(
-        commandName: string,
-        message: TwitchMessage | DiscordMessage | DummyMessage
-    ): Promise<string> {
+    private async parseAlias(commandName: string, message: TwitchMessage | DiscordMessage | DummyMessage): Promise<string> {
         commandName = commandName.toLowerCase();
         const command = this.managers.command.getCommandByName(commandName);
         if (command) {
@@ -302,32 +294,26 @@ export class ValueParser extends Base {
         return ErrorCodes.PlatformError.Channel;
     }
 
-    private async parseGame(
-        message: TwitchMessage | DiscordMessage | DummyMessage,
-        isManageCom?: boolean
-    ): Promise<string> {
+    private async parseGame(message: TwitchMessage | DiscordMessage | DummyMessage, isManageCom?: boolean): Promise<string> {
         if (isManageCom) return ErrorCodes.Dummy.Game;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Game);
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Game;
         }
-        const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
+        const channel = await this.client.twitch.api.channels.getChannelInfoById(message.channel.id);
         if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetGame;
         return channel.gameName;
     }
 
-    private async parseTitle(
-        message: TwitchMessage | DiscordMessage | DummyMessage,
-        isManageCom?: boolean
-    ): Promise<string> {
+    private async parseTitle(message: TwitchMessage | DiscordMessage | DummyMessage, isManageCom?: boolean): Promise<string> {
         if (isManageCom) return ErrorCodes.Dummy.Title;
         if (!(message instanceof TwitchMessage)) {
             this.results?.code?.replaceAll(ErrorCodes.PlatformError.Title);
             this.results?.code?.setError(true);
             return ErrorCodes.PlatformError.Title;
         } else {
-            const channel = await this.twitchApi.channels.getChannelInfoById(message.channel.id);
+            const channel = await this.client.twitch.api.channels.getChannelInfoById(message.channel.id);
             if (!channel) return ErrorCodes.TwitchAPIError.CanNotGetTitle;
             return channel.title;
         }
@@ -431,22 +417,18 @@ export class PubValueParser {
 }
 
 export const ErrorCodes = {
-    RemoteServerError: (status: string | number) =>
-        `RemoteServerError: リモートサーバーからエラーが返されました [code: ${status}]`,
+    RemoteServerError: (status: string | number) => `RemoteServerError: リモートサーバーからエラーが返されました [code: ${status}]`,
     SyntaxError: {
         FetchInvalidArgs: 'SyntaxError: fetch は半角スペースの後にurlを指定する必要があります',
         RandomInvalidArgs: 'SyntaxError: random は半角スペースを使用して選択肢を指定する必要があります',
         AliasInvalidArgs: 'SyntaxError: alias は半角スペースの後に ![コマンド名] でコマンドを指定する必要があります',
-        AliasLoop:
-            'SyntaxError: alias を使用しているコマンドに対してaliasを行うことはできません。これは無限ループを防ぐためです。',
-        ModLoop:
-            'SyntaxError: mod を使用したコード内で二個目のmod を使用することはできません。これは無限ループを防ぐためです。',
+        AliasLoop: 'SyntaxError: alias を使用しているコマンドに対してaliasを行うことはできません。これは無限ループを防ぐためです。',
+        ModLoop: 'SyntaxError: mod を使用したコード内で二個目のmod を使用することはできません。これは無限ループを防ぐためです。',
         InvalidBrackets: 'SyntaxError: {}の対応関係が崩れています。',
     },
     ReferenceError: {
         AliasNotExist: (command: string) => `ReferenceError: alias先のコマンドが存在しません [command: ${command}]`,
-        VariableNotExit: (variable: string) =>
-            `ReferenceError: 変数または関数が見つかりません。 [variable: ${variable}]`,
+        VariableNotExit: (variable: string) => `ReferenceError: 変数または関数が見つかりません。 [variable: ${variable}]`,
     },
     PermissionError: {
         onlyMods: 'PermissionError: このコマンドはモデレーター専用です。',
