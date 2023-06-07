@@ -13,8 +13,8 @@ export const createApiServer = (app: Express): HTTP | HTTPS => {
     if (!settings.api.isSecure) return createHTTP(app);
     return createHTTPS(
         {
-            key: DM.getKey(),
-            cert: DM.getCert(),
+            key: DM.getKey4Api(),
+            cert: DM.getCert4Api(),
         },
         app
     );
