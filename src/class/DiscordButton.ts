@@ -2,32 +2,25 @@
 import { ButtonInteraction, GuildMember, Message } from 'discord.js';
 
 // モジュールをインポート
-import { Base } from './Base';
 import { CommandManager } from './Command';
-import {
-    addTemplateModal,
-    addModal,
-    ComponentCustomIds,
-    editModal,
-    removeModal,
-    createCommandPanelActionRow,
-} from './Components';
+import { addTemplateModal, addModal, ComponentCustomIds, editModal, removeModal, createCommandPanelActionRow } from './Components';
 import { createCommandPanelEmbeds, currentPage, isFirstPageByFooter, isLastPageByFooter } from '../utils/Embed';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class DiscordButton extends Base {
+export class DiscordButton extends ArikenCompany {
     public interaction: ButtonInteraction;
     public member: GuildMember | null;
     public type: ButtonTypes;
     public customId: string;
     public _commandManager: CommandManager;
 
-    constructor(base: Base, interaction: ButtonInteraction) {
-        super({ base });
+    constructor(app: ArikenCompany, interaction: ButtonInteraction) {
+        super(app);
         this.interaction = interaction;
         this.member = this.interaction.guild?.members.resolve(this.interaction.user) ?? null;
         this.customId = this.interaction.customId;
         this.type = this.buttonType();
-        this._commandManager = new CommandManager(this.getMe());
+        this._commandManager = new CommandManager(this);
     }
 
     buttonType(): ButtonTypes {
@@ -160,15 +153,7 @@ export class DiscordButton extends Base {
     }
 }
 
-export type ButtonTypes =
-    | 'commandAdd'
-    | 'commandEdit'
-    | 'commandRemove'
-    | 'panelNext'
-    | 'panelPrevious'
-    | 'templateAdd'
-    | 'template'
-    | 'site';
+export type ButtonTypes = 'commandAdd' | 'commandEdit' | 'commandRemove' | 'panelNext' | 'panelPrevious' | 'templateAdd' | 'template' | 'site';
 
 const isMessage = (data: any): data is Message => {
     return true;

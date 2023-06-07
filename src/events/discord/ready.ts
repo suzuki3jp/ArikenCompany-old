@@ -1,12 +1,12 @@
 // モジュールをインポート
-import { Base } from '../../class/Base';
+import { ArikenCompany } from '../../ArikenCompany';
 import { CommandManager } from '../../class/Command';
 import { slashCommands } from '../../class/SlashCommands';
 
-export const discordReady = async (base: Base) => {
-    const settings = base.DM.getSettings();
-    new CommandManager(base).syncCommandPanel();
+export const discordReady = async (app: ArikenCompany) => {
+    const settings = app.DM.getSettings();
+    new CommandManager(app).syncCommandPanel();
 
-    await base.discord.application?.commands.set(slashCommands, settings.discord.guildId);
-    base.logger.system('discord client is ready.');
+    await app.client.discord.application?.commands.set(slashCommands, settings.discord.guildId);
+    app.logger.system('discord client is ready.');
 };

@@ -1,8 +1,8 @@
-import { Base } from './Base';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class ApiAuthManager extends Base {
-    constructor(base: Base) {
-        super({ base });
+export class ApiAuthManager extends ArikenCompany {
+    constructor(app: ArikenCompany) {
+        super(app);
     }
 
     getKey(): string {

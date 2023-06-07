@@ -4,11 +4,11 @@ import { Message, MessageActionRow, MessageButton, ModalSubmitInteraction } from
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 
 // モジュールをインポート
-import { Base } from './Base';
 import { CommandManager } from './Command';
 import { ComponentCustomIds } from './Components';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class DiscordModal extends Base {
+export class DiscordModal extends ArikenCompany {
     public interaction: ModalSubmitInteraction;
     public customId: any;
     public type: ModalTypes;
@@ -16,11 +16,11 @@ export class DiscordModal extends Base {
     public value: string | null;
     public _commandManager: CommandManager;
 
-    constructor(base: Base, modalInteraction: ModalSubmitInteraction) {
-        super({ base });
+    constructor(app: ArikenCompany, modalInteraction: ModalSubmitInteraction) {
+        super(app);
         this.interaction = modalInteraction;
         this.customId = this.interaction.customId;
-        this._commandManager = new CommandManager(this.getMe());
+        this._commandManager = new CommandManager(this);
         this.type = this.modalType();
         try {
             this.commandName = this.interaction.fields.getTextInputValue(ComponentCustomIds.text.commandName);
@@ -60,10 +60,7 @@ export class DiscordModal extends Base {
                 const messageActionRowLength = components.length;
                 const lastRowLength = components[messageActionRowLength - 1].components.length;
 
-                if (
-                    messageActionRowLength === ACTION_ROW_MAX_LENGTH_PER_MESSAGE &&
-                    lastRowLength === BUTTON_MAX_LENGTH_PER_ROW
-                ) {
+                if (messageActionRowLength === ACTION_ROW_MAX_LENGTH_PER_MESSAGE && lastRowLength === BUTTON_MAX_LENGTH_PER_ROW) {
                     // ボタンが5行5個づつで一つのメッセージに付けることのできる最大数だった場合
                     return 'これ以上このメッセージにテンプレートを追加できません';
                 } else if (lastRowLength === BUTTON_MAX_LENGTH_PER_ROW) {
@@ -117,11 +114,7 @@ export class DiscordModal extends Base {
 }
 
 export type ModalTypes = 'commandAdd' | 'commandEdit' | 'commandRemove' | 'templateAdd';
-export type AddTemplateResult =
-    | 'テンプレートに追加する内容は80字未満である必要があります'
-    | 'これ以上このメッセージにテンプレートを追加できません'
-    | 'テンプレートを追加しました'
-    | '予期せぬエラー';
+export type AddTemplateResult = 'テンプレートに追加する内容は80字未満である必要があります' | 'これ以上このメッセージにテンプレートを追加できません' | 'テンプレートを追加しました' | '予期せぬエラー';
 
 const isMessage = (data: any): data is Message => {
     return true;

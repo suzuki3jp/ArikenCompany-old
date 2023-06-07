@@ -1,20 +1,19 @@
 import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { ApiAuthManager } from './ApiAuth';
-import { Base } from './Base';
 import { addTemplateButton, createCommandPanelActionRow } from './Components';
 import { TwitchStreamer } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
-import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 import { restartPm2Process } from '../utils/Pm2';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class DiscordSlashCommand extends Base {
+export class DiscordSlashCommand extends ArikenCompany {
     public interaction: CommandInteraction;
     public command: string;
     public subCommand: string | null;
 
-    constructor(base: Base, interaction: CommandInteraction) {
-        super({ base });
+    constructor(app: ArikenCompany, interaction: CommandInteraction) {
+        super(app);
         this.interaction = interaction;
         this.command = this.interaction.commandName;
         this.subCommand = this.interaction.options.getSubcommand();
@@ -64,7 +63,7 @@ export class DiscordSlashCommand extends Base {
         if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
-        const user = await this.twitchApi.users.getUserByName(name);
+        const user = await this.client.twitch.api.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
         // 取得したユーザーから配信を取得する
@@ -83,9 +82,7 @@ export class DiscordSlashCommand extends Base {
         users.push(newUser);
         this.DM.setStreamStatus({ users });
 
-        const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(
-            newUser.notificationChannelId
-        )}に送信するよう設定しました。`;
+        const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(newUser.notificationChannelId)}に送信するよう設定しました。`;
         await this.interaction.reply(result);
         restartPm2Process(this);
         return result;
