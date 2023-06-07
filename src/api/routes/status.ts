@@ -3,10 +3,10 @@ import { Request, Response } from 'express';
 import os from 'node:os';
 
 import { saveAccessLog, setHeaderAllowOrigin } from '../apiUtils';
-import { Base } from '../../class/Base';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const getStatus = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const getStatus = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
     const jstNow = JST.getDate();
     const status = {

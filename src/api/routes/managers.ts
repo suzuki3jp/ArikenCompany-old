@@ -3,22 +3,22 @@ import type { Request, Response } from 'express';
 
 // モジュールをインポート
 import { saveAccessLog, setHeaderAllowOrigin, verifyAuth } from '../apiUtils';
-import { Base } from '../../class/Base';
 import { ManagersManager } from '../../class/Managers';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const getManagers = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const getManagers = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const managers = base.DM.getManagers();
+    const managers = app.DM.getManagers();
     res.status(200);
     res.json(managers);
 };
 
-export const allowManagers = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const allowManagers = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const managersManager = new ManagersManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const managersManager = new ManagersManager(app);
 
     if (isAuthorized.status === 200) {
         const userName = getNewManagersFromRequest(req);
@@ -37,11 +37,11 @@ export const allowManagers = (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const denyManagers = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const denyManagers = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const managersManager = new ManagersManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const managersManager = new ManagersManager(app);
 
     if (isAuthorized.status === 200) {
         const userName = getNewManagersFromRequest(req);

@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
 
 import { saveAccessLog, setHeaderAllowOrigin, verifyAuth } from '../apiUtils';
-import { Base } from '../../class/Base';
 import { CoolTimeManager } from '../../class/CoolTime';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const getCooltime = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const getCooltime = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
     res.status(200);
-    res.json({ status: 200, cooltime: base.DM.getSettings().twitch.cooltime });
+    res.json({ status: 200, cooltime: app.DM.getSettings().twitch.cooltime });
 };
 
-export const setCooltime = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const setCooltime = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const cooltimemanager = new CoolTimeManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const cooltimemanager = new CoolTimeManager(app);
 
     if (isAuthorized.status === 200) {
         const newCooltime = getNewCooltimeFromRequest(req);
