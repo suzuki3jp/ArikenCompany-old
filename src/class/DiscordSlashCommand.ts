@@ -2,7 +2,7 @@ import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { ApiAuthManager } from './ApiAuth';
 import { addTemplateButton, createCommandPanelActionRow } from './Components';
-import { TwitchStreamer } from './JsonTypes';
+import { TwitchStreamerData } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
 import { restartPm2Process } from '../utils/Pm2';
 import { ArikenCompany } from '../ArikenCompany';
@@ -70,7 +70,7 @@ export class DiscordSlashCommand extends ArikenCompany {
         const stream = await user.getStream();
 
         // 取得した情報からTwitchStreamerを作成する
-        const newUser: TwitchStreamer = {
+        const newUser: TwitchStreamerData = {
             id: user.id,
             name: user.name,
             displayName: user.displayName,

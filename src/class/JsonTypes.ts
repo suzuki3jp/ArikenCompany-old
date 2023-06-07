@@ -94,10 +94,10 @@ export interface SettingsJson {
 }
 
 export interface StreamStatusJson {
-    users: TwitchStreamer[];
+    users: TwitchStreamerData[];
 }
 
-export interface TwitchStreamer {
+export interface TwitchStreamerData {
     id: string;
     name: string;
     displayName: string;
