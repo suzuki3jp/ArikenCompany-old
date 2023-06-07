@@ -11,6 +11,7 @@ import { Server as HTTPS, createServer as createHTTPS } from 'https';
 
 import { DataManager } from './class/DataManager';
 import { DotEnv, SettingsJson } from './class/JsonTypes';
+import { TwitchStream } from './class/TwitchStream';
 import { dotenv } from './utils/Env';
 
 export class ArikenCompany {
@@ -18,6 +19,7 @@ export class ArikenCompany {
     public client: ClientManager;
     public DM: DataManager;
     public logger: Logger;
+    public streamNotifications: TwitchStream;
 
     private env: DotEnv;
 
@@ -32,14 +34,35 @@ export class ArikenCompany {
             this.client = new ClientManager(this.env, logger);
             this.DM = new DataManager();
             this.logger = logger;
+            this.addLoggerEventListener();
+            this.streamNotifications = new TwitchStream(this.logger, this.client.twitch.api, this.client.twitch.eventSub, this.client.discord);
         } else {
-            const { api, client, DM, logger } = extend;
+            const { api, client, DM, logger, streamNotifications } = extend;
             this.api = api;
             this.client = client;
             this.DM = DM;
             this.logger = logger;
             this.env = dotenv();
+            this.streamNotifications = streamNotifications;
         }
+    }
+
+    addLoggerEventListener() {
+        this.logger.on('debug', (msg) => {
+            if (process.argv.includes('--debug')) {
+                console.log(msg);
+            }
+        });
+
+        this.logger.on('system', (msg) => {
+            console.log(msg);
+            this.logger.appendToCsv(msg);
+        });
+
+        this.logger.on('info', (msg) => {
+            console.log(msg);
+            this.logger.appendToCsv(msg);
+        });
     }
 
     async start() {

@@ -18,7 +18,7 @@ export const commandInteraction = async (app: ArikenCompany, interaction: Comman
                     slashCommandInteraction.setupTemplate();
                     break;
                 case 'notification':
-                    slashCommandInteraction.setupNotification();
+                    slashCommandInteraction.reply(await slashCommandInteraction.setupNotification());
                     break;
                 default:
                     break;

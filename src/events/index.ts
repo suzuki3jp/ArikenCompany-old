@@ -17,23 +17,6 @@ export const events = (app: ArikenCompany) => {
 
     app.client.twitch.chat.onMessage((channel, user, text, message) => twitchMessage(app, new Message(app, channel, text, message)));
 
-    // logger events
-    app.logger.on('debug', (msg) => {
-        if (process.argv.includes('--debug')) {
-            console.log(msg);
-        }
-    });
-
-    app.logger.on('system', (msg) => {
-        console.log(msg);
-        app.logger.appendToCsv(msg);
-    });
-
-    app.logger.on('info', (msg) => {
-        console.log(msg);
-        app.logger.appendToCsv(msg);
-    });
-
     // app start
     app.start();
 };

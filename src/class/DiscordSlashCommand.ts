@@ -57,35 +57,20 @@ export class DiscordSlashCommand extends ArikenCompany {
         // スラコマから指定のユーザー名を抜き出し、既に登録されていないか確認する
         const name = this.interaction.options.getString('user')?.trim();
         if (!name) return ErrorMessages.isNotDefinedUserInput;
-        const users = this.DM.getStreamStatus().users;
-        const oldUsers = users.filter((value) => value.name === name);
-        if (oldUsers.length !== 0) return ErrorMessages.alreadyRegisterd;
-        if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
         const user = await this.client.twitch.api.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
-        // 取得したユーザーから配信を取得する
-        const stream = await user.getStream();
+        const streamer = this.streamNotifications.cache.get(user.id);
+        if (streamer) return ErrorMessages.alreadyRegisterd;
 
-        // 取得した情報からTwitchStreamerを作成する
-        const newUser: TwitchStreamerData = {
-            id: user.id,
-            name: user.name,
-            displayName: user.displayName,
-            isStreaming: stream ? true : false,
-            notificationChannelId: this.interaction.channel.id,
-        };
+        if (!this.interaction.channel) return ErrorMessages.unknownError;
 
-        // StreamStatusJsonにプッシュする
-        users.push(newUser);
-        this.DM.setStreamStatus({ users });
+        const streamNotification = await this.streamNotifications.addStreamNotification(user.id, this.interaction.channel.id);
+        if (!streamNotification) return ErrorMessages.twitchUser404;
 
-        const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(newUser.notificationChannelId)}に送信するよう設定しました。`;
-        await this.interaction.reply(result);
-        restartPm2Process(this);
-        return result;
+        return `${streamNotification.displayName}(${streamNotification.name}) の配信開始通知を${Formatters.channelMention(streamNotification.notificationChannelId)}に送信するよう設定しました。`;
     }
 
     getApiKey(): string {

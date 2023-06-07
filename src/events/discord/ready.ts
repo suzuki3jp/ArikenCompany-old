@@ -8,5 +8,5 @@ export const discordReady = async (app: ArikenCompany) => {
     new CommandManager(app).syncCommandPanel();
 
     await app.client.discord.application?.commands.set(slashCommands, settings.discord.guildId);
-    app.logger.system('discord client is ready.');
+    app.logger.system('discord client is ready. ' + app.client.discord.user?.username);
 };
