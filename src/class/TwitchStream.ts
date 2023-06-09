@@ -171,6 +171,12 @@ export class TwitchStream {
             });
         }
     }
+
+    async syncArikenStatus() {
+        const ariken = this.cache.filter((streamer) => streamer.name === 'arikendebu').first();
+        if (!ariken) return;
+        await this.setArikenStatus(ariken.toJSON());
+    }
 }
 
 export class TwitchStreamer {
