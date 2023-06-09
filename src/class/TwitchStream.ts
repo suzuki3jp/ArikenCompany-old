@@ -77,6 +77,10 @@ export class TwitchStream {
             this.cache.set(event.broadcasterId, oldData);
             this.saveToFileFromCache();
             this.sendStreamNotification(oldData);
+
+            // 配信開始したのがありけんだった時
+            if (oldData.name !== 'arikendebu') return;
+            this.setArikenStatus(oldData);
         }
     }
 
@@ -87,6 +91,10 @@ export class TwitchStream {
             oldData.isStreaming = false;
             this.cache.set(event.broadcasterId, oldData);
             this.saveToFileFromCache();
+
+            // 配信終了したのがありけんだった時
+            if (oldData.name !== 'arikendebu') return;
+            this.setArikenStatus(oldData);
         }
     }
 
@@ -147,6 +155,21 @@ export class TwitchStream {
         });
         this.DM.setStreamStatus(streamStatus);
         return streamStatus;
+    }
+
+    async setArikenStatus(data: TwitchStreamerData) {
+        const stream = await this.api.streams.getStreamByUserId(data.id);
+        if (stream) {
+            this.discord.user?.setPresence({
+                status: 'online',
+                activities: [{ type: 'STREAMING', name: stream.title, url: 'https://twitch.tv/arikendebu' }],
+            });
+        } else {
+            this.discord.user?.setPresence({
+                status: 'idle',
+                activities: [],
+            });
+        }
     }
 }
 
