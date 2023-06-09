@@ -1,10 +1,10 @@
-import { ApiClient as TwitchApi } from '@twurple/api';
+import { HelixStream, ApiClient as TwitchApi } from '@twurple/api';
 import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent, EventSubSubscription, EventSubListener as TwitchEventSub } from '@twurple/eventsub-base';
 import { Logger } from '@suzuki3jp/logger';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { Collection, Client as Discord } from 'discord.js';
+import { Collection, Client as Discord, ForumChannel, AnyChannel } from 'discord.js';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.tz.setDefault('Asia/Tokyo');
@@ -69,10 +69,11 @@ export class TwitchStream {
         return this.eventSub.onStreamOffline(id, (event) => this.offlineHandler(event));
     }
 
-    onlineHandler(event: EventSubStreamOnlineEvent) {
+    async onlineHandler(event: EventSubStreamOnlineEvent) {
         this.logger.info('Stream online. ' + event.broadcasterDisplayName);
         const oldData = this.cache.get(event.broadcasterId);
-        if (oldData) {
+        const stream = await event.getStream();
+        if (oldData && stream) {
             oldData.isStreaming = true;
             this.cache.set(event.broadcasterId, oldData);
             this.saveToFileFromCache();
@@ -81,6 +82,7 @@ export class TwitchStream {
             // 配信開始したのがありけんだった時
             if (oldData.name !== 'arikendebu') return;
             this.setArikenStatus(oldData);
+            this.postClipMemo(stream);
         }
     }
 
@@ -177,6 +179,36 @@ export class TwitchStream {
         if (!ariken) return;
         await this.setArikenStatus(ariken.toJSON());
     }
+
+    async postClipMemo(stream: HelixStream) {
+        const video = (await this.api.videos.getVideosByUser(stream.userId, { type: 'archive' })).data[0];
+        const MEMO_CHANNELID = '1102269877881933916';
+        const forum = this.discord.channels.cache.get(MEMO_CHANNELID);
+        if (!isForumChannel(forum)) return;
+        const { startDate } = stream;
+        const now = dayjs(startDate);
+        const title = `${now.year()}/${formatMonthDate(now.month() + 1)}/${formatMonthDate(now.date())}`;
+
+        // 最新のアーカイブがスタートされた配信のものか確認する
+        if (video.streamId !== stream.id) return;
+
+        // 同じ日に複数回配信したときは同じスレッドにurlを投稿する
+        const latestThread = forum.threads.cache.last();
+        if (latestThread?.name === title) {
+            // その日複数回目
+            latestThread.send(video.url);
+            this.logger.info('Sent the link that started the Nth stream today.');
+        } else {
+            // その日初めて
+            await forum.threads.create({
+                name: title,
+                message: {
+                    content: video.url,
+                },
+            });
+            this.logger.info('Create memo channel with the link that started the first stream today.');
+        }
+    }
 }
 
 export class TwitchStreamer {
@@ -224,3 +256,13 @@ export class TwitchStreamer {
         };
     }
 }
+
+const isForumChannel = (channel: AnyChannel | undefined): channel is ForumChannel => {
+    return channel?.type === 'GUILD_FORUM';
+};
+
+const formatMonthDate = (str: string | number): string => {
+    str = str.toString();
+    if (str.length !== 1) return str;
+    return `0${str}`;
+};
