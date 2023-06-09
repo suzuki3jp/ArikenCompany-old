@@ -1,98 +1,220 @@
-import { JST } from '@suzuki3jp/utils';
-import { HelixStream } from '@twurple/api';
-import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
+import { ApiClient as TwitchApi } from '@twurple/api';
+import { EventSubStreamOfflineEvent, EventSubStreamOnlineEvent, EventSubSubscription, EventSubListener as TwitchEventSub } from '@twurple/eventsub-base';
+import { Logger } from '@suzuki3jp/logger';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+import { Collection, Client as Discord } from 'discord.js';
+dayjs.extend(utc);
+dayjs.extend(tz);
+dayjs.tz.setDefault('Asia/Tokyo');
 
-import { Base } from './Base';
-import { TwitchStreamer } from './JsonTypes';
-import { MessageEmbed, TextChannel } from 'discord.js';
-import { APIEmbed } from 'discord-api-types/v9';
+import { DataManager } from './DataManager';
+import { StreamStatusJson, TwitchStreamerData } from './JsonTypes';
 
-export class TwitchStream extends Base {
-    public users: TwitchStreamer[];
-    public user: TwitchStreamer | null;
-    public userIndex: number | null;
-    constructor(base: Base, event: EventSubStreamOfflineEvent | EventSubStreamOnlineEvent) {
-        super({ base });
-        this.users = this.DM.getStreamStatus().users;
-        this.user = null;
-        this.userIndex = null;
-        this.users.forEach((value, index) => {
-            if (value.id !== event.broadcasterId) return;
-            this.userIndex = index;
-            this.user = value;
+export class TwitchStream {
+    cache: Collection<string, TwitchStreamer>;
+
+    private DM: DataManager;
+    private discord: Discord;
+    private logger: Logger;
+    private api: TwitchApi;
+    private eventSub: TwitchEventSub;
+    constructor(logger: Logger, api: TwitchApi, eventSub: TwitchEventSub, discord: Discord) {
+        this.DM = new DataManager();
+        this.logger = logger;
+        this.api = api;
+        this.discord = discord;
+        this.eventSub = eventSub;
+        this.cache = new Collection(null);
+
+        const { users } = this.DM.getStreamStatus();
+        users.forEach((streamerData) => {
+            const streamer = new TwitchStreamer(this.api, streamerData, this.subscribeOnline(streamerData.id), this.subscribeOffline(streamerData.id));
+            this.cache.set(streamerData.id, streamer);
         });
     }
 
-    async turnOnline() {
-        if (this.userIndex === null || this.user === null) return;
+    async addStreamNotification(id: string, notificationChannelId: string): Promise<TwitchStreamer | null> {
+        const user = await this.api.users.getUserById(id);
+        const stream = await user?.getStream();
+        if (!user) return null;
+        const onlineSub = this.subscribeOnline(id);
+        const offlineSub = this.subscribeOffline(id);
 
-        const channel = await this.discord.channels.fetch(this.user.notificationChannelId);
-        const stream = await this.twitchApi.streams.getStreamByUserId(this.user.id);
-        if (!channel || !stream) return;
-        this._updateData(true);
-        this._changeDiscordActivity();
-        const embeds = await this._createOnStreamEmbed(stream);
-        if (channel instanceof TextChannel) {
-            await channel.send({ content: '@everyone', embeds });
-            this.logger.info(`Sent stream notification. [${stream.userDisplayName}](${stream.userId})`);
-        } else {
-            this.logger.debug(`Failed to send stream notification. The channel is not TextChannel.`);
+        // cacheに対して登録する
+        const streamerData: TwitchStreamerData = {
+            id: id,
+            name: user.name,
+            displayName: user.displayName,
+            isStreaming: Boolean(stream),
+            notificationChannelId: notificationChannelId,
+        };
+        const streamer = new TwitchStreamer(this.api, streamerData, onlineSub, offlineSub);
+        this.cache.set(id, streamer);
+
+        // ファイルに反映する
+        this.saveToFileFromCache();
+
+        return streamer;
+    }
+
+    subscribeOnline(id: string): EventSubSubscription<unknown> {
+        this.logger.info('Listening stream online event.' + id);
+        return this.eventSub.onStreamOnline(id, (event) => this.onlineHandler(event));
+    }
+
+    subscribeOffline(id: string): EventSubSubscription<unknown> {
+        this.logger.info('Listening stream offline event.' + id);
+        return this.eventSub.onStreamOffline(id, (event) => this.offlineHandler(event));
+    }
+
+    onlineHandler(event: EventSubStreamOnlineEvent) {
+        this.logger.info('Stream online. ' + event.broadcasterDisplayName);
+        const oldData = this.cache.get(event.broadcasterId);
+        if (oldData) {
+            oldData.isStreaming = true;
+            this.cache.set(event.broadcasterId, oldData);
+            this.saveToFileFromCache();
+            this.sendStreamNotification(oldData);
+
+            // 配信開始したのがありけんだった時
+            if (oldData.name !== 'arikendebu') return;
+            this.setArikenStatus(oldData);
         }
     }
 
-    async turnOffline() {
-        this._updateData(false);
-        this._changeDiscordActivity();
-        this.logger.info(`Stream has been offline. [${this.user?.displayName}](${this.user?.id})`);
+    offlineHandler(event: EventSubStreamOfflineEvent) {
+        this.logger.info('Stream offline. ' + event.broadcasterDisplayName);
+        const oldData = this.cache.get(event.broadcasterId);
+        if (oldData) {
+            oldData.isStreaming = false;
+            this.cache.set(event.broadcasterId, oldData);
+            this.saveToFileFromCache();
+
+            // 配信終了したのがありけんだった時
+            if (oldData.name !== 'arikendebu') return;
+            this.setArikenStatus(oldData);
+        }
     }
 
-    _updateData(isStreaming: boolean) {
-        if (this.userIndex === null || this.user === null) return;
-        this.users.splice(this.userIndex, 1);
-        this.user.isStreaming = isStreaming;
-        this.users.push(this.user);
-        this.DM.setStreamStatus({ users: this.users });
-        this.logger.debug(`Update isStreaming to ${isStreaming}. [${this.user.displayName}](${this.user.id})`);
+    async sendStreamNotification(streamer: TwitchStreamer) {
+        const date = dayjs.tz(undefined);
+        const channel = await this.discord.channels.fetch(streamer.notificationChannelId);
+        if (!channel?.isText()) return;
+        const stream = await this.api.streams.getStreamByUserId(streamer.id);
+        if (!stream) return;
+        channel.send({
+            content: '@everyone',
+            embeds: [
+                {
+                    title: `${streamer.displayName} が配信を開始しました`,
+                    description: '-----------------------------',
+                    url: `https://twitch.tv/${streamer.name}`,
+                    fields: [
+                        { name: 'タイトル', value: stream.title || 'No Data', inline: true },
+                        { name: 'ゲーム', value: stream.gameName || 'No Data', inline: true },
+                    ],
+                    footer: {
+                        text: `${date.year()}/${date.month() + 1}/${date.date()} ${date.hour()}:${date.minute()}:${date.second()}`,
+                    },
+                },
+            ],
+        });
     }
 
-    async _createOnStreamEmbed(stream: HelixStream): Promise<MessageEmbed[]> {
-        const archives = (await this.twitchApi.videos.getVideosByUser(stream.userId, { type: 'archive' })).data;
-        const latestArchive = archives[0];
-
-        const embed: APIEmbed = {
-            title: `${stream.userDisplayName}が配信を開始しました`,
-            url: `https://www.twitch.tv/${stream.userName}`,
-            description: `**タイトル**: ${stream.title}, **ゲーム**: ${stream.gameName}`,
-            footer: {
-                text: `${JST.getDateString()} | videoId: ${latestArchive.streamId === stream.id ? latestArchive.id : 'アーカイブ未生成'}`,
-            },
+    saveToFileFromCache(): StreamStatusJson {
+        const streamStatus: StreamStatusJson = {
+            users: [],
         };
-        // @ts-expect-error
-        return [new MessageEmbed(embed)];
+        this.cache.forEach((streamer) => streamStatus.users.push(streamer.toJSON()));
+        this.DM.setStreamStatus(streamStatus);
+        this.logger.debug('Saved stream notification to file from cache.');
+        return streamStatus;
     }
 
-    _changeDiscordActivity() {
-        if (!this.user) return;
-        if (this.user.name !== ARIKEN_TWITCH_ID) return;
-        const isStreaming = this.user.isStreaming;
+    async reloadStreamerDataById(): Promise<StreamStatusJson> {
+        const streamStatus: StreamStatusJson = {
+            users: [],
+        };
+        const results: Promise<TwitchStreamerData | null>[] = this.cache.map(async (target) => {
+            const user = await this.api.users.getUserById(target.id);
+            const stream = await user?.getStream();
+            if (!user) return null;
+            return {
+                id: user.id,
+                name: user.name,
+                displayName: user.displayName,
+                isStreaming: Boolean(stream),
+                notificationChannelId: target.notificationChannelId,
+            };
+        });
+        (await Promise.all(results)).forEach((streamerData) => {
+            if (!streamerData) return;
+            streamStatus.users.push(streamerData);
+        });
+        this.DM.setStreamStatus(streamStatus);
+        return streamStatus;
+    }
 
-        changeArikenActivity(isStreaming, this);
+    async setArikenStatus(data: TwitchStreamerData) {
+        const stream = await this.api.streams.getStreamByUserId(data.id);
+        if (stream) {
+            this.discord.user?.setPresence({
+                status: 'online',
+                activities: [{ type: 'STREAMING', name: stream.title, url: 'https://twitch.tv/arikendebu' }],
+            });
+        } else {
+            this.discord.user?.setPresence({
+                status: 'idle',
+                activities: [],
+            });
+        }
     }
 }
 
-export const ARIKEN_TWITCH_ID = 'arikendebu';
-export const changeArikenActivity = (isStreaming: boolean, base: Base) => {
-    const streamingStr = 'ありけん: 配信中';
-    if (isStreaming) {
-        base.discord.user?.setPresence({
-            activities: [{ name: streamingStr, type: 'STREAMING', url: 'https://www.twitch.tv/arikendebu' }],
-            status: 'online',
-        });
-        base.logger.info(`Discord activity changed to streaming.`);
-    } else {
-        base.discord.user?.setPresence({
-            status: 'idle',
-        });
-        base.logger.info(`Discord activity changed to not-streming.`);
+export class TwitchStreamer {
+    public displayName: string;
+    public id: string;
+    public isStreaming: boolean;
+    public name: string;
+    public notificationChannelId: string;
+    public onlineSubscription: EventSubSubscription<unknown>;
+    public offlineSubscription: EventSubSubscription<unknown>;
+
+    private api: TwitchApi;
+    constructor(api: TwitchApi, data: TwitchStreamerData, onlineSubscription: EventSubSubscription<unknown>, offlineSubscription: EventSubSubscription<unknown>) {
+        this.displayName = data.displayName;
+        this.id = data.id;
+        this.isStreaming = data.isStreaming;
+        this.name = data.name;
+        this.notificationChannelId = data.notificationChannelId;
+        this.onlineSubscription = onlineSubscription;
+        this.offlineSubscription = offlineSubscription;
+        this.api = api;
     }
-};
+
+    async updateStreamerInfoById(): Promise<boolean> {
+        const streamer = await this.api.users.getUserById(this.id);
+        if (!streamer) return false;
+        this.displayName = streamer.displayName;
+        this.name = streamer.name;
+        const stream = await streamer.getStream();
+        this.isStreaming = Boolean(stream);
+        return true;
+    }
+
+    setIsStreaming(isStreaming: boolean) {
+        this.isStreaming = isStreaming;
+    }
+
+    toJSON(): TwitchStreamerData {
+        return {
+            id: this.id,
+            name: this.name,
+            displayName: this.displayName,
+            isStreaming: this.isStreaming,
+            notificationChannelId: this.notificationChannelId,
+        };
+    }
+}

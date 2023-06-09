@@ -3,23 +3,23 @@ import type { Request, Response } from 'express';
 
 // モジュールをインポート
 import { saveAccessLog, setHeaderAllowOrigin, verifyAuth } from '../apiUtils';
-import { Base } from '../../class/Base';
 import { CommandManager } from '../../class/Command';
 import { DummyMessage } from '../../class/ValueParser';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const getCommands = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const getCommands = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const commands = base.DM.getPublicCommands();
+    const commands = app.DM.getPublicCommands();
     res.status(200);
     res.json(commands);
 };
 
-export const onCommands = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const onCommands = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const commandManager = new CommandManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const commandManager = new CommandManager(app);
 
     if (isAuthorized.status === 200) {
         const result = commandManager.on();
@@ -31,11 +31,11 @@ export const onCommands = (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const offCommands = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const offCommands = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const commandManager = new CommandManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const commandManager = new CommandManager(app);
 
     if (isAuthorized.status === 200) {
         const result = commandManager.off();
@@ -47,20 +47,16 @@ export const offCommands = (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const addCommands = async (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const addCommands = async (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const commandManager = new CommandManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const commandManager = new CommandManager(app);
     const commandName = req.body.name;
     const commandValue = req.body.value;
 
     if (isAuthorized.status === 200) {
-        if (
-            isValidBodyForManageCommands(req, false) &&
-            typeof commandName === 'string' &&
-            typeof commandValue === 'string'
-        ) {
+        if (isValidBodyForManageCommands(req, false) && typeof commandName === 'string' && typeof commandValue === 'string') {
             const dummyMessage = new DummyMessage();
             const result = await commandManager.addCom(commandName, commandValue, dummyMessage);
             res.status(200);
@@ -81,20 +77,16 @@ export const addCommands = async (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const editCommands = async (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const editCommands = async (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const commandManager = new CommandManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const commandManager = new CommandManager(app);
     const commandName = req.body.name;
     const commandValue = req.body.value;
 
     if (isAuthorized.status === 200) {
-        if (
-            isValidBodyForManageCommands(req, false) &&
-            typeof commandName === 'string' &&
-            typeof commandValue === 'string'
-        ) {
+        if (isValidBodyForManageCommands(req, false) && typeof commandName === 'string' && typeof commandValue === 'string') {
             const dummyMessage = new DummyMessage();
             const result = await commandManager.editCom(commandName, commandValue, dummyMessage);
             res.status(200);
@@ -115,11 +107,11 @@ export const editCommands = async (req: Request, res: Response, base: Base) => {
     }
 };
 
-export const removeCommands = async (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const removeCommands = async (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const isAuthorized = verifyAuth(req, base);
-    const commandManager = new CommandManager(base);
+    const isAuthorized = verifyAuth(req, app);
+    const commandManager = new CommandManager(app);
     const commandName = req.body.name;
 
     if (isAuthorized.status === 200) {

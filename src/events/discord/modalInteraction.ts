@@ -3,11 +3,11 @@ import { Message } from 'discord.js';
 import type { ModalSubmitInteraction } from 'discord.js';
 
 // モジュールをインポート
-import { Base } from '../../class/Base';
 import { DiscordModal } from '../../class/DiscordModal';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const modalInteraction = async (base: Base, interaction: ModalSubmitInteraction) => {
-    const modal = new DiscordModal(base, interaction);
+export const modalInteraction = async (app: ArikenCompany, interaction: ModalSubmitInteraction) => {
+    const modal = new DiscordModal(app, interaction);
 
     if (interaction.message instanceof Message) {
         switch (modal.type) {

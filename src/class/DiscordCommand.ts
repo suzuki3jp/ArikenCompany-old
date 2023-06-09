@@ -3,27 +3,27 @@ import { CommandParser } from '@suzuki3jp/twitch.js';
 import type { Message } from 'discord.js';
 
 // モジュールをインポート
-import { Base } from './Base';
 import { CommandManager } from './Command';
 import { CoolTimeManager } from './CoolTime';
 import { ManagersManager } from './Managers';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class DiscordCommand extends Base {
+export class DiscordCommand extends ArikenCompany {
     public message: Message;
     public command: CommandParser;
     public _commandManager: CommandManager;
     public _cooltimeManager: CoolTimeManager;
     public _managersManager: ManagersManager;
 
-    constructor(base: Base, message: Message) {
-        super({ base });
+    constructor(app: ArikenCompany, message: Message) {
+        super(app);
         this.message = message;
         this.command = new CommandParser(message.content, {
             manageCommands: this.DM.getSettings().twitch.manageCommands,
         });
-        this._commandManager = new CommandManager(this.getMe());
-        this._cooltimeManager = new CoolTimeManager(this.getMe());
-        this._managersManager = new ManagersManager(this.getMe());
+        this._commandManager = new CommandManager(this);
+        this._cooltimeManager = new CoolTimeManager(this);
+        this._managersManager = new ManagersManager(this);
     }
 
     isCommand(): boolean {
@@ -40,17 +40,7 @@ export class DiscordCommand extends Base {
         return false;
     }
 
-    manageCommandName():
-        | '!oncom'
-        | '!offcom'
-        | '!addcom'
-        | '!editcom'
-        | '!rmcom'
-        | '!cooltime'
-        | '!setcooltime'
-        | '!allow'
-        | '!deny'
-        | 'none' {
+    manageCommandName(): '!oncom' | '!offcom' | '!addcom' | '!editcom' | '!rmcom' | '!cooltime' | '!setcooltime' | '!allow' | '!deny' | 'none' {
         const commandName = this.command.commandName;
 
         switch (commandName) {

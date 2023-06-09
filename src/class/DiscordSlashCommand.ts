@@ -1,20 +1,19 @@
 import { CommandInteraction, MessageActionRow, Formatters } from 'discord.js';
 
 import { ApiAuthManager } from './ApiAuth';
-import { Base } from './Base';
 import { addTemplateButton, createCommandPanelActionRow } from './Components';
-import { TwitchStreamer } from './JsonTypes';
+import { TwitchStreamerData } from './JsonTypes';
 import { createCommandPanelEmbeds } from '../utils/Embed';
-import { subscribeOfflineEvent, subscribeOnlineEvent } from '../utils/EventSub';
 import { restartPm2Process } from '../utils/Pm2';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class DiscordSlashCommand extends Base {
+export class DiscordSlashCommand extends ArikenCompany {
     public interaction: CommandInteraction;
     public command: string;
     public subCommand: string | null;
 
-    constructor(base: Base, interaction: CommandInteraction) {
-        super({ base });
+    constructor(app: ArikenCompany, interaction: CommandInteraction) {
+        super(app);
         this.interaction = interaction;
         this.command = this.interaction.commandName;
         this.subCommand = this.interaction.options.getSubcommand();
@@ -58,37 +57,20 @@ export class DiscordSlashCommand extends Base {
         // スラコマから指定のユーザー名を抜き出し、既に登録されていないか確認する
         const name = this.interaction.options.getString('user')?.trim();
         if (!name) return ErrorMessages.isNotDefinedUserInput;
-        const users = this.DM.getStreamStatus().users;
-        const oldUsers = users.filter((value) => value.name === name);
-        if (oldUsers.length !== 0) return ErrorMessages.alreadyRegisterd;
-        if (!this.interaction.channel) return ErrorMessages.unknownError;
 
         // TwitchAPIから指定のユーザーを取得する
-        const user = await this.twitchApi.users.getUserByName(name);
+        const user = await this.client.twitch.api.users.getUserByName(name);
         if (!user) return ErrorMessages.twitchUser404;
 
-        // 取得したユーザーから配信を取得する
-        const stream = await user.getStream();
+        const streamer = this.streamNotifications.cache.get(user.id);
+        if (streamer) return ErrorMessages.alreadyRegisterd;
 
-        // 取得した情報からTwitchStreamerを作成する
-        const newUser: TwitchStreamer = {
-            id: user.id,
-            name: user.name,
-            displayName: user.displayName,
-            isStreaming: stream ? true : false,
-            notificationChannelId: this.interaction.channel.id,
-        };
+        if (!this.interaction.channel) return ErrorMessages.unknownError;
 
-        // StreamStatusJsonにプッシュする
-        users.push(newUser);
-        this.DM.setStreamStatus({ users });
+        const streamNotification = await this.streamNotifications.addStreamNotification(user.id, this.interaction.channel.id);
+        if (!streamNotification) return ErrorMessages.twitchUser404;
 
-        const result = `${newUser.displayName}(${newUser.name}) の配信開始通知を${Formatters.channelMention(
-            newUser.notificationChannelId
-        )}に送信するよう設定しました。`;
-        await this.interaction.reply(result);
-        restartPm2Process(this);
-        return result;
+        return `${streamNotification.displayName}(${streamNotification.name}) の配信開始通知を${Formatters.channelMention(streamNotification.notificationChannelId)}に送信するよう設定しました。`;
     }
 
     getApiKey(): string {

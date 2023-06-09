@@ -37,9 +37,9 @@ export interface SettingsJson {
      */
     twitch: {
         /**
-         * ログインしているチャンネル名
+         * ログインするチャンネルのID
          */
-        channelName: string;
+        id: string;
 
         /**
          * 接続しているチャンネル名
@@ -86,13 +86,18 @@ export interface SettingsJson {
      * サイトのリンク
      */
     web: string;
+
+    /**
+     * TwitchEventSubに使用するhttpHostName
+     */
+    httpHostName: string;
 }
 
 export interface StreamStatusJson {
-    users: TwitchStreamer[];
+    users: TwitchStreamerData[];
 }
 
-export interface TwitchStreamer {
+export interface TwitchStreamerData {
     id: string;
     name: string;
     displayName: string;
@@ -130,5 +135,6 @@ export interface DotEnv {
     TWITCH_REFRESHTOKEN: string;
     TWITCH_CLIENTID: string;
     TWITCH_CLIENTSECRET: string;
+    TWITCH_HTTPSECRET: string;
     DISCORD_TOKEN: string;
 }

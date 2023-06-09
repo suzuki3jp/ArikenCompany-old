@@ -1,12 +1,12 @@
 // nodeモジュールをインポート
 import { CommandInteraction } from 'discord.js';
-import { Base } from '../../class/Base';
 
 // モジュールをインポート
 import { DiscordSlashCommand } from '../../class/DiscordSlashCommand';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const commandInteraction = async (base: Base, interaction: CommandInteraction) => {
-    const slashCommandInteraction = new DiscordSlashCommand(base, interaction);
+export const commandInteraction = async (app: ArikenCompany, interaction: CommandInteraction) => {
+    const slashCommandInteraction = new DiscordSlashCommand(app, interaction);
 
     if (slashCommandInteraction.isMod()) {
         if (slashCommandInteraction.command === 'setup') {
@@ -18,7 +18,7 @@ export const commandInteraction = async (base: Base, interaction: CommandInterac
                     slashCommandInteraction.setupTemplate();
                     break;
                 case 'notification':
-                    slashCommandInteraction.setupNotification();
+                    slashCommandInteraction.reply(await slashCommandInteraction.setupNotification());
                     break;
                 default:
                     break;

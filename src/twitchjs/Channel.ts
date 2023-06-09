@@ -1,7 +1,7 @@
 import type { HelixChannel } from '@twurple/api';
-import { Base } from '../class/Base';
+import { ArikenCompany } from '../ArikenCompany';
 
-export class Channel extends Base {
+export class Channel extends ArikenCompany {
     /**
      * The id of the channel.
      */
@@ -12,8 +12,8 @@ export class Channel extends Base {
      */
     public name: string;
 
-    constructor(base: Base, channelName: string, channelId: string) {
-        super({ base });
+    constructor(app: ArikenCompany, channelName: string, channelId: string) {
+        super(app);
         this.name = channelName;
         this.id = channelId;
     }
@@ -22,7 +22,7 @@ export class Channel extends Base {
      * Get the channel information.
      */
     async getInfo(): Promise<HelixChannel | null> {
-        return await this.twitchApi.channels.getChannelInfoById(this.id);
+        return await this.client.twitch.api.channels.getChannelInfoById(this.id);
     }
 
     /**
@@ -30,6 +30,6 @@ export class Channel extends Base {
      * @param content The content of send message.
      */
     send(content: string) {
-        this.twitchChat.say(this.name, content);
+        this.client.twitch.chat.say(this.name, content);
     }
 }

@@ -4,23 +4,17 @@ import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 // モジュールをインポート
-import {
-    CommandsJson,
-    ManagersJson,
-    ChattersJson,
-    PublicCommandsJson,
-    SettingsJson,
-    StreamStatusJson,
-    DotEnv,
-} from './JsonTypes';
+import { CommandsJson, ManagersJson, ChattersJson, PublicCommandsJson, SettingsJson, StreamStatusJson, DotEnv } from './JsonTypes';
 
 export class DataManager {
     public _paths: {
         chatters: string;
-        cert: string;
+        cert4Api: string;
+        cert4Http: string;
         commands: string;
         env: string;
-        key: string;
+        key4Api: string;
+        key4Http: string;
         managers: string;
         publicCommands: string;
         settings: string;
@@ -30,10 +24,12 @@ export class DataManager {
     constructor() {
         this._paths = {
             chatters: resolve(__dirname, '../../data/Chatters.json'),
-            cert: '/etc/letsencrypt/live/api.suzuki3jp.xyz/fullchain.pem',
+            cert4Api: '/etc/letsencrypt/live/api.suzuki3jp.xyz/fullchain.pem',
+            cert4Http: '/etc/letsencrypt/live/ws.suzuki3jp.xyz/fullchain.pem',
             commands: resolve(__dirname, '../../data/Commands.json'),
             env: resolve(__dirname, '../../.env'),
-            key: '/etc/letsencrypt/live/api.suzuki3jp.xyz/privkey.pem',
+            key4Api: '/etc/letsencrypt/live/api.suzuki3jp.xyz/privkey.pem',
+            key4Http: '/etc/letsencrypt/live/ws.suzuki3jp.xyz/privkey.pem',
             managers: resolve(__dirname, '../../data/Managers.json'),
             publicCommands: resolve(__dirname, '../../data/PublicCommands.json'),
             settings: resolve(__dirname, '../../data/settings.json'),
@@ -49,8 +45,12 @@ export class DataManager {
         this._writeFile(this._paths.chatters, data);
     }
 
-    getCert(): string {
-        return readFileSync(this._paths.cert, 'utf-8');
+    getCert4Api(): string {
+        return readFileSync(this._paths.cert4Api, 'utf-8');
+    }
+
+    getCert4Http(): string {
+        return readFileSync(this._paths.cert4Http, 'utf-8');
     }
 
     getCommands(): CommandsJson {
@@ -69,8 +69,12 @@ export class DataManager {
         }
     }
 
-    getKey(): string {
-        return readFileSync(this._paths.key, 'utf-8');
+    getKey4Api(): string {
+        return readFileSync(this._paths.key4Api, 'utf-8');
+    }
+
+    getKey4Http(): string {
+        return readFileSync(this._paths.key4Http, 'utf-8');
     }
 
     getManagers(): ManagersJson {

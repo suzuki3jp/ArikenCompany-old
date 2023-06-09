@@ -4,12 +4,12 @@ import type { Request, Response } from 'express';
 // モジュールをインポート
 import { saveAccessLog, setHeaderAllowOrigin } from '../apiUtils';
 import { convertPublicChatters } from '../../utils/Chatters';
-import { Base } from '../../class/Base';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const getChatters = (req: Request, res: Response, base: Base) => {
-    saveAccessLog(req, base);
+export const getChatters = (req: Request, res: Response, app: ArikenCompany) => {
+    saveAccessLog(req, app);
     setHeaderAllowOrigin(res);
-    const chatters = base.DM.getChatters();
+    const chatters = app.DM.getChatters();
     res.status(200);
     res.json(convertPublicChatters(chatters));
 };

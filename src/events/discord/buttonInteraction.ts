@@ -1,10 +1,10 @@
 // nodeモジュールをインポート
 import type { ButtonInteraction } from 'discord.js';
-import { Base } from '../../class/Base';
 import { DiscordButton } from '../../class/DiscordButton';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const buttonInteraction = (base: Base, interaction: ButtonInteraction) => {
-    const button = new DiscordButton(base, interaction);
+export const buttonInteraction = (app: ArikenCompany, interaction: ButtonInteraction) => {
+    const button = new DiscordButton(app, interaction);
 
     // コマンドパネルページネーション
     switch (button.type) {

@@ -1,42 +1,22 @@
 // モジュールをインポート
-import { Base } from '../class/Base';
 import { discordInteraction, discordMessage, discordReady } from './discord/index';
 import { twitchMessage, twitchReady } from './twitch/index';
 import { Message } from '../twitchjs/index';
+import { ArikenCompany } from '../ArikenCompany';
 
-export const events = (base: Base, discordToken: string) => {
+export const events = (app: ArikenCompany) => {
     // discord events
-    base.discord.on('ready', () => discordReady(base));
+    app.client.discord.on('ready', () => discordReady(app));
 
-    base.discord.on('messageCreate', (message) => discordMessage(base, message));
+    app.client.discord.on('messageCreate', (message) => discordMessage(app, message));
 
-    base.discord.on('interactionCreate', (interaction) => discordInteraction(base, interaction));
+    app.client.discord.on('interactionCreate', (interaction) => discordInteraction(app, interaction));
 
     // twitch events
-    base.twitchChat.onConnect(() => twitchReady(base));
+    app.client.twitch.chat.onConnect(() => twitchReady(app));
 
-    base.twitchChat.onMessage((channel, user, text, message) =>
-        twitchMessage(base, new Message(base, channel, text, message))
-    );
+    app.client.twitch.chat.onMessage((channel, user, text, message) => twitchMessage(app, new Message(app, channel, text, message)));
 
-    // logger events
-    base.logger.on('debug', (msg) => {
-        if (process.argv.includes('--debug')) {
-            console.log(msg);
-        }
-    });
-
-    base.logger.on('system', (msg) => {
-        console.log(msg);
-        base.logger.appendToCsv(msg);
-    });
-
-    base.logger.on('info', (msg) => {
-        console.log(msg);
-        base.logger.appendToCsv(msg);
-    });
-
-    // client login
-    base.twitchChat.connect();
-    base.discord.login(discordToken);
+    // app start
+    app.start();
 };

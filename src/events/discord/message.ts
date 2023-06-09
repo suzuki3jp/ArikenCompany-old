@@ -2,13 +2,13 @@
 import type { Message, MessagePayload, ReplyMessageOptions } from 'discord.js';
 
 // モジュールをインポート
-import { Base } from '../../class/Base';
 import { DiscordCommand } from '../../class/DiscordCommand';
 import { ValueParser } from '../../class/ValueParser';
+import { ArikenCompany } from '../../ArikenCompany';
 
-export const discordMessage = async (base: Base, message: Message) => {
+export const discordMessage = async (app: ArikenCompany, message: Message) => {
     if (message.author.bot) return;
-    const discordCommand = new DiscordCommand(base, message);
+    const discordCommand = new DiscordCommand(app, message);
     const reply = (options: string | MessagePayload | ReplyMessageOptions) => {
         message.reply(options);
     };
@@ -42,7 +42,7 @@ export const discordMessage = async (base: Base, message: Message) => {
         if (!discordCommand.isOnCom()) return;
         const commandValue = discordCommand.commandValue();
         if (!commandValue) return;
-        const valueParser = new ValueParser(base);
+        const valueParser = new ValueParser(app);
         const valueParseResult = await valueParser.parse(commandValue, message);
         if (!valueParseResult || valueParseResult.error) return;
         message.channel.send(valueParseResult.parsed);
