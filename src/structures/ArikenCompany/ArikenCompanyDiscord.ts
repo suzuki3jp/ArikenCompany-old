@@ -17,11 +17,10 @@ export class ArikenCompanyDiscord {
         this.client.logger.system('Loaded discord client events.');
     }
 
-    async start(): Promise<string> {
+    async start() {
         this.eventsLoad();
-        const result = await this.discordClient.login(this.client.dotenv.DISCORD_TOKEN);
+        await this.discordClient.login(this.client.dotenv.DISCORD_TOKEN);
         this.client.logger.system('Started discord client.');
-        return result;
     }
 }
 
