@@ -1,5 +1,3 @@
-import logColor from 'chalk';
-
 import { JSTController } from '../index';
 
 export class Logger {
@@ -28,14 +26,8 @@ export class Logger {
 
     makeLog(level: LogLevel, ...messages: string[]): string {
         const now = new JSTController();
-        return ColorizeLog[level](`[${now.toString()} JST] [${level}] - ${messages.join('')}`);
+        return `[${now.toString()} JST] [${level}] - ${messages.join('')}`;
     }
 }
 
 type LogLevel = 'SYSTEM' | 'INFO' | 'DEBUG';
-
-const ColorizeLog = {
-    SYSTEM: logColor.blue,
-    DEBUG: logColor.gray,
-    INFO: logColor.green,
-};
