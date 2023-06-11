@@ -6,3 +6,19 @@ export interface DotEnvData {
     TWITCH_TOKEN: string;
     TWITCH_HTTPSECRET: string;
 }
+
+export interface SettingsData {
+    twitch: {
+        /**
+         * 認証しているユーザーのid
+         */
+        id: string;
+
+        /**
+         * 接続するチャットのチャンネル名
+         */
+        channels: string[];
+    };
+}
+
+export type JsonTypes = SettingsData;

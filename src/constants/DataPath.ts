@@ -4,4 +4,5 @@ const resolvePath = (relativePath: string) => path.resolve(__dirname, relativePa
 
 export class DataPath {
     public static readonly env: string = resolvePath('../../.env');
+    public static readonly settings: string = resolvePath('../../data/settings.json');
 }
