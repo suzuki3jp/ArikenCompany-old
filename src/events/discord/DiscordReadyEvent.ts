@@ -2,7 +2,7 @@ import { ClientEvents } from 'discord.js';
 
 import { ArikenCompany } from '../../structures/index';
 
-export class DiscordReady {
+export class DiscordReadyEvent {
     private client: ArikenCompany;
 
     constructor(client: ArikenCompany) {

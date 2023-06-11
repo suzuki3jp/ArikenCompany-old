@@ -3,7 +3,7 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 
 import { ArikenCompany } from './ArikenCompany';
-import { TwitchReady } from '../../events/twitch/index';
+import { TwitchReadyEvent } from '../../events/twitch/index';
 
 export class ArikenCompanyTwitch {
     private client: ArikenCompany;
@@ -31,7 +31,7 @@ export class ArikenCompanyTwitch {
     }
 
     eventsLoad() {
-        this.chat.onConnect((...args) => new TwitchReady(this.client).execute(...args));
+        this.chat.onConnect((...args) => new TwitchReadyEvent(this.client).execute(...args));
         this.client.logger.system('Loaded twitch chat events.');
     }
 

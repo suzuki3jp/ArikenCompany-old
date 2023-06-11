@@ -1,1 +1,1 @@
-export { DiscordReady } from './DiscordReady';
+export { DiscordReadyEvent } from './DiscordReadyEvent';

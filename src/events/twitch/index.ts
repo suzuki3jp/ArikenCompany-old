@@ -1,1 +1,1 @@
-export { TwitchReady } from './TwitchReady';
+export { TwitchReadyEvent } from './TwitchReadyEvent';

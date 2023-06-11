@@ -1,7 +1,7 @@
 import { Client, IntentsBitField, Partials } from 'discord.js';
 
 import { ArikenCompany } from './ArikenCompany';
-import { DiscordReady } from '../../events/discord/index';
+import { DiscordReadyEvent } from '../../events/discord/index';
 
 export class ArikenCompanyDiscord {
     private client: ArikenCompany;
@@ -13,7 +13,7 @@ export class ArikenCompanyDiscord {
     }
 
     eventsLoad() {
-        this.discordClient.on('ready', (...args) => new DiscordReady(this.client).execute(...args));
+        this.discordClient.on('ready', (...args) => new DiscordReadyEvent(this.client).execute(...args));
         this.client.logger.system('Loaded discord client events.');
     }
 

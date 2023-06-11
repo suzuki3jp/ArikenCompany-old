@@ -1,6 +1,6 @@
 import { ArikenCompany } from '../../structures/index';
 
-export class TwitchReady {
+export class TwitchReadyEvent {
     constructor(private client: ArikenCompany) {}
 
     execute() {
