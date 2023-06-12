@@ -17,11 +17,11 @@ export class TwitchMessage {
         this.client = client;
         this.id = info.id;
         this.content = content;
-        this.channel = new TwitchChannel(this.client, channelName, info.channelId);
+        this.channel = new TwitchChannel(this.client, channelName.slice(1), info.channelId);
         this.user = new TwitchUser(this.client, info.userInfo);
     }
 
     async reply(content: string) {
-        await this.client.twitch.say(this.channel.id, content, this.id);
+        await this.client.twitch.say(this.channel.name, content, this.id);
     }
 }
