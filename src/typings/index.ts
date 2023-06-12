@@ -21,4 +21,18 @@ export interface SettingsData {
     };
 }
 
+export interface CommandsData {
+    total: number;
+    commands: CommandData[];
+}
+
+export interface CommandData {
+    name: string;
+    content: string;
+    created_at: string;
+    updated_at: string;
+    used_at: string;
+    count: number;
+}
+
 export type JsonTypes = SettingsData;
