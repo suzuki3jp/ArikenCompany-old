@@ -13,6 +13,7 @@ export class ArikenCompanyDiscord {
     }
 
     eventsLoad() {
+        this.discordClient.on('debug', (...args) => this.client.logger.debug(...args));
         this.discordClient.on('ready', (...args) => new DiscordReadyEvent(this.client).execute(...args));
         this.client.logger.system('Loaded discord client events.');
     }
