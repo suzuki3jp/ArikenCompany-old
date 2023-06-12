@@ -10,11 +10,6 @@ export interface DotEnvData {
 export interface SettingsData {
     twitch: {
         /**
-         * 認証しているユーザーのid
-         */
-        id: string;
-
-        /**
          * 接続するチャットのチャンネル名
          */
         channels: string[];
