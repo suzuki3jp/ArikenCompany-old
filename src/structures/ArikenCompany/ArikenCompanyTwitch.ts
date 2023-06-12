@@ -3,7 +3,7 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 
 import { ArikenCompany } from './ArikenCompany';
-import { TwitchReadyEvent } from '../../events/twitch/index';
+import { TwitchReadyEvent, TwitchMessageEvent } from '../../events/twitch/index';
 
 export class ArikenCompanyTwitch {
     private client: ArikenCompany;
@@ -32,6 +32,7 @@ export class ArikenCompanyTwitch {
 
     eventsLoad() {
         this.chat.onConnect((...args) => new TwitchReadyEvent(this.client).execute(...args));
+        this.chat.onMessage((...args) => new TwitchMessageEvent(this.client).execute(...args));
         this.client.logger.system('Loaded twitch chat events.');
     }
 
@@ -47,5 +48,9 @@ export class ArikenCompanyTwitch {
         );
         this.eventsLoad();
         await this.chat.connect();
+    }
+
+    async say(channel: string, content: string, replyTo?: string): Promise<void> {
+        await this.chat.say(channel, content, { replyTo });
     }
 }
