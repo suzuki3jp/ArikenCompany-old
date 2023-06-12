@@ -1,21 +1,32 @@
+import { Collection, ColorResolvable } from 'discord.js';
+
 import { DataPath } from '../../constants';
-import { CommandsData } from '../../typings/index';
+import { CommandsData, CommandData } from '../../typings/index';
 import { FileManager } from '../FileManager';
 
 export class CommandsJSON extends FileManager<CommandsData> {
-    public cache: CommandsData;
+    public cache: Collection<string, CommandData>;
 
     constructor() {
         super(DataPath.commands);
-        this.cache = this.read();
+        this.cache = new Collection(null);
+        this.refreshCache();
     }
 
     write(data: string | CommandsData): void {
         super.write(data);
-        this.cache = this.read();
+        this.refreshCache();
+    }
+
+    refreshCache() {
+        const data = this.read();
+        data.commands.forEach((it) => this.cache.set(it._id, it));
     }
 
     toJSON(): CommandsData {
-        return this.cache;
+        return {
+            total: this.cache.size,
+            commands: this.cache.toJSON(),
+        };
     }
 }

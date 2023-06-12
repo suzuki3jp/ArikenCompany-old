@@ -22,6 +22,7 @@ export interface CommandsData {
 }
 
 export interface CommandData {
+    _id: string;
     name: string;
     content: string;
     created_at: string;
