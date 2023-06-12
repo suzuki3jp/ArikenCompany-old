@@ -1,7 +1,11 @@
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+
+import { ArikenCompanyError } from '../utils/index';
 
 export class FileManager<FileType> {
-    constructor(private path: string) {}
+    constructor(private path: string) {
+        if (!existsSync(this.path)) throw new ArikenCompanyError(`File not found.`, this.path);
+    }
 
     read(): FileType {
         return JSON.parse(readFileSync(this.path, 'utf-8'));
