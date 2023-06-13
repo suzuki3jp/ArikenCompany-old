@@ -1,5 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 
+import { DateJSON } from '../../typings';
+
 export class BaseDateController {
     protected date: Dayjs;
 
@@ -39,7 +41,24 @@ export class BaseDateController {
         return this.date.format(template);
     }
 
+    toISOString(): string {
+        return this.date.toISOString();
+    }
+
     toString(): string {
+        console.log(this.date.utcOffset());
         return this.format('YYYY/MM/DD HH:mm:ss');
+    }
+
+    toJSON(): DateJSON {
+        return {
+            year: this.getYear(),
+            month: this.getMonth(),
+            day: this.getDay(),
+            hours: this.getHours(),
+            minutes: this.getMinutes(),
+            seconds: this.getSeconds(),
+            milliSeconds: this.getMilliSeconds(),
+        };
     }
 }
