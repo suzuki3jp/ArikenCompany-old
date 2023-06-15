@@ -18,6 +18,10 @@ export class CommandsJSON extends FileManager<CommandsData> {
         this.refreshCache();
     }
 
+    writeFromCache() {
+        this.write(this.toJSON());
+    }
+
     refreshCache() {
         const data = this.read();
         data.commands.forEach((it) => this.cache.set(it._id, it));
