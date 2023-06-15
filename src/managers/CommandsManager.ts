@@ -4,7 +4,6 @@ import { uid } from 'uid';
 import { ArikenCompany } from '../structures';
 import { CommandData } from '../typings';
 import { UTCController } from '../utils';
-import dayjs from 'dayjs';
 
 export class CommandManager {
     constructor(private client: ArikenCompany) {}
