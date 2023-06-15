@@ -32,3 +32,13 @@ export interface CommandData {
 }
 
 export type JsonTypes = SettingsData;
+
+export interface DateJSON {
+    year: number;
+    month: number;
+    day: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    milliSeconds: number;
+}
