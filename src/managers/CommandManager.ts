@@ -68,7 +68,7 @@ export class CommandManager {
         return command;
     }
 
-    updateUsedAt(name: string): CommandData | null {
+    updateUsedAtByName(name: string): CommandData | null {
         const now = new UTCController();
         const command = this.getCommandByName(name);
         if (!command) return null;
@@ -87,7 +87,7 @@ export class CommandManager {
         return data;
     }
 
-    incrementCount(name: string): CommandData | null {
+    incrementCountByName(name: string): CommandData | null {
         const command = this.getCommandByName(name);
         if (!command) return null;
         const data: CommandData = {
