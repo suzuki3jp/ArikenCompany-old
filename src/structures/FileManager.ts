@@ -1,10 +1,10 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 
-import { ArikenCompanyError } from '../utils/index';
+import { makeError, ErrorMessages } from '../utils/index';
 
 export class FileManager<FileType> {
     constructor(private path: string) {
-        if (!existsSync(this.path)) throw new ArikenCompanyError(`File not found.`, this.path);
+        if (!existsSync(this.path)) throw makeError(ErrorMessages.FileNotFoud(this.path));
     }
 
     read(): FileType {
