@@ -18,6 +18,8 @@ export interface SettingsData {
 
 export interface CommandsData {
     total: number;
+    status: boolean;
+    coolDown: number;
     commands: CommandData[];
 }
 
@@ -31,7 +33,7 @@ export interface CommandData {
     count: number;
 }
 
-export type JsonTypes = SettingsData;
+export type JsonTypes = SettingsData | CommandsData;
 
 export interface DateJSON {
     year: number;
