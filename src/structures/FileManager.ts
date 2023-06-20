@@ -1,8 +1,9 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 
 import { makeError, ErrorMessages } from '../utils/index';
+import { JsonTypes } from '../typings';
 
-export class FileManager<FileType> {
+export class FileManager<FileType extends JsonTypes> {
     constructor(private path: string) {
         if (!existsSync(this.path)) throw makeError(ErrorMessages.FileNotFoud(this.path));
     }
