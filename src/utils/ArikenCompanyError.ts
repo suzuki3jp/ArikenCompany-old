@@ -13,6 +13,9 @@ export const ErrorMessages = {
 
     // file error
     FileNotFoud: (path: string) => `File not found. ${path}`,
+
+    // env error
+    EnvNotFound: (env: string) => `${env} not found in .env file.`,
 };
 
 export const makeError = (message: string): ArikenCompanyError => {

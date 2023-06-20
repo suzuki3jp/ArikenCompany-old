@@ -1,17 +1,18 @@
 import { PrivateMessage } from '@twurple/chat';
 
-import { ArikenCompany, TwitchMessage, TwitchChatCommand } from '../../structures/index';
+import { ArikenCompany, TwitchMessage, TwitchChatCommand, ChatManageCommand } from '../../structures/index';
+import { LogMessages } from '../../utils/index';
 
 export class TwitchMessageEvent {
     constructor(private client: ArikenCompany) {
-        this.client.logger.system('Loaded Twitch message event.');
+        this.client.logger.system(LogMessages.LoadedTwitchMessageEvent);
     }
 
-    execute(channelName: string, userName: string, content: string, info: PrivateMessage) {
+    async execute(channelName: string, userName: string, content: string, info: PrivateMessage) {
         const message = new TwitchMessage(this.client, channelName, content, info);
         const command = new TwitchChatCommand(this.client, message);
-        this.client.logger.debug(
-            `Twitch chat sent by ${message.user.name} in ${message.channel.name}. ${message.content}`
-        );
+        this.client.logger.debug(LogMessages.SentTwitchChat(userName, channelName, content));
+
+        await new ChatManageCommand(this.client, command).execute();
     }
 }

@@ -4,6 +4,7 @@ import { ChatClient } from '@twurple/chat';
 
 import { ArikenCompany } from './ArikenCompany';
 import { TwitchReadyEvent, TwitchMessageEvent } from '../../events/twitch/index';
+import { LogMessages } from '../../utils';
 
 export class ArikenCompanyTwitch {
     private client: ArikenCompany;
@@ -19,11 +20,11 @@ export class ArikenCompanyTwitch {
             clientId: this.client.dotenv.TWITCH_CLIENTID,
             clientSecret: this.client.dotenv.TWITCH_CLIENTSECRET,
             onRefresh: (userId, token) => {
-                if (!token.refreshToken) throw new Error('Twitch token refresh failed.');
+                if (!token.refreshToken) throw new Error(LogMessages.TokenRefreshFailed);
                 this.client.dotenv.TWITCH_TOKEN = token.accessToken;
                 this.client.dotenv.TWITCH_REFRESHTOKEN = token.refreshToken;
                 this.client.dotenv.save();
-                this.client.logger.info('Twitch token has been refreshed.');
+                this.client.logger.info(LogMessages.TokenRefreshed);
             },
         });
         this.api = new ApiClient({ authProvider: this.auth });
@@ -33,7 +34,7 @@ export class ArikenCompanyTwitch {
     eventsLoad() {
         this.chat.onConnect((...args) => new TwitchReadyEvent(this.client).execute(...args));
         this.chat.onMessage((...args) => new TwitchMessageEvent(this.client).execute(...args));
-        this.client.logger.system('Loaded twitch chat events.');
+        this.client.logger.system(LogMessages.LoadedTwitchEvents);
     }
 
     async start() {
@@ -48,6 +49,7 @@ export class ArikenCompanyTwitch {
         );
         this.eventsLoad();
         await this.chat.connect();
+        this.client.logger.system(LogMessages.StartedTwitch);
     }
 
     async say(channel: string, content: string, replyTo?: string): Promise<void> {

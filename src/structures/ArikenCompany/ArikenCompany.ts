@@ -2,7 +2,7 @@ import { ArikenCompanyDiscord } from './ArikenCompanyDiscord';
 import { ArikenCompanyTwitch } from './ArikenCompanyTwitch';
 import { DotEnv } from '../index';
 import { SettingsJSON } from '../JSON/SettingsJSON';
-import { Logger } from '../../utils/index';
+import { LogMessages, Logger } from '../../utils/index';
 import { CommandsJSON } from '../JSON/CommandsJSON';
 
 export class ArikenCompany {
@@ -23,7 +23,7 @@ export class ArikenCompany {
     }
 
     async start() {
-        this.logger.system('Starting app...');
+        this.logger.system(LogMessages.StartingApp);
         await this.discord.start();
         await this.twitch.start();
     }

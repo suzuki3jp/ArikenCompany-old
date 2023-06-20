@@ -5,6 +5,7 @@ config();
 
 import { DataPath } from '../constants/index';
 import { DotEnvData } from '../typings/index';
+import { ErrorMessages } from '../utils';
 
 export class DotEnv {
     public DISCORD_TOKEN: string;
@@ -16,14 +17,7 @@ export class DotEnv {
     public TWITCH_REFRESHTOKEN: string;
 
     constructor() {
-        const {
-            DISCORD_TOKEN,
-            TWITCH_CLIENTID,
-            TWITCH_CLIENTSECRET,
-            TWITCH_HTTPSECRET,
-            TWITCH_TOKEN,
-            TWITCH_REFRESHTOKEN,
-        } = process.env;
+        const { DISCORD_TOKEN, TWITCH_CLIENTID, TWITCH_CLIENTSECRET, TWITCH_HTTPSECRET, TWITCH_TOKEN, TWITCH_REFRESHTOKEN } = process.env;
 
         if (!DISCORD_TOKEN) throw envError('DISCORD_TOKEN');
         if (!TWITCH_CLIENTID) throw envError('TWITCH_CLIENTID');
@@ -58,4 +52,4 @@ export class DotEnv {
     }
 }
 
-const envError = (env: string) => new Error(`${env} not found in .env file.`);
+const envError = (env: string) => new Error(ErrorMessages.EnvNotFound(env));

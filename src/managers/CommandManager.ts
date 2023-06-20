@@ -3,7 +3,7 @@ import { uid } from 'uid';
 
 import { ArikenCompany } from '../structures';
 import { CommandData } from '../typings';
-import { UTCController } from '../utils';
+import { LogMessages, UTCController } from '../utils';
 
 export class CommandManager {
     constructor(private client: ArikenCompany) {}
@@ -36,7 +36,7 @@ export class CommandManager {
         };
         this.client.commands.cache.set(data._id, data);
         this.client.commands.writeFromCache();
-        this.client.logger.info(`Added command. ${name} ${content}`);
+        this.client.logger.info(LogMessages.AddedCommand(data.name, data.content));
         return data;
     }
 
@@ -55,7 +55,7 @@ export class CommandManager {
         };
         this.client.commands.cache.set(data._id, data);
         this.client.commands.writeFromCache();
-        this.client.logger.info(`Edited command. ${name} ${content}`);
+        this.client.logger.info(LogMessages.EditedCommand(data.name, data.content));
         return data;
     }
 
@@ -64,7 +64,7 @@ export class CommandManager {
         if (!command) return null;
         this.client.commands.cache.delete(command._id);
         this.client.commands.writeFromCache();
-        this.client.logger.info(`Removed command. ${name}`);
+        this.client.logger.info(LogMessages.RemovedCommand(name));
         return command;
     }
 
@@ -83,7 +83,7 @@ export class CommandManager {
         };
         this.client.commands.cache.set(data._id, data);
         this.client.commands.writeFromCache();
-        this.client.logger.info(`Update command used_at. ${data.name}`);
+        this.client.logger.info(LogMessages.UpdatedCommandUsedAt(data.name));
         return data;
     }
 
@@ -101,7 +101,7 @@ export class CommandManager {
         };
         this.client.commands.cache.set(data._id, data);
         this.client.commands.writeFromCache();
-        this.client.logger.info(`Incremented command count. ${data.name}`);
+        this.client.logger.info(LogMessages.IncrementedCommandCount(data.name));
         return data;
     }
 
