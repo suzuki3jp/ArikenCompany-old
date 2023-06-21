@@ -5,4 +5,6 @@ export { JSTController } from './date/JSTController';
 
 export { Logger } from './logger/Logger';
 
+export { LogMessages } from './Logs';
+
 export { valueOf } from './typings';

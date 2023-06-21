@@ -119,6 +119,20 @@ export class CommandManager {
         return this.client.commands.status;
     }
 
+    getCoolDown(): number {
+        return this.client.commands.coolDown;
+    }
+
+    setCoolDown(period: number | string): number | null {
+        if (typeof period === 'string') period = parseInt(period);
+        if (isNaN(period)) return null;
+
+        this.client.commands.coolDown = period;
+        this.client.commands.writeFromCache();
+        this.client.logger.info(LogMessages.SetCoolDown(period));
+        return this.client.commands.coolDown;
+    }
+
     getTotal(): number {
         return this.client.commands.cache.size;
     }

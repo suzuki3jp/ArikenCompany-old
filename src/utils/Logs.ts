@@ -36,6 +36,8 @@ export const LogMessages = {
     EnabledCommands: `Enabled commands.`,
     DisabledCommands: `Disabled commands.`,
 
+    SetCoolDown: (period: number) => `Set coolDown ${period} seconds.`,
+
     UpdatedCommandUsedAt: (name: string) => `Updated command used_at. ${name}`,
     IncrementedCommandCount: (name: string) => `Incremented command count. ${name}`,
 };
