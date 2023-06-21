@@ -33,6 +33,9 @@ export const LogMessages = {
     RemovedCommand: (name: string) => `Removed command. ${name}`,
     RemovedCommandBy: (by: string) => `Removed command by ${by}.`,
 
+    EnabledCommands: `Enabled commands.`,
+    DisabledCommands: `Disabled commands.`,
+
     UpdatedCommandUsedAt: (name: string) => `Updated command used_at. ${name}`,
     IncrementedCommandCount: (name: string) => `Incremented command count. ${name}`,
 };

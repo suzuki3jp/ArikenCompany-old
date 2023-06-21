@@ -105,6 +105,20 @@ export class CommandManager {
         return data;
     }
 
+    enable(): boolean {
+        this.client.commands.status = true;
+        this.client.commands.writeFromCache();
+        this.client.logger.info(LogMessages.EnabledCommands);
+        return this.client.commands.status;
+    }
+
+    disable(): boolean {
+        this.client.commands.status = false;
+        this.client.commands.writeFromCache();
+        this.client.logger.info(LogMessages.DisabledCommands);
+        return this.client.commands.status;
+    }
+
     getTotal(): number {
         return this.client.commands.cache.size;
     }
