@@ -1,5 +1,6 @@
 export { ArikenCompany } from './ArikenCompany/ArikenCompany';
 
+export { ChatManageCommand } from './ChatCommand/ChatManageCommand';
 export { TwitchChatCommand } from './ChatCommand/TwitchChatCommand';
 
 export { DotEnv } from './DotEnv';
