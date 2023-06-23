@@ -14,6 +14,10 @@ export interface SettingsData {
          */
         channels: string[];
     };
+
+    discord: {
+        modRoleId: string;
+    };
 }
 
 export interface CommandsData {
