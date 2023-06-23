@@ -8,6 +8,7 @@ class ArikenCompanyError extends Error {
 export const ErrorMessages = {
     // managing command error
     InvalidArgs: '必要な引数が入力されていません。',
+    InvalidCoolDownArgs: (period: string) => `クールダウンが不正な値です。 [${period}]`,
     CommandExists: 'コマンドがすでに存在します。',
     CommandNotExists: 'コマンドが存在しません。',
 
