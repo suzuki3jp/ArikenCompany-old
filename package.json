@@ -9,7 +9,6 @@
     "@twurple/auth": "^6.2.1",
     "@twurple/chat": "^6.2.1",
     "@twurple/eventsub-http": "^6.2.1",
-    "chalk": "^5.2.0",
     "dayjs": "^1.11.8",
     "discord.js": "^14.11.0",
     "dotenv": "^16.1.4",
@@ -26,7 +25,11 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node ./dist/index.js",
+    "dev": "npx ts-node ./src/index.ts --debug"
+  },
   "author": "suzuki3jp <suzuki3.info@gmail.com>",
   "license": "MIT"
 }
