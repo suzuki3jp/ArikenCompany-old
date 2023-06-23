@@ -3,7 +3,7 @@ export const LogMessages = {
     StartingApp: `Starting app...`,
 
     // events logs
-    LoadedTwitchEvents: `Loaded Twitch events`,
+    LoadedTwitchEvents: `Loaded Twitch events.`,
     LoadedTwitchMessageEvent: `Loaded Twitch message event.`,
     LoadedTwitchReadyEvent: `Loaded Twitch ready event.`,
 
@@ -34,9 +34,12 @@ export const LogMessages = {
     RemovedCommandBy: (by: string) => `Removed command by ${by}.`,
 
     EnabledCommands: `Enabled commands.`,
+    EnabledCommandsBy: (by: string) => `Enabled commands by ${by}.`,
     DisabledCommands: `Disabled commands.`,
+    DisabledCommandsBy: (by: string) => `Disabled commands by ${by}.`,
 
     SetCoolDown: (period: number) => `Set coolDown ${period} seconds.`,
+    SetCoolDownBy: (by: string) => `Set coolDown by ${by}.`,
 
     UpdatedCommandUsedAt: (name: string) => `Updated command used_at. ${name}`,
     IncrementedCommandCount: (name: string) => `Incremented command count. ${name}`,
