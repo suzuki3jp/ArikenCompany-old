@@ -46,7 +46,6 @@ export class BaseDateController {
     }
 
     toString(): string {
-        console.log(this.date.utcOffset());
         return this.format('YYYY/MM/DD HH:mm:ss');
     }
 
