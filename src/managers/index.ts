@@ -1,1 +1,1 @@
-export { CommandManager } from './CommandsManager';
+export { CommandManager } from './CommandManager';
