@@ -47,7 +47,7 @@ export class CommandManager {
         const data: CommandData = {
             _id: command._id,
             name: command.name,
-            content: command.content,
+            content: content,
             created_at: command.created_at,
             updated_at: now.toISOString(),
             used_at: command.used_at,
