@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 
-import { BaseDate } from '@/helpers/date/BaseDate';
+import { BaseDate } from '@/helpers/Date/BaseDate';
 
 // load dayjs plugins
 dayjs.extend(utc);
