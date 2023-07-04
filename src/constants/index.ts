@@ -1,1 +1,0 @@
-export { DataPath } from './DataPath';
