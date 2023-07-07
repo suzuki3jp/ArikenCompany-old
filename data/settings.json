@@ -1,0 +1,6 @@
+{
+    "api": {
+        "isSecure": false,
+        "port": 443
+    }
+}
