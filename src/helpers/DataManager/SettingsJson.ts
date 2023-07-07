@@ -1,8 +1,8 @@
 import { FilePaths } from '@/constants/FilePaths';
-import { DataManager } from '@/helpers/DataManager/DataManager';
+import { JSONManager } from '@/helpers/DataManager/JSONManager';
 import { SettingsJson as ISettingsJson } from '@/helpers/typings';
 
-export class SettingsJson extends DataManager<ISettingsJson> {
+export class SettingsJson extends JSONManager<ISettingsJson> {
     public cache: ISettingsJson;
 
     constructor() {
