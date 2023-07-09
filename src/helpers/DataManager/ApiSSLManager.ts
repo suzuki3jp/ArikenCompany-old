@@ -5,8 +5,8 @@ export class ApiSSLManager {
     private managers: { key: DataManager; cert: DataManager };
     constructor() {
         this.managers = {
-            key: new DataManager(FilePaths.apiSSL.key),
-            cert: new DataManager(FilePaths.apiSSL.cert),
+            key: new DataManager(FilePaths.apiSSL.key, false),
+            cert: new DataManager(FilePaths.apiSSL.cert, false),
         };
     }
 

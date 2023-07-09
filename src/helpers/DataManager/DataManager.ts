@@ -3,7 +3,8 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { makeError, ErrorMessages } from '@/helpers/errors/ArikenCompanyError';
 
 export class DataManager {
-    constructor(private path: string) {
+    constructor(private path: string, checkExists: boolean = true) {
+        if (!checkExists) return;
         if (!existsSync(this.path)) throw makeError(ErrorMessages.FileNotFound(this.path));
     }
 
