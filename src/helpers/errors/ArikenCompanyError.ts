@@ -8,6 +8,7 @@ class ArikenCompanyError extends Error {
 
 export const ErrorMessages = {
     FileNotFound: (path: string) => `${path} not found.`,
+    EnvNotFound: (env: string) => `${env} not found in .env file.`,
 };
 
 export const makeError = (...messages: string[]): ArikenCompanyError => {

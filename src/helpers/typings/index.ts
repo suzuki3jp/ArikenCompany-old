@@ -1,3 +1,3 @@
-export { JsonTypes, SettingsJson } from './Data';
+export { JsonTypes, SettingsJson, DotEnv } from './Data';
 
 export { valueOf } from './ValueOf';
