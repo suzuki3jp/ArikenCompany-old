@@ -1,5 +1,3 @@
-import { valueOf } from '@/helpers/typings';
-
 class ArikenCompanyError extends Error {
     constructor(...messages: string[]) {
         super();
