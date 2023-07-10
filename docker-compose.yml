@@ -1,0 +1,19 @@
+services:
+    app:
+        build: .
+        container_name: app
+        ports:
+            - '443:443'
+        depends_on:
+            - mongo
+
+    mongo:
+        image: mongo
+        container_name: mongo
+        environment:
+            MONGO_INITDB_DATABASE: admin
+        volumes:
+            - ./data/db/init.js:/docker-entrypoint-initdb.d/init.js:ro
+            - ./data/db:/data/db
+        # Start mongo with authentication enabled
+        command: [mongod, --auth]

@@ -4,7 +4,10 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node ./dist/boot.js",
-    "setup": "npm run build && npm start"
+    "setup": "npm run build && npm start",
+    "docker": "npm run docker:build && npm run docker:start",
+    "docker:start": "docker-compose up -d",
+    "docker:build": "docker-compose build"
   },
   "repository": {
     "type": "git",
