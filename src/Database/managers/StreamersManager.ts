@@ -14,13 +14,17 @@ export class StreamersManager {
         this.logger = db.logger.createChild('Streamers');
     }
 
-    async getStreamerById(id: string): Promise<IStreamer | null> {
+    public async getStreamerById(id: string): Promise<IStreamer | null> {
         const d = await this.model.find({ id }).exec();
         if (d.length === 0) return null;
         return d[0];
     }
 
-    async addStremer(data: Optional<IStreamer, 'isStreaming' | 'created_at' | 'updated_at'>): Promise<IStreamer | null> {
+    public async getAll(): Promise<IStreamer[]> {
+        return await this.model.find({}).exec();
+    }
+
+    public async addStremer(data: Optional<IStreamer, 'isStreaming' | 'created_at' | 'updated_at'>): Promise<IStreamer | null> {
         const now = new UTC().toISOString();
         const { id, notificationChannelId } = data;
         const user = await this.client.twitchApi?.getUserById(id);
@@ -41,7 +45,7 @@ export class StreamersManager {
         return newData;
     }
 
-    async removeStreamer(id: string): Promise<IStreamer | null> {
+    public async removeStreamer(id: string): Promise<IStreamer | null> {
         const result = await this.model.findOneAndDelete({ id }).exec();
         if (result) this.logger.info(LogMessages.removedStreamer(result.id));
         return result;
