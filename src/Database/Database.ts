@@ -6,9 +6,9 @@ import { LogMessages, Logger } from '@/helpers/Logger/Logger';
 
 export class Database {
     private connection: Connection;
-    private logger: Logger;
     private url: string;
 
+    public logger: Logger;
     public streamers: StreamersManager;
 
     constructor(private client: ArikenCompany) {
@@ -18,7 +18,7 @@ export class Database {
 
         this.connection.once('open', () => this.onOpen());
 
-        this.streamers = new StreamersManager(this.client);
+        this.streamers = new StreamersManager(this.client, this);
     }
 
     public async connect() {

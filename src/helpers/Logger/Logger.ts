@@ -52,7 +52,9 @@ export const LogMessages = {
     startedApi: (port: number) => `Started ArikenCompany api. listening port: ${port}`,
 
     refreshedTwitchToken: `Refreshed Twitch token.`,
-    addedToken: (userId: string) => `Added user.${userId} token.`,
+    addedToken: (userId: string) => `Added twitch.user.${userId} token.`,
 
+    addedStreamer: (userId: string) => `Added streamer. twitch.user.${userId}`,
+    removedStreamer: (userId: string) => `Removed streamer. twitch.user.${userId}`,
     connectedToMongoDB: (url: string) => `Connected to ${url}.`,
 };

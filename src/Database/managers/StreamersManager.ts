@@ -1,13 +1,17 @@
 import { ArikenCompany } from '@/ArikenCompany';
 import { StreamersModel, IStreamer } from '@/Database/models/Streamers';
+import { Database } from '@/Database/Database';
 import { Optional } from '@/helpers/typings';
+import { LogMessages, Logger } from '@/helpers/Logger/Logger';
 import { UTC } from '@/helpers/date/UTC';
 
 export class StreamersManager {
     private model;
+    private logger: Logger;
 
-    constructor(private client: ArikenCompany) {
+    constructor(private client: ArikenCompany, db: Database) {
         this.model = StreamersModel;
+        this.logger = db.logger.createChild('Streamers');
     }
 
     async getStreamerById(id: string): Promise<IStreamer | null> {
@@ -33,10 +37,13 @@ export class StreamersManager {
 
         const d = new this.model(newData);
         await d.save();
+        this.logger.info(LogMessages.addedStreamer(d.id));
         return newData;
     }
 
     async removeStreamer(id: string): Promise<IStreamer | null> {
-        return await this.model.findOneAndDelete({ id }).exec();
+        const result = await this.model.findOneAndDelete({ id }).exec();
+        if (result) this.logger.info(LogMessages.removedStreamer(result.id));
+        return result;
     }
 }
