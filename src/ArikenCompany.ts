@@ -5,6 +5,7 @@ import { SettingsJson } from '@/helpers/DataManager/SettingsJson';
 import { makeError, ErrorMessages } from '@/helpers/errors/ArikenCompanyError';
 import { Logger } from '@/helpers/Logger/Logger';
 import { TwitchAuth } from '@/helpers/Twitch/TwitchAuth';
+import { TwitchApi } from '@/helpers/Twitch/TwitchApi';
 
 export class ArikenCompany {
     public apiSSL: ApiSSLManager = new ApiSSLManager();
@@ -13,14 +14,11 @@ export class ArikenCompany {
     public dotenv: DotEnv = new DotEnv();
 
     public api: ArikenCompanyApi = new ArikenCompanyApi(this);
-    public twitchAuth: TwitchAuth | null;
+    public twitchApi: TwitchApi | null = null;
 
     private ready: boolean = false;
-    constructor() {
-        this.twitchAuth = null;
-    }
 
-    isReady(): this is this & { twitchAuth: TwitchAuth } {
+    isReady(): this is this & { twitchApi: TwitchApi } {
         return this.ready;
     }
 
@@ -30,7 +28,8 @@ export class ArikenCompany {
     }
 
     public async setup() {
-        this.twitchAuth = await TwitchAuth.build(this);
+        const auth = await TwitchAuth.build(this);
+        this.twitchApi = new TwitchApi(auth);
         this.ready = true;
     }
 }
