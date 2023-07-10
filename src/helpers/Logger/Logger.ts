@@ -1,4 +1,4 @@
-import { JST } from '@/helpers/Date/index';
+import { JST } from '@/helpers/date/index';
 
 export class Logger {
     public parent: Logger | null;
