@@ -1,4 +1,5 @@
 import { ArikenCompanyApi } from '@/api/ArikenCompanyApi';
+import { ArikenCompanyChat } from '@/chat/ArikenCompanyChat';
 import { Database } from '@/Database';
 import { DotEnv } from '@/helpers/DataManager/DotEnv';
 import { ApiSSLManager } from '@/helpers/DataManager/ApiSSLManager';
@@ -17,22 +18,25 @@ export class ArikenCompany {
     public api: ArikenCompanyApi = new ArikenCompanyApi(this);
     public db: Database = new Database(this);
     public twitchApi: TwitchApi | null = null;
+    public chat: ArikenCompanyChat | null = null;
 
     private ready: boolean = false;
 
-    isReady(): this is this & { twitchApi: TwitchApi } {
+    isReady(): this is this & { twitchApi: TwitchApi; chat: ArikenCompanyChat } {
         return this.ready;
     }
 
-    public start() {
+    public async start() {
         if (!this.isReady()) throw makeError(ErrorMessages.CantStartArikenCompany);
         this.api.listen();
+        await this.chat.start();
     }
 
     public async setup() {
+        this.ready = true;
         const auth = await TwitchAuth.build(this);
         this.twitchApi = new TwitchApi(auth);
+        this.chat = new ArikenCompanyChat(this);
         await this.db.connect();
-        this.ready = true;
     }
 }

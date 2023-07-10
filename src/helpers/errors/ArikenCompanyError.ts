@@ -8,6 +8,7 @@ class ArikenCompanyError extends Error {
 
 export const ErrorMessages = {
     CantStartArikenCompany: 'Can not start ArikenCompany. Call start() after calling setup().',
+    CantSetupChat: `Can not setup chat. setup chat after calling ArikenCompany.setup().`,
     FileNotFound: (path: string) => `${path} not found.`,
     EnvNotFound: (env: string) => `${env} not found in .env file.`,
     TwitchTokenRefreshFailed: `Twitch token refresh failed.`,

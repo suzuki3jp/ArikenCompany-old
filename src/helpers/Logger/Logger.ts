@@ -54,6 +54,8 @@ export const LogMessages = {
     refreshedTwitchToken: `Refreshed Twitch token.`,
     addedToken: (userId: string) => `Added twitch.user.${userId} token.`,
 
+    startedArikenCompanyChats: `Started ArikenCompanyChat.`,
+
     addedStreamer: (userId: string) => `Added streamer. twitch.user.${userId}`,
     removedStreamer: (userId: string) => `Removed streamer. twitch.user.${userId}`,
     connectedToMongoDB: (url: string) => `Connected to ${url}.`,
