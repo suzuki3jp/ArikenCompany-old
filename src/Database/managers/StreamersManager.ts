@@ -24,17 +24,15 @@ export class StreamersManager {
         return await this.model.find({}).exec();
     }
 
-    public async addStremer(data: Optional<IStreamer, 'isStreaming' | 'created_at' | 'updated_at'>): Promise<IStreamer | null> {
+    public async addStremer(data: Optional<IStreamer, 'created_at' | 'updated_at'>): Promise<IStreamer | null> {
         const now = new UTC().toISOString();
         const { id, notificationChannelId } = data;
         const user = await this.client.twitchApi?.getUserById(id);
         if (!user) return null;
 
-        const stream = await user.getStream();
         const newData: IStreamer = {
             id,
             notificationChannelId,
-            isStreaming: Boolean(stream),
             created_at: now,
             updated_at: now,
         };
