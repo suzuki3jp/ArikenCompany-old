@@ -42,4 +42,8 @@ export class BaseDate {
     toString(): string {
         return this.format('YYYY/MM/DD HH:mm:ss');
     }
+
+    toISOString(): string {
+        return this.toISOString();
+    }
 }
