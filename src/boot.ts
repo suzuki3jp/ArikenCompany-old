@@ -1,4 +1,11 @@
 import 'module-alias/register';
 
 import { ArikenCompany } from '@/ArikenCompany';
-new ArikenCompany().start();
+
+const boot = async () => {
+    const client = new ArikenCompany();
+    await client.setup();
+    client.start();
+};
+
+boot();

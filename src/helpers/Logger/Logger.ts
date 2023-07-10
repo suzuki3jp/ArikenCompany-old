@@ -49,6 +49,8 @@ type LogLevel = 'error' | 'system' | 'info' | 'debug';
 export const LogMessages = {
     startingArikenCompany: 'Starting ArikenCompany...',
     startedArikenCompany: 'Started ArikenCompany.',
-    registerdApiRoutes: 'Registerd ArikenCompany api routes.',
     startedApi: (port: number) => `Started ArikenCompany api. listening port: ${port}`,
+
+    refreshedTwitchToken: `Refreshed Twitch token.`,
+    addedToken: (userId: string) => `Added user.${userId} token.`,
 };
