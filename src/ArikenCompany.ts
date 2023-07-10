@@ -1,4 +1,5 @@
 import { ArikenCompanyApi } from '@/api/ArikenCompanyApi';
+import { Database } from '@/Database';
 import { DotEnv } from '@/helpers/DataManager/DotEnv';
 import { ApiSSLManager } from '@/helpers/DataManager/ApiSSLManager';
 import { SettingsJson } from '@/helpers/DataManager/SettingsJson';
@@ -14,6 +15,7 @@ export class ArikenCompany {
     public dotenv: DotEnv = new DotEnv();
 
     public api: ArikenCompanyApi = new ArikenCompanyApi(this);
+    public db: Database = new Database(this);
     public twitchApi: TwitchApi | null = null;
 
     private ready: boolean = false;
@@ -30,6 +32,7 @@ export class ArikenCompany {
     public async setup() {
         const auth = await TwitchAuth.build(this);
         this.twitchApi = new TwitchApi(auth);
+        await this.db.connect();
         this.ready = true;
     }
 }

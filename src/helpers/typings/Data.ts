@@ -3,6 +3,7 @@ export interface SettingsJson {
         isSecure: boolean;
         port: number;
     };
+    mongoUrl: string;
 }
 
 export interface DotEnv {

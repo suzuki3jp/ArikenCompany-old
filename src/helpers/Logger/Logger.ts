@@ -53,4 +53,6 @@ export const LogMessages = {
 
     refreshedTwitchToken: `Refreshed Twitch token.`,
     addedToken: (userId: string) => `Added user.${userId} token.`,
+
+    connectedToMongoDB: (url: string) => `Connected to ${url}.`,
 };

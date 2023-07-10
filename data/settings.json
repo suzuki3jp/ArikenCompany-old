@@ -2,5 +2,6 @@
     "api": {
         "isSecure": false,
         "port": 443
-    }
+    },
+    "mongoUrl": "mongodb://mongo:27017/test"
 }
