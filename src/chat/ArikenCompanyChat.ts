@@ -1,4 +1,4 @@
-import { Client as Discord } from 'discord.js';
+import { Client as Discord, FetchChannelOptions } from 'discord.js';
 import { ChatClient as Twitch } from '@twurple/chat';
 
 import { ArikenCompany } from '@/ArikenCompany';
@@ -26,5 +26,9 @@ export class ArikenCompanyChat {
         await this.twitch.connect();
         this.logger.info(LogMessages.startedArikenCompanyChats);
         return;
+    }
+
+    public async fetchDiscordChannel(id: string, options?: FetchChannelOptions) {
+        return await this.discord.channels.fetch(id, options);
     }
 }

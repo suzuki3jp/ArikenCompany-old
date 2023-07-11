@@ -54,6 +54,11 @@ export const LogMessages = {
     refreshedTwitchToken: `Refreshed Twitch token.`,
     addedToken: (userId: string) => `Added twitch.user.${userId} token.`,
 
+    subscribedStreamEvents: (userId: string) => `Subscribed stream online/offline event. twitch.user.${userId}`,
+    streamerOnline: (userId: string) => `Streamer is online. twitch.user${userId}`,
+    streamerOffline: (userId: string) => `Streamer is offline. twitch.user${userId}`,
+    notificationChannelIsntTextBased: (channelId: string) => `Stream online notification channel is not text based. discord.channel.${channelId}`,
+
     startedArikenCompanyChats: `Started ArikenCompanyChat.`,
 
     addedStreamer: (userId: string) => `Added streamer. twitch.user.${userId}`,

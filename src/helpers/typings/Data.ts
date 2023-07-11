@@ -15,6 +15,7 @@ export interface DotEnv {
     TWITCH_CLIENTSECRET: string;
     TWITCH_TOKEN: string;
     TWITCH_REFRESHTOKEN: string;
+    EVENTSUB_SECRET: string;
 }
 
 export type JsonTypes = SettingsJson;

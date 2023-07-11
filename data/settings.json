@@ -3,5 +3,6 @@
         "isSecure": false,
         "port": 443
     },
-    "mongoUrl": "mongodb://mongo:27017/test"
+    "twitch": { "channels": ["pre_ariken_company"] },
+    "mongoUrl": "mongodb://mongo:27017/ArikenCompany"
 }
