@@ -12,6 +12,8 @@ export const ErrorMessages = {
     FileNotFound: (path: string) => `${path} not found.`,
     EnvNotFound: (env: string) => `${env} not found in .env file.`,
     TwitchTokenRefreshFailed: `Twitch token refresh failed.`,
+    InvalidSlashCommandData: (path: string) => `Invalid slash command data. ${path}`,
+    InvalidDiscordEventListener: (path: string) => `Invalid discord event listener. ${path}`,
 };
 
 export const makeError = (...messages: string[]): ArikenCompanyError => {

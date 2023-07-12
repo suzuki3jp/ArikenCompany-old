@@ -64,4 +64,10 @@ export const LogMessages = {
     addedStreamer: (userId: string) => `Added streamer. twitch.user.${userId}`,
     removedStreamer: (userId: string) => `Removed streamer. twitch.user.${userId}`,
     connectedToMongoDB: (url: string) => `Connected to ${url}.`,
+
+    loadedSlashCommand: (name?: string) => (name ? `Loaded slash command. [/${name}]` : `Loaded slash commands.`),
+    loadedDiscordEvent: (name?: string) => (name ? `Loaded discord event. [${name}]` : `Loaded discord events.`),
+    notFoundSlashCommand: (name: string) => `Slash command data not found. ${name}`,
+
+    readyDiscordClient: (name: string) => `Discord client is ready. Logged in as ${name}.`,
 };

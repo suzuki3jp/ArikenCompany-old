@@ -9,4 +9,6 @@ export class FilePaths {
         key: '/etc/letsencrypt/live/api.suzuki3jp.xyz/privkey.pem',
         cert: '/etc/letsencrypt/live/api.suzuki3jp.xyz/fullchain.pem',
     };
+    public static readonly slashCommandsDir: string = resolvePath('../chat/SlashCommands');
+    public static readonly discordEventsDir: string = resolvePath('../chat/services/discord');
 }

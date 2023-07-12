@@ -6,6 +6,9 @@ export interface SettingsJson {
     twitch: {
         channels: string[];
     };
+    discord: {
+        guildId: string;
+    };
     mongoUrl: string;
 }
 

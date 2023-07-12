@@ -4,5 +4,8 @@
         "port": 443
     },
     "twitch": { "channels": ["pre_ariken_company"] },
+    "discord": {
+        "guildId": "927440256633028649"
+    },
     "mongoUrl": "mongodb://mongo:27017/ArikenCompany"
 }
